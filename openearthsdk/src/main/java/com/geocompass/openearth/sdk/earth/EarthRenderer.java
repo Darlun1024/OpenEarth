@@ -1,4 +1,4 @@
-package com.geocompass.openearth.earth;
+package com.geocompass.openearth.sdk.earth;
 
 import android.opengl.GLSurfaceView;
 
