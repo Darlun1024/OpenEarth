@@ -18,6 +18,7 @@ add_library( # Sets the name of the library.
 
              # Provides a relative path to your source file(s).
              src/main/cpp/native_earth_view.cpp
+             src/main/cpp/earth/sphere.cpp
              src/main/cpp/earth/earth_renderer.cpp
              src/main/cpp/main.cpp
              src/main/cpp/jni.cpp
@@ -41,8 +42,8 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
                        lib-earth
-                       EGL
-                       GLESv2
+                       EGL    #必须要添加这两行，否则会报link错误，找不到glXXXX方法
+                       GLESv2 #
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib}
