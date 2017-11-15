@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "native_earth_view.hpp"
+#include "earth/earth_renderer.hpp"
 
 
 //LoadLibrary后，首先调用该方法
@@ -19,6 +20,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     assert(env != NULL);
 
     OpenEarth::NativeEarthView::registerNative(env);
+    OpenEarth::EarthRenderer::registerNative(env);
 
     result = JNI_VERSION_1_6;
     return result;

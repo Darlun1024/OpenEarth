@@ -5,7 +5,7 @@
 #include "native_earth_view.hpp"
 
 //Java 类名
-static const char* const kClassName="com/geocompass/openearth/sdk/earth/NativeEarthView";
+static const char* const JavaClassName="com/geocompass/openearth/sdk/earth/NativeEarthView";
 
 
 OpenEarth::NativeEarthView::NativeEarthView(){
@@ -50,7 +50,7 @@ static int registerNativeMethods(JNIEnv* env
 }
 
 void OpenEarth::NativeEarthView::registerNative(JNIEnv *env){
-    registerNativeMethods(env,kClassName,gMethods, sizeof(gMethods)/ sizeof(gMethods[0]));
+    registerNativeMethods(env,JavaClassName,gMethods, sizeof(gMethods)/ sizeof(gMethods[0]));
 }
 
 
