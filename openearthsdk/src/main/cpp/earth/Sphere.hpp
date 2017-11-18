@@ -9,11 +9,13 @@
 namespace OpenEarth {
     class Sphere {
     public:
-         OpenEarth::Sphere::Sphere(float radius);
-         OpenEarth::Sphere::~Sphere(float radius);
+         Sphere(float radius);
+         ~Sphere();
 
          void draw();
 
+    private:
+        void generateVertexArray();
     };
 
 

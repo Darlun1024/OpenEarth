@@ -1,8 +1,9 @@
 #include "earth_renderer.hpp"
-
+#include "sphere.hpp"
+#include <memory>
 namespace OpenEarth {
     static const char *const JavaClassName = "com/geocompass/openearth/sdk/earth/EarthRenderer";
-
+    std::unique_ptr<OpenEarth::Sphere> sphere;
     GLuint d_glprogram;
     //构造和析构函数
     OpenEarth::EarthRenderer::EarthRenderer() {
@@ -10,11 +11,14 @@ namespace OpenEarth {
     }
 
     OpenEarth::EarthRenderer::~EarthRenderer() {
-
+        if(sphere)
+            sphere.reset();
     }
 
 
     void surfaceCreated(JNIEnv *env, jobject instance) {
+        sphere = std::make_unique<OpenEarth::Sphere>(10.0f);
+
         GLuint glProgram;
         GLuint vertexShader;
         GLuint fragmentShader;
