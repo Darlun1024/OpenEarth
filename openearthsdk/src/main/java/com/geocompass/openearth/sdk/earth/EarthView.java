@@ -3,7 +3,6 @@ package com.geocompass.openearth.sdk.earth;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
-import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -41,14 +40,7 @@ public class EarthView extends FrameLayout {
     }
 
     private void initSurfaceView() {
-        if(isSupportES2()){
-            mSurfaceView.setEGLContextClientVersion(2);
-        }
-        //支持透明
-        mSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-        mEarthRenderer = new EarthRenderer();
-        mSurfaceView.setRenderer(mEarthRenderer);
-        mSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        mEarthRenderer = new EarthRenderer(mSurfaceView);
     }
 
     /**
@@ -69,6 +61,9 @@ public class EarthView extends FrameLayout {
                         || Build.MODEL.contains("Android SDK built for x86")));
         return supportsEs2;
     }
+
+
+
 
 
 }

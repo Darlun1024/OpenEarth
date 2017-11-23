@@ -13,11 +13,12 @@ namespace OpenEarth {
          ~Sphere();
 
          void draw();
+        GLfloat* getVertexArray();
+        int getVertextSize();
 
     private:
         void generateVertexArray();
     };
-
 
 }
 #endif //OPENEARTH_SPHERE_HPP

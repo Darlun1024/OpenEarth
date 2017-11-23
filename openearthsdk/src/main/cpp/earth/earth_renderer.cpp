@@ -1,30 +1,37 @@
 #include "earth_renderer.hpp"
 #include "sphere.hpp"
 #include <memory>
+#include <GLES3/gl3.h>
+
+
 namespace OpenEarth {
     static const char *const JavaClassName = "com/geocompass/openearth/sdk/earth/EarthRenderer";
     std::unique_ptr<OpenEarth::Sphere> sphere;
     GLuint d_glprogram;
+    GLfloat gModelMatrix[16] = {0.0f};
+    GLfloat gViewMatrix[16] = {0.0f};
+    GLfloat gProjectMatrix[16] = {0.0f};
+    GLfloat gMVPMatrix[16] = {0.0f};
+
     //构造和析构函数
     OpenEarth::EarthRenderer::EarthRenderer() {
 
     }
 
     OpenEarth::EarthRenderer::~EarthRenderer() {
-        if(sphere)
+        if (sphere)
             sphere.reset();
     }
 
 
     void surfaceCreated(JNIEnv *env, jobject instance) {
-        sphere = std::make_unique<OpenEarth::Sphere>(10.0f);
-
+        sphere = std::make_unique<OpenEarth::Sphere>(1.0f);
         GLuint glProgram;
         GLuint vertexShader;
         GLuint fragmentShader;
-
         //shader code
         const char *shader_vertex = "uniform mediump mat4 MODELVIEWPROJECTIONMATRIX;\n"
+                "uniform mat4 u_MVPMatrix; \n"
                 "attribute vec4 POSITION;\n"
                 "void main(){\n"
                 "  gl_Position = POSITION;\n"
@@ -36,50 +43,62 @@ namespace OpenEarth {
         glProgram = glCreateProgram();
 
 
-        if(glProgram == 0){
-//        return ;
+        if (glProgram == 0) {
+            return;
         }
 
         d_glprogram = glProgram;
 
 //    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        glClearColor ( 1.0f, 1.0f, 1.0f, 0.0f );
+        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
         //vertexShader
         vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader,1,&shader_vertex,NULL);
+        glShaderSource(vertexShader, 1, &shader_vertex, NULL);
 
         //fragmentShader
         fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader,1,&shader_fragment,NULL);
+        glShaderSource(fragmentShader, 1, &shader_fragment, NULL);
         glCompileShader(vertexShader);
         glCompileShader(fragmentShader);
 
-        glAttachShader(glProgram,vertexShader);
-        glAttachShader(glProgram,fragmentShader);
+        glAttachShader(glProgram, vertexShader);
+        glAttachShader(glProgram, fragmentShader);
 
         glLinkProgram(glProgram);
     }
 
     void surfaceChanged(JNIEnv *env, jobject instance, jint width, jint height) {
+        GLfloat aspect = width / height;
+        glViewport(0, 0, width, height);
+        const GLfloat ratio = (GLfloat) width / height;
+        const GLfloat left = -ratio;
+        const GLfloat right = ratio;
+        const GLfloat bottom = -1.0f;
+        const GLfloat top = 1.0f;
+        const GLfloat near = 1.0f;
+        const GLfloat far = 10.0f;
 
+//        glm::frustum(left, right, bottom, top, near, far);
     }
 
     void render(JNIEnv *env, jobject instance) {
 
-        glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         //vertex array
-        GLfloat vertexs[] = {
-                0.0f, 1.0f, 0.0f,
-                -1.0f, -1.0f, 0.0f,
-                1.0f, -1.0f, 0.0f
-        };
+//        GLfloat vertexs[] = {
+//                0.0f, 1.0f, 0.0f,
+//                -1.0f, -1.0f, 0.0f,
+//                1.0f, -1.0f, 0.0f
+//        };
 
         glUseProgram(d_glprogram);
-        glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,vertexs);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, sphere->getVertexArray());
         glEnableVertexAttribArray(0);
-
-        glDrawArrays(GL_TRIANGLES,0,3);
+        int projectLocation = glGetUniformLocation(d_glprogram, "u_MVPMatrix");
+        glUniformMatrix4fv(projectLocation, 1, GL_FALSE, gMVPMatrix);
+        int size = sphere->getVertextSize();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, size);
     }
 
 

@@ -6,7 +6,6 @@
 #define OPENEARTH_EARTH_RENDERER_HPP
 
 #include <jni.h>
-#include <GLES2/gl2.h>
 namespace OpenEarth {
     class EarthRenderer {
 
@@ -17,7 +16,6 @@ namespace OpenEarth {
         EarthRenderer();
 
         ~EarthRenderer();
-
     };
 }
 
