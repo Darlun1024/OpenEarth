@@ -2,17 +2,17 @@
 #include "sphere.hpp"
 #include <memory>
 #include <GLES3/gl3.h>
+#include <glm/ext.hpp>
 
 
 namespace OpenEarth {
     static const char *const JavaClassName = "com/geocompass/openearth/sdk/earth/EarthRenderer";
     std::unique_ptr<OpenEarth::Sphere> sphere;
     GLuint d_glprogram;
-    GLfloat gModelMatrix[16] = {0.0f};
-    GLfloat gViewMatrix[16] = {0.0f};
-    GLfloat gProjectMatrix[16] = {0.0f};
-    GLfloat gMVPMatrix[16] = {0.0f};
-
+    glm::mat4x4 mModelMatrix;
+    glm::mat4x4 mViewMatrix;
+    glm::mat4x4 mProjectionMaxrix;
+    glm::mat4x4 mMvpMatrix;
     //构造和析构函数
     OpenEarth::EarthRenderer::EarthRenderer() {
 
@@ -34,7 +34,7 @@ namespace OpenEarth {
                 "uniform mat4 u_MVPMatrix; \n"
                 "attribute vec4 POSITION;\n"
                 "void main(){\n"
-                "  gl_Position = POSITION;\n"
+                "  gl_Position = u_MVPMatrix*POSITION;\n"
                 "}";
         const char *shader_fragment = "precision mediump float;\n"
                 "void main(){\n"
@@ -69,17 +69,25 @@ namespace OpenEarth {
     }
 
     void surfaceChanged(JNIEnv *env, jobject instance, jint width, jint height) {
-        GLfloat aspect = width / height;
+        mModelMatrix = glm::mat4(1.0f);
+        mViewMatrix  = glm::lookAt(
+                glm::vec3(1.0f,1.0f,1.0f), // Camera is at (4,3,3), in World Space
+                glm::vec3(0.0f,0.0f,0.0f), // and looks at the origin
+                glm::vec3(0.0f,1.0f,0.0f) // Head is up (set to 0,-1,0 to look upside-down)
+        );
+
+
         glViewport(0, 0, width, height);
         const GLfloat ratio = (GLfloat) width / height;
-        const GLfloat left = -ratio;
-        const GLfloat right = ratio;
-        const GLfloat bottom = -1.0f;
-        const GLfloat top = 1.0f;
+        const GLfloat left   = width < height ? -1.0f:-1.0f/ratio;
+        const GLfloat right  = width < height ? 1.0f:1.0f/ratio;
+        const GLfloat bottom = width < height? -1.0f/ratio : -1.0f;
+        const GLfloat top    = width < height? 1.0f/ratio : 1.0f;
         const GLfloat near = 1.0f;
         const GLfloat far = 10.0f;
 
-//        glm::frustum(left, right, bottom, top, near, far);
+        mProjectionMaxrix  =  glm::ortho (left, right, bottom, top, near, far);
+        mMvpMatrix = mProjectionMaxrix * mViewMatrix * mModelMatrix;
     }
 
     void render(JNIEnv *env, jobject instance) {
@@ -96,7 +104,7 @@ namespace OpenEarth {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, sphere->getVertexArray());
         glEnableVertexAttribArray(0);
         int projectLocation = glGetUniformLocation(d_glprogram, "u_MVPMatrix");
-        glUniformMatrix4fv(projectLocation, 1, GL_FALSE, gMVPMatrix);
+        glUniformMatrix4fv(projectLocation, 1, GL_FALSE, glm::value_ptr(mMvpMatrix));
         int size = sphere->getVertextSize();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, size);
     }

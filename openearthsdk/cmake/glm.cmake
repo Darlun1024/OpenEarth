@@ -1,6 +1,6 @@
 add_library(
 	glm 
-	STATIC
+	SHARED
     # File source
     src/main/cpp/glm/vec2.hpp
     src/main/cpp/glm/vec3.hpp
@@ -18,4 +18,8 @@ add_library(
     src/main/cpp/glm/gtc/matrix_transform.hpp
     src/main/cpp/glm/gtc/matrix_inverse.hpp
 )
+
+
+
+
 SET_TARGET_PROPERTIES(glm PROPERTIES LINKER_LANGUAGE CXX)
