@@ -1,5 +1,6 @@
 package com.geocompass.openearth.sdk.earth;
 
+import android.content.res.AssetManager;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 
@@ -44,6 +45,12 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     @Override
     public void onDrawFrame(GL10 gl) {
         nativeRender();
+    }
+
+    public AssetManager getAssetManager(){
+
+        AssetManager manager = glSurfaceView.getContext().getAssets();
+        return manager;
     }
 
     private native void  nativeSurfaceCreated();

@@ -3,7 +3,9 @@
 #include <memory>
 #include <GLES3/gl3.h>
 #include <glm/ext.hpp>
-
+#include <android>
+#include <android/asset_manager_jni.h>
+#include <android/asset_manager.h>
 
 namespace OpenEarth {
     static const char *const JavaClassName = "com/geocompass/openearth/sdk/earth/EarthRenderer";
@@ -13,6 +15,9 @@ namespace OpenEarth {
     glm::mat4x4 mViewMatrix;
     glm::mat4x4 mProjectionMaxrix;
     glm::mat4x4 mMvpMatrix;
+
+    JNIEnv* mEnv;
+    jobject  mJavaObject; //java 的EarthRenderer类对象
     //构造和析构函数
     OpenEarth::EarthRenderer::EarthRenderer() {
 
@@ -25,6 +30,8 @@ namespace OpenEarth {
 
 
     void surfaceCreated(JNIEnv *env, jobject instance) {
+        mEnv  = env;
+        mJavaObject = instance;
         sphere = std::make_unique<OpenEarth::Sphere>(1.0f);
         GLuint glProgram;
         GLuint vertexShader;
@@ -79,8 +86,8 @@ namespace OpenEarth {
 
         glViewport(0, 0, width, height);
         const GLfloat ratio = (GLfloat) width / height;
-        const GLfloat left   = width < height ? -1.0f:-1.0f/ratio;
-        const GLfloat right  = width < height ? 1.0f:1.0f/ratio;
+        const GLfloat left   = width < height ? -1.0f:-1.0f*ratio;
+        const GLfloat right  = width < height ? 1.0f:1.0f*ratio;
         const GLfloat bottom = width < height? -1.0f/ratio : -1.0f;
         const GLfloat top    = width < height? 1.0f/ratio : 1.0f;
         const GLfloat near = 1.0f;
@@ -93,12 +100,6 @@ namespace OpenEarth {
     void render(JNIEnv *env, jobject instance) {
 
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        //vertex array
-//        GLfloat vertexs[] = {
-//                0.0f, 1.0f, 0.0f,
-//                -1.0f, -1.0f, 0.0f,
-//                1.0f, -1.0f, 0.0f
-//        };
 
         glUseProgram(d_glprogram);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, sphere->getVertexArray());
@@ -109,9 +110,39 @@ namespace OpenEarth {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, size);
     }
 
+    void setLight(){
+        GLfloat ambientLight[]={0.2f,0.2f,0.2f,1.0f};//白色主光源环境光
+        GLfloat diffuseLight[]={0.8f,0.8f,0.8f,1.0f};//白色主光源漫反射
+        GLfloat specularLight[]={1.0f,1.0f,1.0f,1.0f};//白色主光源镜面光
+        GLfloat lightPos[]={50.0f,120.0f,120.0f,1.0f};  //光源位置
+        GLfloat spotLightPos[]={0.0f,0.0f,200.0f,1.0f}; //射灯位置
+        GLfloat spotDir[]={0.0f,0.0f,-1.0f};            //射灯方向
 
-// {"getStringFromJNI", "()Ljava/lang/String;", (jstring*)getString}
-//三个参数分别为 Java中的方法名，参数和返回类型，C++中的函数名
+        GLfloat redLight[]={1.0f,0.0f,0.0f,1.0f};       //红色光源
+        GLfloat greenLight[]={0.0f,1.0f,0.0f,1.0f};     //绿色光源
+        GLfloat blueLight[]={0.0f,0.0f,1.0f,1.0f};      //蓝色光源
+
+
+//        glEnable(GL_LIGHTING);                          //启用光照
+//        glLightfv(GL_LIGHT0,GL_AMBIENT,ambientLight);   //设置环境光源
+//        glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuseLight);   //设置漫反射光源
+//        glLightfv(GL_LIGHT0,GL_SPECULAR,specularLight); //设置镜面光源
+//        glLightfv(GL_LIGHT0,GL_POSITION,lightPos);      //设置灯光位置
+//        glEnable(GL_LIGHT0);                            //打开白色主光源
+
+    }
+
+
+
+    void loadTexture(){
+//        jmethodID methodID =  mEnv->GetMethodID(mJavaObject, "getAssetManager","()Landroid/content/res/AssetManager;");
+//        AAssetManager* mgr = AAssetManager_fromJava(mEnv,methodID);
+//        const char *eastImg = "east.jpeg";
+//        const char *westImg = "west.jpeg";
+//        AAsset* asset = AAssetManager_open(mgr, eastImg,AASSET_MODE_UNKNOWN);
+    }
+
+
     static JNINativeMethod gMethods[] = {
             {"nativeSurfaceCreated", "()V",   (void *) surfaceCreated},
             {"nativeSurfaceChanged", "(II)V", (void *) surfaceChanged},
