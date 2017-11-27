@@ -22,8 +22,10 @@ add_library( # Sets the name of the library.
              src/main/cpp/earth/earth_renderer.cpp
              src/main/cpp/main.cpp
              src/main/cpp/jni.cpp
+             src/main/cpp/util.cpp
+             src/main/cpp/logging.hpp
              )
-
+INCLUDE_DIRECTORIES (src/main/cpp/)
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -44,6 +46,8 @@ target_link_libraries( # Specifies the target library.
                        lib-earth
                        EGL    #必须要添加这两行，否则会报link错误，找不到glXXXX方法
                        GLESv2 #
+                       GLESv3 #
+                       android
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib}
