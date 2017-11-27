@@ -31,7 +31,9 @@ namespace OpenEarth {
     }
 
 
-
+/**
+ * 加载图片
+ */
     void loadTexture(){
         //获取类
         jclass objectClass  =  mEnv->GetObjectClass(mJavaObject);
@@ -44,8 +46,16 @@ namespace OpenEarth {
         const char *westImg = "west.jpeg";
 
         AAsset* asset = AAssetManager_open(mgr, eastImg,AASSET_MODE_UNKNOWN);
+        AAsset* asset1 = AAssetManager_open(mgr, westImg,AASSET_MODE_UNKNOWN);
         off_t length  = AAsset_getLength(asset);
-//         LOGE(TAG,"east size %d",length);
+        GLuint textureId[] = {0};
+        GLuint textureId1[] = {0};
+        glGenTextures(1,textureId);
+        glGenTextures(1,textureId1);
+        glBindTexture(GL_TEXTURE0,textureId[0]);
+        glBindTexture(GL_TEXTURE1,textureId1[0]);
+
+         LOGE(TAG,"east size %d",length);
     }
 
     void surfaceCreated(JNIEnv *env, jobject instance) {
@@ -93,6 +103,8 @@ namespace OpenEarth {
 
         glLinkProgram(glProgram);
 
+        glEnable(GL_TEXTURE0);
+        glEnable(GL_TEXTURE1);
         loadTexture();
     }
 

@@ -26,7 +26,7 @@ OpenEarth::Sphere::~Sphere(){
 }
 
 float dtor(float d){
-    return M_PIl*d/180;
+    return M_PI*d/180;
 }
 
 //生成顶点

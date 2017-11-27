@@ -2,6 +2,7 @@
 // Created by GXSN-Pro on 2017/11/14.
 //
 
+#include <cstddef>
 #include "native_earth_view.hpp"
 
 //Java 类名
@@ -40,6 +41,7 @@ static int registerNativeMethods(JNIEnv* env
         , JNINativeMethod* gMethods, int numMethods) {
     jclass clazz;
     clazz = env->FindClass(className);
+
     if (clazz == NULL) {
         return JNI_FALSE;
     }
