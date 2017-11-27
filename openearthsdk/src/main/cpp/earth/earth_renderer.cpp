@@ -3,12 +3,14 @@
 #include <memory>
 #include <GLES3/gl3.h>
 #include <glm/ext.hpp>
-#include <android>
 #include <android/asset_manager_jni.h>
 #include <android/asset_manager.h>
+#include "../logging.hpp"
+#include <android/log.h>
 
 namespace OpenEarth {
     static const char *const JavaClassName = "com/geocompass/openearth/sdk/earth/EarthRenderer";
+    static const char *const TAG = "earth_renderer_cpp";
     std::unique_ptr<OpenEarth::Sphere> sphere;
     GLuint d_glprogram;
     glm::mat4x4 mModelMatrix;
@@ -28,6 +30,23 @@ namespace OpenEarth {
             sphere.reset();
     }
 
+
+
+    void loadTexture(){
+        //获取类
+        jclass objectClass  =  mEnv->GetObjectClass(mJavaObject);
+        //获取函数句柄
+        jmethodID methodID  =  mEnv->GetMethodID(objectClass , "getAssetManager","()Landroid/content/res/AssetManager;");
+        //从Java获取AssetManager
+        jobject  javaAssetManager = mEnv->CallObjectMethod(mJavaObject,methodID);
+        AAssetManager* mgr  = AAssetManager_fromJava(mEnv,javaAssetManager);
+        const char *eastImg = "east.jpeg";
+        const char *westImg = "west.jpeg";
+
+        AAsset* asset = AAssetManager_open(mgr, eastImg,AASSET_MODE_UNKNOWN);
+        off_t length  = AAsset_getLength(asset);
+//         LOGE(TAG,"east size %d",length);
+    }
 
     void surfaceCreated(JNIEnv *env, jobject instance) {
         mEnv  = env;
@@ -73,6 +92,8 @@ namespace OpenEarth {
         glAttachShader(glProgram, fragmentShader);
 
         glLinkProgram(glProgram);
+
+        loadTexture();
     }
 
     void surfaceChanged(JNIEnv *env, jobject instance, jint width, jint height) {
@@ -95,12 +116,12 @@ namespace OpenEarth {
 
         mProjectionMaxrix  =  glm::ortho (left, right, bottom, top, near, far);
         mMvpMatrix = mProjectionMaxrix * mViewMatrix * mModelMatrix;
+
+
     }
 
     void render(JNIEnv *env, jobject instance) {
-
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
         glUseProgram(d_glprogram);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, sphere->getVertexArray());
         glEnableVertexAttribArray(0);
@@ -133,14 +154,6 @@ namespace OpenEarth {
     }
 
 
-
-    void loadTexture(){
-//        jmethodID methodID =  mEnv->GetMethodID(mJavaObject, "getAssetManager","()Landroid/content/res/AssetManager;");
-//        AAssetManager* mgr = AAssetManager_fromJava(mEnv,methodID);
-//        const char *eastImg = "east.jpeg";
-//        const char *westImg = "west.jpeg";
-//        AAsset* asset = AAssetManager_open(mgr, eastImg,AASSET_MODE_UNKNOWN);
-    }
 
 
     static JNINativeMethod gMethods[] = {

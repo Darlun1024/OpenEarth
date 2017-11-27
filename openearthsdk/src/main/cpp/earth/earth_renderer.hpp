@@ -16,6 +16,8 @@ namespace OpenEarth {
         EarthRenderer();
 
         ~EarthRenderer();
+
+    private:
     };
 }
 

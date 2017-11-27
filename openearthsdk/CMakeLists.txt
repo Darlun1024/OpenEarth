@@ -47,6 +47,7 @@ target_link_libraries( # Specifies the target library.
                        EGL    #必须要添加这两行，否则会报link错误，找不到glXXXX方法
                        GLESv2 #
                        GLESv3 #
+                       android
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib}
