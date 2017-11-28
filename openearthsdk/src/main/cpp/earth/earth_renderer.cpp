@@ -2,11 +2,18 @@
 #include "sphere.hpp"
 #include <memory>
 #include <GLES3/gl3.h>
-#include <glm/ext.hpp>
+#include "../deps/glm/ext.hpp"
 #include <android/asset_manager_jni.h>
 #include <android/asset_manager.h>
 #include "../logging.hpp"
 #include <android/log.h>
+#include <android/bitmap.h>
+#include "../util/assets_file_reader.hpp"
+extern "C"{
+    #include "../util/image.h"
+}
+
+
 
 namespace OpenEarth {
     static const char *const JavaClassName = "com/geocompass/openearth/sdk/earth/EarthRenderer";
@@ -31,9 +38,12 @@ namespace OpenEarth {
     }
 
 
-/**
+
+
+    /**
  * 加载图片
  */
+    extern "C"
     void loadTexture(){
         //获取类
         jclass objectClass  =  mEnv->GetObjectClass(mJavaObject);
@@ -45,8 +55,8 @@ namespace OpenEarth {
         const char *eastImg = "east.jpeg";
         const char *westImg = "west.jpeg";
 
-        AAsset* asset = AAssetManager_open(mgr, eastImg,AASSET_MODE_UNKNOWN);
-        AAsset* asset1 = AAssetManager_open(mgr, westImg,AASSET_MODE_UNKNOWN);
+        AAsset* asset = AAssetManager_open(mgr, eastImg,AASSET_MODE_BUFFER);
+        AAsset* asset1 = AAssetManager_open(mgr, westImg,AASSET_MODE_BUFFER);
         off_t length  = AAsset_getLength(asset);
         GLuint textureId[] = {0};
         GLuint textureId1[] = {0};
@@ -55,8 +65,17 @@ namespace OpenEarth {
         glBindTexture(GL_TEXTURE0,textureId[0]);
         glBindTexture(GL_TEXTURE1,textureId1[0]);
 
-         LOGE(TAG,"east size %d",length);
+        FileData fileData = OpenEarth::util::AssetsFileReader::get_asset_data(eastImg,mgr);
+
+        RawImageData data = get_raw_image_data_from_png(fileData.data,(int)fileData.data_length);
+
+
+//        glTexImage2D()
+//        gltex
+         LOGE(TAG,"east size %ld",length);
     }
+
+
 
     void surfaceCreated(JNIEnv *env, jobject instance) {
         mEnv  = env;
@@ -128,6 +147,7 @@ namespace OpenEarth {
 
         mProjectionMaxrix  =  glm::ortho (left, right, bottom, top, near, far);
         mMvpMatrix = mProjectionMaxrix * mViewMatrix * mModelMatrix;
+
 
 
     }

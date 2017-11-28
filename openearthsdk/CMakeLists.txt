@@ -10,22 +10,49 @@ cmake_minimum_required(VERSION 3.4.1)
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+
+
 add_library( # Sets the name of the library.
              lib-earth
 
              # Sets the library as a shared library.
              SHARED
 
+                 #libpng
+              src/main/cpp/deps/libpng/png.c
+              src/main/cpp/deps/libpng/pngerror.c
+              src/main/cpp/deps/libpng/pngget.c
+              src/main/cpp/deps/libpng/pngmem.c
+              src/main/cpp/deps/libpng/pngpread.c
+              src/main/cpp/deps/libpng/pngread.c
+              src/main/cpp/deps/libpng/pngrio.c
+              src/main/cpp/deps/libpng/pngrtran.c
+              src/main/cpp/deps/libpng/pngrutil.c
+              src/main/cpp/deps/libpng/pngtrans.c
+              src/main/cpp/deps/libpng/pngset.c
+              src/main/cpp/deps/libpng/pngtrans.c
+              src/main/cpp/deps/libpng/pngwio.c
+              src/main/cpp/deps/libpng/pngwrite.c
+              src/main/cpp/deps/libpng/pngwtran.c
+              src/main/cpp/deps/libpng/pngwutil.c
+
              # Provides a relative path to your source file(s).
+              src/main/cpp/util/image.h
+              src/main/cpp/util/image.c
+              src/main/cpp/util/assets_file_reader.cpp
+              src/main/cpp/util/util.cpp
              src/main/cpp/native_earth_view.cpp
              src/main/cpp/earth/sphere.cpp
              src/main/cpp/earth/earth_renderer.cpp
              src/main/cpp/main.cpp
              src/main/cpp/jni.cpp
-             src/main/cpp/util.cpp
              src/main/cpp/logging.hpp
+
+
              )
-INCLUDE_DIRECTORIES (src/main/cpp/)
+INCLUDE_DIRECTORIES (src/main/cpp/deps/glm/
+                    src/main/cpp/deps/libpng/
+                    )
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -48,6 +75,7 @@ target_link_libraries( # Specifies the target library.
                        GLESv2 #
                        GLESv3 #
                        android
+                       z    #zlib
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib}
