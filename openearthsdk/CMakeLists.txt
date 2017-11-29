@@ -37,12 +37,12 @@ add_library( # Sets the name of the library.
               src/main/cpp/deps/libpng/pngwutil.c
 
              # Provides a relative path to your source file(s).
-              src/main/cpp/util/image.h
               src/main/cpp/util/image.c
               src/main/cpp/util/assets_file_reader.cpp
               src/main/cpp/util/util.cpp
              src/main/cpp/native_earth_view.cpp
              src/main/cpp/earth/sphere.cpp
+             src/main/cpp/earth/tile.cpp
              src/main/cpp/earth/earth_renderer.cpp
              src/main/cpp/main.cpp
              src/main/cpp/jni.cpp
