@@ -20,7 +20,8 @@ namespace OpenEarth {
     static const char *const JavaClassName = "com/geocompass/openearth/sdk/earth/EarthRenderer";
     static const char *const TAG = "earth_renderer_cpp";
     std::unique_ptr<OpenEarth::Sphere> sphere;
-    Tile *tile;
+    Tile *tile1;
+    Tile *tile2;
     GLuint d_glprogram;
     int aPostionLocaiton;
     int aTextureLocation;
@@ -43,9 +44,12 @@ namespace OpenEarth {
         if (sphere)
             sphere.reset();
 
-        if (tile) {
-            delete tile;
+        if (tile1) {
+            delete tile1;
         }
+
+        if(tile2)
+            delete tile2;
     }
 
 
@@ -54,7 +58,7 @@ namespace OpenEarth {
     /**
  * 加载图片
  */
-    void loadTexture() {
+    GLuint loadTexture(const char* name) {
         //获取类
         jclass objectClass = mEnv->GetObjectClass(mJavaObject);
         //获取函数句柄
@@ -63,17 +67,17 @@ namespace OpenEarth {
         //从Java获取AssetManager
         jobject javaAssetManager = mEnv->CallObjectMethod(mJavaObject, methodID);
         AAssetManager *mgr = AAssetManager_fromJava(mEnv, javaAssetManager);
-        const char *eastImg = "east.png";
-        const char *westImg = "west.png";
+//        const char *eastImg = "east.png";
+//        const char *westImg = "west.png";
 
-        FileData fileData = OpenEarth::util::AssetsFileReader::get_asset_data(eastImg, mgr);
+        FileData fileData = OpenEarth::util::AssetsFileReader::get_asset_data(name, mgr);
 
         RawImageData data = get_raw_image_data_from_png(fileData.data, (int) fileData.data_length);
+        GLuint textureId;
+        glGenTextures(1, &textureId);
+        assert(textureId != 0);
 
-        glGenTextures(1, &mTextureId);
-        assert(mTextureId != 0);
-
-        glBindTexture(GL_TEXTURE_2D, mTextureId);
+        glBindTexture(GL_TEXTURE_2D, textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexImage2D(
@@ -81,7 +85,7 @@ namespace OpenEarth {
                 data.gl_color_format, GL_UNSIGNED_BYTE, data.data);
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
-
+        return textureId;
     }
 
 
@@ -89,7 +93,8 @@ namespace OpenEarth {
         mEnv = env;
         mJavaObject = instance;
 //        sphere = std::make_unique<OpenEarth::Sphere>(1.0f);
-        tile = new Tile(1, 0, 1);
+        tile1 = new Tile(0, 0, 1);
+        tile2 = new Tile(1, 0, 1);
         GLuint glProgram;
         GLuint vertexShader;
         GLuint fragmentShader;
@@ -140,7 +145,7 @@ namespace OpenEarth {
             glDeleteProgram(glProgram);
         }
         d_glprogram = glProgram;
-        loadTexture();
+
     }
 
     void surfaceChanged(JNIEnv *env, jobject instance, jint width, jint height) {
@@ -180,10 +185,14 @@ namespace OpenEarth {
     }
 
     void render(JNIEnv *env, jobject instance) {
+        mEnv = env;
+        mJavaObject = instance;
+        GLuint  textureId1 =  loadTexture("west.png");
+        GLuint  textureId2 =  loadTexture("east.png");
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glUseProgram(d_glprogram);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, mTextureId);
+        glBindTexture(GL_TEXTURE_2D, textureId1);
 //        GLfloat * vertexArray = tile->getVertexArray();
 
 
@@ -200,16 +209,31 @@ namespace OpenEarth {
 //        GLuint buffer = create_vbo(sizeof(vertexArray),vertexArray,GL_STATIC_DRAW);
 //        glBindBuffer(GL_ARRAY_BUFFER, buffer);
 
-        glVertexAttribPointer(aPostionLocaiton, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GL_FLOAT), tile->getVertexArray());
+        glVertexAttribPointer(aPostionLocaiton, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GL_FLOAT), tile1->getVertexArray());
         glEnableVertexAttribArray(aPostionLocaiton);
 //        (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer)
-        glVertexAttribPointer(aTextureLocation,2,GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),tile->getTextureVertexArray());
+        glVertexAttribPointer(aTextureLocation,2,GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),tile1->getTextureVertexArray());
         glEnableVertexAttribArray(aPostionLocaiton);
         glEnableVertexAttribArray(aTextureLocation);
 
-        int size = tile->getVertexArraySize();
+        int size = tile1->getVertexArraySize();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, size);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindTexture(GL_TEXTURE_2D,0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId2);
+
+        glVertexAttribPointer(aPostionLocaiton, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GL_FLOAT), tile2->getVertexArray());
+        glEnableVertexAttribArray(aPostionLocaiton);
+//        (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer)
+        glVertexAttribPointer(aTextureLocation,2,GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),tile2->getTextureVertexArray());
+        glEnableVertexAttribArray(aPostionLocaiton);
+        glEnableVertexAttribArray(aTextureLocation);
+
+         size = tile2->getVertexArraySize();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, size);
+
+
     }
 
 

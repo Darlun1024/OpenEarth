@@ -18,7 +18,7 @@ GLfloat* OpenEarth::Tile::getTextureVertexArray(){
 }
 
 int OpenEarth::Tile::getVertexArraySize(){
-    return vertexSize;
+    return vertexSize*2;
 }
 
 OpenEarth::Tile::Tile(int x, int y, int z) {
