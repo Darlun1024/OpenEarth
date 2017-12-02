@@ -18,9 +18,14 @@ import com.geocompass.openearth.sdk.R;
  */
 
 public class EarthView extends FrameLayout {
+    static {
+        System.loadLibrary("lib-earth");
+    }
+
     private EarthRenderer mEarthRenderer;
     private GLSurfaceView mSurfaceView;
     private NativeEarthView mNativeEarthView;
+    private Earth mEarth;
 
     public EarthView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -34,13 +39,14 @@ public class EarthView extends FrameLayout {
         //初始化SurfaceView
         View view = LayoutInflater.from(getContext()).inflate(R.layout.earth_view, this);
         mSurfaceView = view.findViewById(R.id.surface_view);
-        initSurfaceView();
-
+        mEarthRenderer = new EarthRenderer(mSurfaceView);
         mNativeEarthView = new NativeEarthView(this, mEarthRenderer);
+
+        mEarth = new Earth(mEarthRenderer);
     }
 
     private void initSurfaceView() {
-        mEarthRenderer = new EarthRenderer(mSurfaceView);
+
     }
 
     /**
@@ -63,6 +69,9 @@ public class EarthView extends FrameLayout {
     }
 
 
+    public Earth getEarth(){
+        return mEarth;
+    }
 
 
 

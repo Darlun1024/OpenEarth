@@ -27,6 +27,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
         glSurfaceView.setEGLConfigChooser(new EGLConfigChooser());
         glSurfaceView.setRenderer(this);
         glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
+        nativeInitialize();
     }
 
 
@@ -41,6 +42,15 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
         nativeSurfaceChanged(width,height);
     }
 
+    /**
+     *
+     * @param axis 围绕旋转的坐标轴  0 X轴,1 Y轴 ，2 Z轴
+     * @param radian 旋转的弧度
+     */
+    public void rotateEarth(int axis,float radian){
+        nativeRotateEarth(axis,radian);
+        glSurfaceView.requestRender();
+    }
 
     @Override
     public void onDrawFrame(GL10 gl) {
@@ -48,7 +58,6 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     }
 
     public AssetManager getAssetManager(){
-
         AssetManager manager = glSurfaceView.getContext().getAssets();
         return manager;
     }
@@ -56,5 +65,8 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     private native void  nativeSurfaceCreated();
     private native void  nativeSurfaceChanged(int width,int height);
     private native void  nativeRender();
+    private native void  nativeRotateEarth(int axis,float radian);
+    private native void  nativeInitialize();
+
 
 }

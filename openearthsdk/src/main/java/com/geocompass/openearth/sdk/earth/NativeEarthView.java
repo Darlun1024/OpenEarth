@@ -8,9 +8,6 @@ import android.util.Log;
 
 public final class NativeEarthView {
 
-    static {
-        System.loadLibrary("lib-earth");
-    }
 
     private static  final  String TAG = "NativeEarthView";
     private EarthView mEarthView;
