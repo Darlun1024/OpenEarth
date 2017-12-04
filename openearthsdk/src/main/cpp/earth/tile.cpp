@@ -9,16 +9,13 @@
 #include <android/log.h>
 
 
-GLfloat* OpenEarth::Tile::getVertexArray(){
+GLfloat *OpenEarth::Tile::getVertexArray() {
     return vertexArray;
 }
 
-GLfloat* OpenEarth::Tile::getTextureVertexArray(){
-    return textureVertexArray;
-}
 
-int OpenEarth::Tile::getVertexArraySize(){
-    return vertexSize*2;
+int OpenEarth::Tile::getVertexArraySize() {
+    return vertexSize * 2;
 }
 
 OpenEarth::Tile::Tile(int x, int y, int z) {
@@ -39,13 +36,29 @@ OpenEarth::Tile::Tile(int x, int y, int z) {
 }
 
 OpenEarth::Tile::~Tile() {
-    delete  this->vertexArray;
-    delete  this->bounds;
+    delete this->vertexArray;
+    delete this->bounds;
+    delete this->stripes;
 }
 
 
-void OpenEarth::Tile::draw() {
+void OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation) {
 
+    for (int i = 0; i < rows; i++) {
+        GLfloat *vertexArray = stripes[i];
+        glVertexAttribPointer(aPostionLocaiton, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT),
+                              vertexArray);
+        glEnableVertexAttribArray(aPostionLocaiton);
+//        (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer)
+        glVertexAttribPointer(aTextureLocation, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT),
+                              vertexArray+3);
+        glEnableVertexAttribArray(aPostionLocaiton);
+        glEnableVertexAttribArray(aTextureLocation);
+
+        int pointCount = cols*2;
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, pointCount);
+
+    }
 }
 
 static float dtor(float d) {
@@ -53,29 +66,36 @@ static float dtor(float d) {
 }
 
 /**
- *
+ *用绘制球体的方法，绘制瓦片是不行的，在右边界的点会左边界的点连接起来
  */
 void OpenEarth::Tile::genVertexArray() {
     float R = OpenEarth::RADIUS;
-    float width  = bounds[2] - bounds[0];
+    float width = bounds[2] - bounds[0];
     float height = bounds[1] - bounds[3];
-    int size = (int) ((height / step) * (width / step));  //后期考虑不能整除的情况
+
+     rows = height / step;
+     cols = width / step;
+
+    int size = cols * rows;  //后期考虑不能整除的情况
+
     vertexSize = size;  //x,y,z,s,t
-    vertexArray = new GLfloat[size*2*3];
-    textureVertexArray = new GLfloat[size*2*2];
+    vertexArray = new GLfloat[size * 2 * 5];
+    stripes = new GLfloat *[rows];
     int index = 0;
-    int texIndex = 0;
     float x1, x2, y1, y2, z1, z2;
     float imgXStep = step / width;
     float imgYStep = step / height;
     float imageX;
     float imageY = 0.0f;
+    int row = 0;
     for (float lat = bounds[1]; lat > bounds[3]; lat -= step) {
         float latR1 = dtor(lat);
         float latR2 = dtor(lat - step);
         y1 = (float) (R * sin(latR1));
         y2 = (float) (R * sin(latR2));
         imageX = 0.0f;
+        GLfloat *vertexs = new GLfloat[cols * 2 * 5];
+        index = 0;
         for (float lon = bounds[0]; lon < bounds[2]; lon += step) {
             float lonR1 = dtor(lon);
             float lonR2 = dtor(lon + step);
@@ -83,20 +103,23 @@ void OpenEarth::Tile::genVertexArray() {
             z1 = (float) (R * cos(latR1) * cos(lonR1));
             x2 = (float) (R * cos(latR2) * sin(lonR2));
             z2 = (float) (R * cos(latR2) * cos(lonR2));
-            vertexArray[index++] = x1;
-            vertexArray[index++] = y1;
-            vertexArray[index++] = z1;
-            textureVertexArray[texIndex++] = imageX; //s
-            textureVertexArray[texIndex++] = imageY; //t
-            vertexArray[index++] = x2;
-            vertexArray[index++] = y2;
-            vertexArray[index++] = z2;
-            textureVertexArray[texIndex++] = imageX + imgXStep; //s
-            textureVertexArray[texIndex++] = imageY + imgYStep; //t
-            LOGE("sphere","%f,%f,%f,%f,%f",x1,y1,z1,imageX,imageY);
+            vertexs[index++] = x1;
+            vertexs[index++] = y1;
+            vertexs[index++] = z1;
+            vertexs[index++] = imageX;
+            vertexs[index++] = imageY;
+            vertexs[index++] = x2;
+            vertexs[index++] = y2;
+            vertexs[index++] = z2;
+            vertexs[index++] = imageX + imgXStep;
+            vertexs[index++] = imageY + imgYStep;
+            LOGE("sphere", "%d,%f,%f,%f,%f,%f", index, x1, y1, z1, imageX, imageY);
             imageX += imgXStep;
         }
         imageY += imgYStep;
+        stripes[row++] = vertexs;
     }
+
+
 }
 

@@ -226,32 +226,12 @@ namespace OpenEarth {
         mMvpMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(mMvpMatrix));
 
-//        GLuint buffer = create_vbo(sizeof(vertexArray),vertexArray,GL_STATIC_DRAW);
-//        glBindBuffer(GL_ARRAY_BUFFER, buffer);
-
-        glVertexAttribPointer(aPostionLocaiton, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GL_FLOAT), tile1->getVertexArray());
-        glEnableVertexAttribArray(aPostionLocaiton);
-//        (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer)
-        glVertexAttribPointer(aTextureLocation,2,GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),tile1->getTextureVertexArray());
-        glEnableVertexAttribArray(aPostionLocaiton);
-        glEnableVertexAttribArray(aTextureLocation);
-
-        int size = tile1->getVertexArraySize();
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, size);
+        tile1->draw(aPostionLocaiton,aTextureLocation);
 
         glBindTexture(GL_TEXTURE_2D,0);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureId2);
-
-        glVertexAttribPointer(aPostionLocaiton, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GL_FLOAT), tile2->getVertexArray());
-        glEnableVertexAttribArray(aPostionLocaiton);
-//        (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer)
-        glVertexAttribPointer(aTextureLocation,2,GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),tile2->getTextureVertexArray());
-        glEnableVertexAttribArray(aPostionLocaiton);
-        glEnableVertexAttribArray(aTextureLocation);
-
-        size = tile2->getVertexArraySize();
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, size);
+        tile2->draw(aPostionLocaiton,aTextureLocation);
     }
 
 

@@ -12,18 +12,18 @@ namespace OpenEarth {
     class Tile {
     public:
         int x,y,z;
+        int cols,rows;
         GLfloat* getVertexArray();
-        GLfloat* getTextureVertexArray();
         int getVertexArraySize();
         Tile(int x,int y,int z);
         ~Tile();
-        void draw();
+        void draw(GLuint aPostionLocaiton, GLuint aTextureLocation);
     private:
         double *bounds = new double[4];//left,top,right,bottom
-        float step = 1.0f;
+        float step = 3.0f;
         int vertexSize = 0;
         GLfloat *vertexArray;
-        GLfloat *textureVertexArray;
+        GLfloat **stripes;
         void genVertexArray();
 
     };
