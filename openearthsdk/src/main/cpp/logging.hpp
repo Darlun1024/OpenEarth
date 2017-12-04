@@ -5,6 +5,7 @@
 #ifndef OPENEARTH_LOGGING_HPP
 #define OPENEARTH_LOGGING_HPP
 
+#include <android/log.h>
 #define LOGD(TAG,...) __android_log_print(ANDROID_LOG_DEBUG,TAG ,__VA_ARGS__) // 定义LOGD类型
 #define LOGI(TAG,...) __android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__) // 定义LOGI类型
 #define LOGW(TAG,...) __android_log_print(ANDROID_LOG_WARN,TAG ,__VA_ARGS__) // 定义LOGW类型

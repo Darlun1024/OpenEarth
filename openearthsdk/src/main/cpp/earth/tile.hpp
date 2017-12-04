@@ -7,6 +7,7 @@
 
 #include <GLES2/gl2.h>
 #include <memory>
+#include <android/asset_manager.h>
 
 namespace OpenEarth {
     class Tile {
@@ -17,7 +18,8 @@ namespace OpenEarth {
         int getVertexArraySize();
         Tile(int x,int y,int z);
         ~Tile();
-        void draw(GLuint aPostionLocaiton, GLuint aTextureLocation);
+        void draw(GLuint aPostionLocaiton, GLuint aTextureLocation,AAssetManager *amgr,
+        const char *path);
     private:
         double *bounds = new double[4];//left,top,right,bottom
         float step = 3.0f;

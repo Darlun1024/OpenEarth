@@ -6,7 +6,6 @@
 #include <android/asset_manager_jni.h>
 #include <android/asset_manager.h>
 #include "../logging.hpp"
-#include <android/log.h>
 #include <android/bitmap.h>
 #include <gtx/extended_min_max.inl>
 #include "../util/assets_file_reader.hpp"
@@ -208,13 +207,14 @@ namespace OpenEarth {
 
     void drawEarth(){
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_ALWAYS);
         GLuint  textureId1 =  loadTexture("west.png");
         GLuint  textureId2 =  loadTexture("east.png");
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glUseProgram(d_glprogram);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureId1);
-//        GLfloat * vertexArray = tile->getVertexArray();
 
         aPostionLocaiton = glGetAttribLocation(d_glprogram, "POSITION");
         aTextureLocation = glGetAttribLocation(d_glprogram, "a_TextureCoordinates");
@@ -226,12 +226,10 @@ namespace OpenEarth {
         mMvpMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(mMvpMatrix));
 
-        tile1->draw(aPostionLocaiton,aTextureLocation);
+        tile1->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"west.png");
+        tile2->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"east.png");
 
-        glBindTexture(GL_TEXTURE_2D,0);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureId2);
-        tile2->draw(aPostionLocaiton,aTextureLocation);
+
     }
 
 

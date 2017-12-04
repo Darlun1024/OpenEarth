@@ -6,8 +6,12 @@
 #include <math.h>
 #include "constants.hpp"
 #include "../logging.hpp"
-#include <android/log.h>
-
+#include "../util/assets_file_reader.hpp"
+#include <GLES2/gl2.h>
+extern "C" {
+#include "../util/image.h"
+}
+GLuint loadTexture(AAssetManager *amgr, const char *path);
 
 GLfloat *OpenEarth::Tile::getVertexArray() {
     return vertexArray;
@@ -42,8 +46,13 @@ OpenEarth::Tile::~Tile() {
 }
 
 
-void OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation) {
-
+void
+OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation, AAssetManager *amgr,
+                      const char *path) {
+    GLuint textureId = loadTexture(amgr, path);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureId);
     for (int i = 0; i < rows; i++) {
         GLfloat *vertexArray = stripes[i];
         glVertexAttribPointer(aPostionLocaiton, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT),
@@ -51,11 +60,11 @@ void OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation) {
         glEnableVertexAttribArray(aPostionLocaiton);
 //        (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer)
         glVertexAttribPointer(aTextureLocation, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT),
-                              vertexArray+3);
+                              vertexArray + 3);
         glEnableVertexAttribArray(aPostionLocaiton);
         glEnableVertexAttribArray(aTextureLocation);
 
-        int pointCount = cols*2;
+        int pointCount = cols * 2;
         glDrawArrays(GL_TRIANGLE_STRIP, 0, pointCount);
 
     }
@@ -73,8 +82,8 @@ void OpenEarth::Tile::genVertexArray() {
     float width = bounds[2] - bounds[0];
     float height = bounds[1] - bounds[3];
 
-     rows = height / step;
-     cols = width / step;
+    rows = height / step;
+    cols = width / step;
 
     int size = cols * rows;  //后期考虑不能整除的情况
 
@@ -119,7 +128,27 @@ void OpenEarth::Tile::genVertexArray() {
         imageY += imgYStep;
         stripes[row++] = vertexs;
     }
-
-
 }
+
+    /**
+     * 加载纹理
+     */
+    GLuint loadTexture(AAssetManager *amgr, const char *path) {
+        FileData fileData = OpenEarth::util::AssetsFileReader::get_asset_data(path, amgr);
+        RawImageData data = get_raw_image_data_from_png(fileData.data,
+                                                        (int) fileData.data_length);
+        GLuint textureId;
+        glGenTextures(1, &textureId);
+        assert(textureId != 0);
+
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(
+                GL_TEXTURE_2D, 0, data.gl_color_format, data.width, data.height, 0,
+                data.gl_color_format, GL_UNSIGNED_BYTE, data.data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        return textureId;
+    }
 
