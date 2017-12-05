@@ -5,7 +5,6 @@
 #include "tile.hpp"
 #include <math.h>
 #include "constants.hpp"
-#include "../logging.hpp"
 #include "../util/assets_file_reader.hpp"
 #include <GLES2/gl2.h>
 extern "C" {
@@ -13,14 +12,6 @@ extern "C" {
 }
 GLuint loadTexture(AAssetManager *amgr, const char *path);
 
-GLfloat *OpenEarth::Tile::getVertexArray() {
-    return vertexArray;
-}
-
-
-int OpenEarth::Tile::getVertexArraySize() {
-    return vertexSize * 2;
-}
 
 OpenEarth::Tile::Tile(int x, int y, int z) {
     this->x = x;
@@ -53,8 +44,6 @@ OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation, AAssetMa
     glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureId);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     for (int i = 0; i < rows; i++) {
         GLfloat *vertexArray = stripes[i];
         glVertexAttribPointer(aPostionLocaiton, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT),
@@ -109,7 +98,7 @@ void OpenEarth::Tile::genVertexArray() {
         index = 0;
         float lon;
         for (lon = bounds[0]; lon <= bounds[2]; lon += step) {
-            if(lon==bounds[2]) lon = lon - (lon/100000000);
+//            if(lon==bounds[2]) lon = lon - (lon/100000000);
             float lonR1 = dtor(lon);
             x1 = (float) (R * cos(latR1) * sin(lonR1));
             z1 = (float) (R * cos(latR1) * cos(lonR1));
@@ -148,6 +137,8 @@ void OpenEarth::Tile::genVertexArray() {
         glBindTexture(GL_TEXTURE_2D, textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//超出图片范围，不重复
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexImage2D(
                 GL_TEXTURE_2D, 0, data.gl_color_format, data.width, data.height, 0,
                 data.gl_color_format, GL_UNSIGNED_BYTE, data.data);

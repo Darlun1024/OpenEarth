@@ -14,8 +14,6 @@ namespace OpenEarth {
     public:
         int x,y,z;
         int cols,rows;
-        GLfloat* getVertexArray();
-        int getVertexArraySize();
         Tile(int x,int y,int z);
         ~Tile();
         void draw(GLuint aPostionLocaiton, GLuint aTextureLocation,AAssetManager *amgr,
