@@ -3,8 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/OpenEarth.iml" filepath="$PROJECT_DIR$/OpenEarth.iml" />
+      <module fileurl="file://E:\gxsn\OpenEarth\OpenEarth.iml" filepath="E:\gxsn\OpenEarth\OpenEarth.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://E:\gxsn\OpenEarth\app\app.iml" filepath="E:\gxsn\OpenEarth\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/openearthsdk/openearthsdk.iml" filepath="$PROJECT_DIR$/openearthsdk/openearthsdk.iml" />
+      <module fileurl="file://E:\gxsn\OpenEarth\openearthsdk\openearthsdk.iml" filepath="E:\gxsn\OpenEarth\openearthsdk\openearthsdk.iml" />
     </modules>
   </component>
 </project>

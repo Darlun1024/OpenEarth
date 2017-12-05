@@ -8,7 +8,9 @@
     <com.geocompass.openearth.sdk.earth.EarthView
         android:id="@+id/earth_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></com.geocompass.openearth.sdk.earth.EarthView>
+        android:layout_height="match_parent">
+
+    </com.geocompass.openearth.sdk.earth.EarthView>
 
     <Button
         android:id="@+id/btn_rotate"

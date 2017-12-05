@@ -62,7 +62,7 @@ namespace OpenEarth {
         mModelMatrix = glm::mat4(1.0f);
 
         mViewMatrix  = glm::lookAt(
-                glm::vec3(1.0f, 0.0f, 2git.0f), //
+                glm::vec3(1.0f, 0.0f, 2.0f), //
                 glm::vec3(0.0f, 0.0f, 0.0f), //
                 glm::vec3(0.0f, 1.0f, 0.0f)  //
         );
