@@ -130,6 +130,7 @@ void OpenEarth::Tile::genVertexArray() {
         FileData fileData = OpenEarth::util::AssetsFileReader::get_asset_data(path, amgr);
         RawImageData data = get_raw_image_data_from_png(fileData.data,
                                                         (int) fileData.data_length);
+        OpenEarth::util::AssetsFileReader::release_asset_data(&fileData);
         GLuint textureId;
         glGenTextures(1, &textureId);
         assert(textureId != 0);
@@ -144,6 +145,7 @@ void OpenEarth::Tile::genVertexArray() {
                 data.gl_color_format, GL_UNSIGNED_BYTE, data.data);
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
+        release_raw_image_data(&data);
         return textureId;
     }
 
