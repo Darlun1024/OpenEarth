@@ -25,6 +25,7 @@ namespace OpenEarth {
     std::unique_ptr<OpenEarth::Sphere> sphere;
     Tile *tile1;
     Tile *tile2;
+    Tile *tile200,*tile201,*tile210,*tile211,*tile220,*tile221,*tile230,*tile231;
     GLuint d_glprogram;
     int aPostionLocaiton;
     int aTextureLocation;
@@ -117,8 +118,16 @@ namespace OpenEarth {
         jobject javaAssetManager = env->CallObjectMethod(instance, methodID);
         mAssetManager = AAssetManager_fromJava(env, javaAssetManager);
 //        sphere = std::make_unique<OpenEarth::Sphere>(1.0f);
-        tile1 = new Tile(0, 0, 1);
-        tile2 = new Tile(1, 0, 1);
+//        tile1 = new Tile(0, 0, 1);
+//        tile2 = new Tile(1, 0, 1);
+        tile200 = new Tile(0,0,2);
+        tile201 = new Tile(0,1,2);
+        tile210 = new Tile(1,0,2);
+        tile211 = new Tile(1,1,2);
+        tile220 = new Tile(2,0,2);
+        tile221 = new Tile(2,1,2);
+        tile230 = new Tile(3,0,2);
+        tile231 = new Tile(3,1,2);
         GLuint glProgram;
         GLuint vertexShader;
         GLuint fragmentShader;
@@ -209,7 +218,7 @@ namespace OpenEarth {
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_ALWAYS);
+        glDepthFunc(GL_LESS);
         GLuint  textureId1 =  loadTexture("west.png");
         GLuint  textureId2 =  loadTexture("east.png");
         glUseProgram(d_glprogram);
@@ -226,9 +235,16 @@ namespace OpenEarth {
         mMvpMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(mMvpMatrix));
 
-        tile1->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"west.png");
-        tile2->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"east.png");
-
+//        tile1->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"west.png");
+//        tile2->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"east.png");
+        tile200->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_0_0.png");
+        tile201->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_0_1.png");
+        tile210->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_1_0.png");
+        tile211->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_1_1.png");
+        tile220->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_2_0.png");
+        tile221->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_2_1.png");
+        tile230->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_3_0.png");
+        tile231->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_3_1.png");
 
     }
 
