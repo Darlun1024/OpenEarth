@@ -83,7 +83,7 @@ void OpenEarth::Tile::genVertexArray() {
     float height = bounds[1] - bounds[3];
 
     rows = height / step;
-    cols = width / step;
+    cols = width / step +1;
 
     int size = cols * rows;  //后期考虑不能整除的情况
 
@@ -92,8 +92,8 @@ void OpenEarth::Tile::genVertexArray() {
     stripes = new GLfloat *[rows];
     int index = 0;
     float x1, x2, y1, y2, z1, z2;
-    float imgXStep = step / width;
-    float imgYStep = step / height;
+    float imgXStep = 1.0f/(cols-1);
+    float imgYStep = 1.0f/rows;
     float imageX;
     float imageY = 0.0f;
     int row = 0;
@@ -105,13 +105,14 @@ void OpenEarth::Tile::genVertexArray() {
         imageX = 0.0f;
         GLfloat *vertexs = new GLfloat[cols * 2 * 5];
         index = 0;
-        for (float lon = bounds[0]; lon < bounds[2]; lon += step) {
+        float lon;
+        for (lon = bounds[0]; lon <= bounds[2]; lon += step) {
             float lonR1 = dtor(lon);
-            float lonR2 = dtor(lon + step);
             x1 = (float) (R * cos(latR1) * sin(lonR1));
             z1 = (float) (R * cos(latR1) * cos(lonR1));
-            x2 = (float) (R * cos(latR2) * sin(lonR2));
-            z2 = (float) (R * cos(latR2) * cos(lonR2));
+            x2 = (float) (R * cos(latR2) * sin(lonR1));
+            z2 = (float) (R * cos(latR2) * cos(lonR1));
+
             vertexs[index++] = x1;
             vertexs[index++] = y1;
             vertexs[index++] = z1;
@@ -120,11 +121,13 @@ void OpenEarth::Tile::genVertexArray() {
             vertexs[index++] = x2;
             vertexs[index++] = y2;
             vertexs[index++] = z2;
-            vertexs[index++] = imageX + imgXStep;
+            vertexs[index++] = imageX;
             vertexs[index++] = imageY + imgYStep;
-            LOGE("sphere", "%d,%f,%f,%f,%f,%f", index, x1, y1, z1, imageX, imageY);
+//            LOGE("Tile", "%d,%f,%f,%f,%f,%f", index, x1, y1, z1, imageX, imageY);
             imageX += imgXStep;
+//            imageX = imageX > 1.0f?1.0f:imageX;
         }
+        LOGE("Tile", "%d,%f,%f,%f",index,lon-step,imageX-imgXStep, imageY);
         imageY += imgYStep;
         stripes[row++] = vertexs;
     }

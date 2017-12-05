@@ -62,7 +62,7 @@ namespace OpenEarth {
         mModelMatrix = glm::mat4(1.0f);
 
         mViewMatrix  = glm::lookAt(
-                glm::vec3(1.0f, 0.0f, 2git.0f), //
+                glm::vec3(1.0f, 0.0f, 2.0f), //
                 glm::vec3(0.0f, 0.0f, 0.0f), //
                 glm::vec3(0.0f, 1.0f, 0.0f)  //
         );
@@ -209,7 +209,7 @@ namespace OpenEarth {
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_ALWAYS);
+        glDepthFunc(GL_LESS);
         GLuint  textureId1 =  loadTexture("west.png");
         GLuint  textureId2 =  loadTexture("east.png");
         glUseProgram(d_glprogram);
