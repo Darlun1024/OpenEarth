@@ -53,6 +53,8 @@ OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation, AAssetMa
     glBindTexture(GL_TEXTURE_2D, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     for (int i = 0; i < rows; i++) {
         GLfloat *vertexArray = stripes[i];
         glVertexAttribPointer(aPostionLocaiton, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GL_FLOAT),
@@ -107,6 +109,7 @@ void OpenEarth::Tile::genVertexArray() {
         index = 0;
         float lon;
         for (lon = bounds[0]; lon <= bounds[2]; lon += step) {
+            if(lon==bounds[2]) lon = lon - (lon/100000000);
             float lonR1 = dtor(lon);
             x1 = (float) (R * cos(latR1) * sin(lonR1));
             z1 = (float) (R * cos(latR1) * cos(lonR1));
@@ -123,11 +126,9 @@ void OpenEarth::Tile::genVertexArray() {
             vertexs[index++] = z2;
             vertexs[index++] = imageX;
             vertexs[index++] = imageY + imgYStep;
-//            LOGE("Tile", "%d,%f,%f,%f,%f,%f", index, x1, y1, z1, imageX, imageY);
             imageX += imgXStep;
-//            imageX = imageX > 1.0f?1.0f:imageX;
         }
-        LOGE("Tile", "%d,%f,%f,%f",index,lon-step,imageX-imgXStep, imageY);
+//        LOGE("Tile", "%d,%f,%f,%f",index,lon-step,imageX-imgXStep, imageY);
         imageY += imgYStep;
         stripes[row++] = vertexs;
     }
