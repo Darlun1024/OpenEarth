@@ -7,6 +7,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -17,7 +18,7 @@ import com.geocompass.openearth.sdk.R;
  * Created by gxsn on 2017/11/13.
  */
 
-public class EarthView extends FrameLayout {
+public class EarthView extends FrameLayout implements View.OnTouchListener,View.OnGenericMotionListener{
     static {
         System.loadLibrary("lib-earth");
     }
@@ -74,5 +75,19 @@ public class EarthView extends FrameLayout {
     }
 
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        int action = event.getAction();
+        switch (action){
+            case MotionEvent.ACTION_DOWN:break;
+            case MotionEvent.ACTION_MOVE:break;
+            case MotionEvent.ACTION_UP:break;
+        }
+        return false;
+    }
 
+    @Override
+    public boolean onGenericMotion(View v, MotionEvent event) {
+        return false;
+    }
 }
