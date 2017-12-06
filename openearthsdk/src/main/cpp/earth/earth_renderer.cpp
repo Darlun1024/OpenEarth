@@ -219,11 +219,7 @@ namespace OpenEarth {
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
-        GLuint  textureId1 =  loadTexture("west.png");
-        GLuint  textureId2 =  loadTexture("east.png");
         glUseProgram(d_glprogram);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureId1);
 
         aPostionLocaiton = glGetAttribLocation(d_glprogram, "POSITION");
         aTextureLocation = glGetAttribLocation(d_glprogram, "a_TextureCoordinates");
