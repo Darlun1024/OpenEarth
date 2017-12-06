@@ -59,6 +59,7 @@ OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation, AAssetMa
         glDrawArrays(GL_TRIANGLE_STRIP, 0, pointCount);
 
     }
+    glDeleteTextures(1,&textureId);  //需要及时清理纹理，否则每次都增加新的纹理到内存中，以后可以考虑使用缓存，不必每次都重新加载纹理
 }
 
 static float dtor(float d) {
