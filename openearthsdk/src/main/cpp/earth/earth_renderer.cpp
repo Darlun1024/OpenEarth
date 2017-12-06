@@ -178,7 +178,6 @@ namespace OpenEarth {
             glDeleteProgram(glProgram);
         }
         d_glprogram = glProgram;
-
     }
 
     void surfaceChanged(JNIEnv *env, jobject instance, jint width, jint height) {
@@ -193,8 +192,6 @@ namespace OpenEarth {
         const GLfloat far = 10.0f;
 
         mProjectionMatrix = glm::ortho(left, right, bottom, top, near, far);
-
-
     }
 
     GLuint create_vbo(const GLsizeiptr size, const GLvoid* data, const GLenum usage) {
