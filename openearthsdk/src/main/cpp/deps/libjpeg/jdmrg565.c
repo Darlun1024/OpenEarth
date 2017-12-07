@@ -1,3 +1,8 @@
+#include "jconfigint.h"
+#include "jpeglib.h"
+#include "jdsample.h"
+#include "jpegint.h"
+
 /*
  * jdmrg565.c
  *

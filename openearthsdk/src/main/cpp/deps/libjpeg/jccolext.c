@@ -15,6 +15,10 @@
 /* This file is included by jccolor.c */
 
 
+#include "jconfigint.h"
+#include "jpeglib.h"
+#include "jpegint.h"
+
 /*
  * Convert some rows of samples to the JPEG colorspace.
  *
@@ -28,8 +32,7 @@
  */
 
 INLINE
-LOCAL(void)
-rgb_ycc_convert_internal (j_compress_ptr cinfo,
+LOCAL(void) rgb_ycc_convert_internal (j_compress_ptr cinfo,
                           JSAMPARRAY input_buf, JSAMPIMAGE output_buf,
                           JDIMENSION output_row, int num_rows)
 {

@@ -11,6 +11,8 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 
+aux_source_directory(src/main/cpp/deps/libpng/  PNG_SRC_LIST)
+aux_source_directory(src/main/cpp/deps/libjpeg/ JPEG_SRC_LIST)
 
 add_library( # Sets the name of the library.
              lib-earth
@@ -37,12 +39,11 @@ add_library( # Sets the name of the library.
               src/main/cpp/deps/libpng/pngwutil.c
 
               #libjpeg
-
+              # ${JPEG_SRC_LIST}
 
              # util
               src/main/cpp/util/image.c
               src/main/cpp/util/assets_file_reader.cpp
-              #src/main/cpp/util/image.cpp
               #src/main/cpp/util/png_reader.cpp
               #src/main/cpp/util/jpeg_reader.cpp
               src/main/cpp/util/util.cpp
