@@ -1,10 +1,11 @@
 package com.geocompass.openearth;
 
 import android.annotation.SuppressLint;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.geocompass.openearth.sdk.earth.Earth;
 import com.geocompass.openearth.sdk.earth.EarthView;
@@ -29,6 +30,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mEarthView = findViewById(R.id.earth_view);
 
         mEarth = mEarthView.getEarth();
+
+        findViewById(R.id.cv).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getBaseContext(),"hehehe",Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        findViewById(R.id.hehe).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getBaseContext(),"d22222222",Toast.LENGTH_SHORT).show();
+            }
+        });
 
         findViewById(R.id.btn_rotate).setOnClickListener(this);
 
@@ -60,17 +76,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 //                        if (Math.abs(v1) > 10 && Math.abs(v2) > 10) {
                             if (v1 > 0 && v2 > 0) {
-                                mEarth.rotateEarth(Earth.ROTATEY, (float) (Math.PI / 90));
-                                mEarth.rotateEarth(Earth.ROTATEX, (float) (Math.PI / 90));
+                                mEarth.rotateEarth(Earth.ROTATEY, (float) (Math.PI / 45));
+                                mEarth.rotateEarth(Earth.ROTATEX, (float) (Math.PI / 45));
                             } else if (v1 > 0 && v2 < 0) {
-                                mEarth.rotateEarth(Earth.ROTATEY, (float) (Math.PI / 90));
-                                mEarth.rotateEarth(Earth.ROTATEX, -(float) (Math.PI / 90));
+                                mEarth.rotateEarth(Earth.ROTATEY, (float) (Math.PI / 45));
+                                mEarth.rotateEarth(Earth.ROTATEX, -(float) (Math.PI / 45));
                             } else if (v1 < 0 && v2 < 0) {
-                                mEarth.rotateEarth(Earth.ROTATEY, -(float) (Math.PI / 90));
-                                mEarth.rotateEarth(Earth.ROTATEX, -(float) (Math.PI / 90));
+                                mEarth.rotateEarth(Earth.ROTATEY, -(float) (Math.PI / 45));
+                                mEarth.rotateEarth(Earth.ROTATEX, -(float) (Math.PI / 45));
                             } else if (v1 < 0 && v2 > 0) {
-                                mEarth.rotateEarth(Earth.ROTATEY, -(float) (Math.PI / 90));
-                                mEarth.rotateEarth(Earth.ROTATEX, (float) (Math.PI / 90));
+                                mEarth.rotateEarth(Earth.ROTATEY, -(float) (Math.PI / 45));
+                                mEarth.rotateEarth(Earth.ROTATEX, (float) (Math.PI / 45));
                             }
 //                        }
                         preX = x1;
