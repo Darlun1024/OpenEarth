@@ -9,7 +9,7 @@ import android.view.View;
 import com.geocompass.openearth.sdk.earth.Earth;
 import com.geocompass.openearth.sdk.earth.EarthView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EarthView mEarthView;
     private Earth mEarth;
