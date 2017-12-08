@@ -30,7 +30,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mEarth = mEarthView.getEarth();
 
         findViewById(R.id.btn_rotate).setOnClickListener(this);
-        
+
+
+
+        //注释掉一些变量
 
 //        mEarthView.setOnTouchListener(this);
 
