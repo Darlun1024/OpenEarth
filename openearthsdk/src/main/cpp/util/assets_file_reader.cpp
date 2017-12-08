@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include "assets_file_reader.hpp"
 
+
 FileData OpenEarth::util::AssetsFileReader::get_asset_data(const char *path, AAssetManager* assetManager){
     assert(path != NULL);
     AAsset* asset =

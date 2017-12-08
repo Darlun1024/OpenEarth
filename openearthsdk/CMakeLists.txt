@@ -11,6 +11,8 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 
+aux_source_directory(src/main/cpp/deps/libpng/  PNG_SRC_LIST)
+aux_source_directory(src/main/cpp/deps/libjpeg/ JPEG_SRC_LIST)
 
 add_library( # Sets the name of the library.
              lib-earth
@@ -36,22 +38,27 @@ add_library( # Sets the name of the library.
               src/main/cpp/deps/libpng/pngwtran.c
               src/main/cpp/deps/libpng/pngwutil.c
 
-             # Provides a relative path to your source file(s).
+              #libjpeg
+              # ${JPEG_SRC_LIST}
+
+             # util
               src/main/cpp/util/image.c
               src/main/cpp/util/assets_file_reader.cpp
+              #src/main/cpp/util/png_reader.cpp
+              #src/main/cpp/util/jpeg_reader.cpp
               src/main/cpp/util/util.cpp
-             src/main/cpp/native_earth_view.cpp
-             src/main/cpp/earth/sphere.cpp
-             src/main/cpp/earth/tile.cpp
-             src/main/cpp/earth/earth_renderer.cpp
-             src/main/cpp/main.cpp
-             src/main/cpp/jni.cpp
-             src/main/cpp/logging.hpp
-
+              src/main/cpp/native_earth_view.cpp
+              src/main/cpp/earth/sphere.cpp
+              src/main/cpp/earth/tile.cpp
+              src/main/cpp/earth/earth_renderer.cpp
+              src/main/cpp/main.cpp
+              src/main/cpp/jni.cpp
+              src/main/cpp/logging.hpp
 
              )
 INCLUDE_DIRECTORIES (src/main/cpp/deps/glm/
                     src/main/cpp/deps/libpng/
+                    src/main/cpp/deps/libjpeg/
                     )
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

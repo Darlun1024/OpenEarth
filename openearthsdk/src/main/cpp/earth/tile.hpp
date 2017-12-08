@@ -12,9 +12,9 @@
 namespace OpenEarth {
     class Tile {
     public:
-        int x,y,z;
-        int cols,rows;
-        Tile(int x,int y,int z);
+        uint32_t x,y,z;
+        uint32_t cols,rows;
+        Tile(uint32_t x,uint32_t y,uint32_t z);
         ~Tile();
         void draw(GLuint aPostionLocaiton, GLuint aTextureLocation,AAssetManager *amgr,
         const char *path);

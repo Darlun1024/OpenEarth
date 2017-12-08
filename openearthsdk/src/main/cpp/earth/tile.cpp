@@ -13,7 +13,7 @@ extern "C" {
 GLuint loadTexture(AAssetManager *amgr, const char *path);
 
 
-OpenEarth::Tile::Tile(int x, int y, int z) {
+OpenEarth::Tile::Tile(uint32_t x, uint32_t y, uint32_t z) {
     this->x = x;
     this->y = y;
     this->z = z;
@@ -77,12 +77,12 @@ void OpenEarth::Tile::genVertexArray() {
     rows = height / step;
     cols = width / step +1;
 
-    int size = cols * rows;  //后期考虑不能整除的情况
+    uint32_t size = cols * rows;  //后期考虑不能整除的情况
 
     vertexSize = size;  //x,y,z,s,t
     vertexArray = new GLfloat[size * 2 * 5];
     stripes = new GLfloat *[rows];
-    int index = 0;
+    uint32_t index = 0;
     float x1, x2, y1, y2, z1, z2;
     float imgXStep = 1.0f/(cols-1);
     float imgYStep = 1.0f/rows;

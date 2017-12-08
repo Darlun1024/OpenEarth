@@ -3,6 +3,7 @@
 #include <png.h>
 #include <string.h>
 #include <stdlib.h>
+#include <pngconf.h>
 
 typedef struct {
 	const png_byte* data;
@@ -22,9 +23,12 @@ typedef struct {
 
 static void read_png_data_callback(
 	png_structp png_ptr, png_byte* png_data, png_size_t read_length);
+
 static PngInfo read_and_update_info(const png_structp png_ptr, const png_infop info_ptr);
+
 static DataHandle read_entire_png_image(
 	const png_structp png_ptr, const png_infop info_ptr, const png_uint_32 height);
+
 static GLenum get_gl_color_format(const int png_color_format);
 
 RawImageData get_raw_image_data_from_png(const void* png_data, const int png_data_size) {
@@ -142,3 +146,5 @@ static GLenum get_gl_color_format(const int png_color_format) {
 
 	return 0;
 }
+
+
