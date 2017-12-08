@@ -3,7 +3,6 @@ package com.geocompass.openearth;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
 import android.view.View;
 
 import com.geocompass.openearth.sdk.earth.Earth;
@@ -13,13 +12,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private EarthView mEarthView;
     private Earth mEarth;
-    float x = 0;
-    float x1;
-    float y = 0;
-    float y1;
-
-    float preX = 0;
-    float preY = 0;
+//    float x = 0;
+//    float x1;
+//    float y = 0;
+//    float y1;
+//
+//    float preX = 0;
+//    float preY = 0;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -33,7 +32,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_rotate).setOnClickListener(this);
 
 
-        
+
+        //注释掉一些变量
+
 //        mEarthView.setOnTouchListener(this);
 
     }
