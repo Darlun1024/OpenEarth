@@ -18,7 +18,7 @@ import com.geocompass.openearth.sdk.R;
  * Created by gxsn on 2017/11/13.
  */
 
-public class EarthView extends FrameLayout implements View.OnTouchListener,View.OnGenericMotionListener{
+public class EarthView extends FrameLayout implements View.OnGenericMotionListener{
     static {
         System.loadLibrary("lib-earth");
     }
@@ -27,6 +27,8 @@ public class EarthView extends FrameLayout implements View.OnTouchListener,View.
     private GLSurfaceView mSurfaceView;
     private NativeEarthView mNativeEarthView;
     private Earth mEarth;
+
+    private MotionEvent.PointerCoords mPrePointer;
 
     public EarthView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -76,18 +78,20 @@ public class EarthView extends FrameLayout implements View.OnTouchListener,View.
 
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event){
         int action = event.getAction();
         switch (action){
             case MotionEvent.ACTION_DOWN:break;
+
             case MotionEvent.ACTION_MOVE:break;
+
             case MotionEvent.ACTION_UP:break;
         }
         return false;
     }
 
     @Override
-    public boolean onGenericMotion(View v, MotionEvent event) {
+    public boolean onGenericMotion(View v, MotionEvent event){
         return false;
     }
 }
