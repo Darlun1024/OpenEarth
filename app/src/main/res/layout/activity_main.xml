@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.geocompass.openearth.MainActivity">
 
     <com.geocompass.openearth.sdk.earth.EarthView
@@ -18,51 +17,6 @@
         android:layout_width="96dp"
         android:layout_height="36dp"
         android:text="Rotate" />
-
-
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/cv"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/colorAccent"
-                android:background="@color/colorAccent"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"></android.support.v7.widget.CardView>
-
-
-
-
-            <android.support.v7.widget.CardView
-                android:id="@+id/hehe"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/colorPrimary"
-                android:layout_width="match_parent"
-                android:layout_height="30dp">
-
-            </android.support.v7.widget.CardView>
-
-
-
-        </LinearLayout>
-
-
-
-
-
-
-
-    </android.support.v7.widget.CardView>
-
 
 
 </RelativeLayout>
