@@ -7,8 +7,9 @@
 #include "constants.hpp"
 #include "../util/assets_file_reader.hpp"
 #include <GLES2/gl2.h>
+
 extern "C" {
-#include "../util/image.h"
+#include "../util/png_reader.h"
 }
 GLuint loadTexture(AAssetManager *amgr, const char *path);
 
@@ -31,14 +32,13 @@ OpenEarth::Tile::Tile(uint32_t x, uint32_t y, uint32_t z) {
 }
 
 OpenEarth::Tile::~Tile() {
-    delete this->vertexArray;
-    delete this->bounds;
+    delete[] this->vertexArray;
+    delete[] this->bounds;
     delete this->stripes;
 }
 
 
-void
-OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation, AAssetManager *amgr,
+void OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation, AAssetManager *amgr,
                       const char *path) {
     GLuint textureId = loadTexture(amgr, path);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -129,8 +129,9 @@ void OpenEarth::Tile::genVertexArray() {
      */
     GLuint loadTexture(AAssetManager *amgr, const char *path) {
         FileData fileData = OpenEarth::util::AssetsFileReader::get_asset_data(path, amgr);
-        RawImageData data = get_raw_image_data_from_png(fileData.data,
-                                                        (int) fileData.data_length);
+//        RawImageData data = decompressJpeg(fileData.data,(int) fileData.data_length);
+        RawImageData data = get_raw_image_data_from_png(fileData.data,(int) fileData.data_length);
+
         OpenEarth::util::AssetsFileReader::release_asset_data(&fileData);
         GLuint textureId;
         glGenTextures(1, &textureId);

@@ -361,10 +361,10 @@
 #   include "pnglibconf.h"
 #endif
 
-#ifndef PNG_VERSION_INFO_ONLY
+//#ifndef PNG_VERSION_INFO_ONLY
 /* Machine specific configuration. */
-#  include "pngconf.h"
-#endif
+#include "pngconf.h"
+//#endif
 
 /*
  * Added at libpng-1.2.8

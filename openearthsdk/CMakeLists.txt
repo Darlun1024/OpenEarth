@@ -10,9 +10,18 @@ cmake_minimum_required(VERSION 3.4.1)
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+#用于编译文件下下所有文件
+#aux_source_directory(src/main/cpp/deps/libpng/  PNG_SRC_LIST)
+#aux_source_directory(src/main/cpp/deps/libjpeg/ JPEG_SRC_LIST)
 
-aux_source_directory(src/main/cpp/deps/libpng/  PNG_SRC_LIST)
-aux_source_directory(src/main/cpp/deps/libjpeg/ JPEG_SRC_LIST)
+INCLUDE_DIRECTORIES (src/main/cpp/deps/glm/
+                    src/main/cpp/deps/libpng/
+                    src/main/cpp/deps/libjpeg/
+                    )
+
+add_library(libjpeg SHARED IMPORTED)
+#这里千万要注意路径的写法
+set_target_properties(libjpeg PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libjpeg.so)
 
 add_library( # Sets the name of the library.
              lib-earth
@@ -38,14 +47,10 @@ add_library( # Sets the name of the library.
               src/main/cpp/deps/libpng/pngwtran.c
               src/main/cpp/deps/libpng/pngwutil.c
 
-              #libjpeg
-              # ${JPEG_SRC_LIST}
 
              # util
-              src/main/cpp/util/image.c
+              src/main/cpp/util/png_reader.c
               src/main/cpp/util/assets_file_reader.cpp
-              #src/main/cpp/util/png_reader.cpp
-              #src/main/cpp/util/jpeg_reader.cpp
               src/main/cpp/util/util.cpp
               src/main/cpp/native_earth_view.cpp
               src/main/cpp/earth/sphere.cpp
@@ -56,10 +61,10 @@ add_library( # Sets the name of the library.
               src/main/cpp/logging.hpp
 
              )
-INCLUDE_DIRECTORIES (src/main/cpp/deps/glm/
-                    src/main/cpp/deps/libpng/
-                    src/main/cpp/deps/libjpeg/
-                    )
+
+
+
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -78,6 +83,7 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
                        lib-earth
+                       libjpeg
                        EGL    #必须要添加这两行，否则会报link错误，找不到glXXXX方法
                        GLESv2 #
                        GLESv3 #

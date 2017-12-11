@@ -9,10 +9,17 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++14 -frtti -fexceptions"
+                abiFilters 'armeabi','armeabi-v7a','arm64-v8a'
             }
+        }
+
+        ndk {
+            //打包进APK的ABI类型
+            abiFilters 'armeabi','armeabi-v7a','arm64-v8a'
         }
     }
 
