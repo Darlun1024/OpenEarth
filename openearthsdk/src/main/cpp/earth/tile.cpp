@@ -9,7 +9,8 @@
 #include <GLES2/gl2.h>
 
 extern "C" {
-#include "../util/png_reader.h"
+    #include "../util/png_reader.h"
+    #include "../util/jpeg_reader.h"
 }
 GLuint loadTexture(AAssetManager *amgr, const char *path);
 
@@ -130,7 +131,8 @@ void OpenEarth::Tile::genVertexArray() {
     GLuint loadTexture(AAssetManager *amgr, const char *path) {
         FileData fileData = OpenEarth::util::AssetsFileReader::get_asset_data(path, amgr);
 //        RawImageData data = decompressJpeg(fileData.data,(int) fileData.data_length);
-        RawImageData data = get_raw_image_data_from_png(fileData.data,(int) fileData.data_length);
+        RawImageData data = decompressJpegFromFile("/storage/emulated/0/west.jpeg");
+//        RawImageData data = get_raw_image_data_from_png(fileData.data,(int) fileData.data_length);
 
         OpenEarth::util::AssetsFileReader::release_asset_data(&fileData);
         GLuint textureId;

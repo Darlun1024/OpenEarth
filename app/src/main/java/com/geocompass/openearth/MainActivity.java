@@ -2,7 +2,9 @@ package com.geocompass.openearth;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import com.geocompass.openearth.sdk.earth.Earth;
@@ -31,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         findViewById(R.id.btn_rotate).setOnClickListener(this);
 
-
+        Log.e("Path",Environment.getExternalStorageDirectory().getAbsolutePath());
 
         //注释掉一些变量
 

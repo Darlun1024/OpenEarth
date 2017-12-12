@@ -50,6 +50,7 @@ add_library( # Sets the name of the library.
 
              # util
               src/main/cpp/util/png_reader.c
+              src/main/cpp/util/jpeg_reader.c
               src/main/cpp/util/assets_file_reader.cpp
               src/main/cpp/util/util.cpp
               src/main/cpp/native_earth_view.cpp
