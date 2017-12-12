@@ -6,68 +6,14 @@
 #include <jpeglib.h>
 
 
-const static JOCTET EOI_BUFFER[1] = { JPEG_EOI };
-
-typedef struct  {
-    struct jpeg_source_mgr pub;
-    const JOCTET *data;
-    size_t       len;
-}my_source_mgr;
-
-static void my_init_source(j_decompress_ptr cinfo) {}
-
-static boolean my_fill_input_buffer(j_decompress_ptr cinfo) {
-	my_source_mgr* src = (my_source_mgr*)cinfo->src;
-	// No more data.  Probably an incomplete image;  just output EOI.
-	src->pub.next_input_byte = EOI_BUFFER;
-	src->pub.bytes_in_buffer = 1;
-	return TRUE;
-}
-static void my_skip_input_data(j_decompress_ptr cinfo, long num_bytes) {
-	my_source_mgr* src = (my_source_mgr*)cinfo->src;
-	if (src->pub.bytes_in_buffer < num_bytes) {
-		// Skipping over all of remaining data;  output EOI.
-		src->pub.next_input_byte = EOI_BUFFER;
-		src->pub.bytes_in_buffer = 1;
-	} else {
-		// Skipping over only some of the remaining data.
-		src->pub.next_input_byte += num_bytes;
-		src->pub.bytes_in_buffer -= num_bytes;
-	}
-}
-static void my_term_source(j_decompress_ptr cinfo) {}
-
-static void my_set_source_mgr(j_decompress_ptr cinfo, const char* data, size_t len) {
-	my_source_mgr* src;
-	if (cinfo->src == 0) { // if this is first time;  allocate memory
-		cinfo->src = (struct jpeg_source_mgr *)(*cinfo->mem->alloc_small)
-				((j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof(my_source_mgr));
-	}
-	src = (my_source_mgr*) cinfo->src;
-	src->pub.init_source = my_init_source;
-	src->pub.fill_input_buffer = my_fill_input_buffer;
-	src->pub.skip_input_data = my_skip_input_data;
-	src->pub.resync_to_restart = jpeg_resync_to_restart; // default
-	src->pub.term_source = my_term_source;
-	// fill the buffers
-	src->data = (const JOCTET *)data;
-	src->len = len;
-	src->pub.bytes_in_buffer = len;
-	src->pub.next_input_byte = src->data;
-}
-
-RawImageData decompressJpeg(const void* data, size_t len) {
+RawImageData get_raw_image_data_from_jpeg(const void *data, size_t len) {
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr jerr;
 
-	// Setup decompression structure
 	cinfo.err = jpeg_std_error(&jerr);
 	jpeg_create_decompress(&cinfo);
-	my_set_source_mgr(&cinfo, data,len);
-
-	// read info from header.
-    //TODO fix it
-	int r = jpeg_read_header(&cinfo, TRUE);
+    jpeg_mem_src(&cinfo,data,len);
+	jpeg_read_header(&cinfo, TRUE);
 	jpeg_start_decompress(&cinfo);
 
 	int row_width = cinfo.output_width * cinfo.output_components;
@@ -93,9 +39,10 @@ RawImageData decompressJpeg(const void* data, size_t len) {
 	};
 
 
+
 }
 
-RawImageData decompressJpegFromFile(const char* path) {
+RawImageData get_raw_image_data_from_jpeg_file(const char *path) {
     struct jpeg_decompress_struct cinfo;
     struct jpeg_error_mgr jerr;
 

@@ -227,8 +227,8 @@ namespace OpenEarth {
         mMvpMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(mMvpMatrix));
 
-        tile1->draw(aPositionLocaiton,aTextureLocation,mAssetManager,"west.png");
-        tile2->draw(aPositionLocaiton,aTextureLocation,mAssetManager,"east.png");
+        tile1->draw(aPositionLocaiton,aTextureLocation,mAssetManager,"west.jpeg");
+        tile2->draw(aPositionLocaiton,aTextureLocation,mAssetManager,"east.jpeg");
 
 //        tile200->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_0_0.png");
 //        tile201->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_0_1.png");
