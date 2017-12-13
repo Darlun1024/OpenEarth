@@ -6,3 +6,4 @@
 
 RawImageData get_raw_image_data_from_jpeg(const void *data, size_t len);
 RawImageData get_raw_image_data_from_jpeg_file(const char *path);
+//void release_jpeg_raw_image_data(const RawImageData *data);

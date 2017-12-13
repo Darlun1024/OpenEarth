@@ -1,9 +1,7 @@
-#include "png_reader.h"
-#include <png.h>
+#include "jpeg_reader.h"
 #include <string.h>
 #include <stdlib.h>
-#include <pngconf.h>
-#include <jpeglib.h>
+#include <libjpeg/jpeglib.h>
 
 
 RawImageData get_raw_image_data_from_jpeg(const void *data, size_t len) {
@@ -79,8 +77,6 @@ RawImageData get_raw_image_data_from_jpeg_file(const char *path) {
             GL_RGB,
             output_buffer
     };
-
-
 }
 
 

@@ -52,6 +52,22 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
         glSurfaceView.requestRender();
     }
 
+
+    public void setScale(float scale){
+        nativeSetScale(scale);
+        glSurfaceView.requestRender();
+    }
+
+    public void setZoom(float zoom){
+        nativeSetZoom(zoom);
+        glSurfaceView.requestRender();
+    }
+
+    public void setTilt(float tilt){
+        nativeSetTilt(tilt);
+        glSurfaceView.requestRender();
+    }
+
     @Override
     public void onDrawFrame(GL10 gl) {
         nativeRender();
@@ -66,6 +82,9 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     private native void  nativeSurfaceChanged(int width,int height);
     private native void  nativeRender();
     private native void  nativeRotateEarth(int axis,float radian);
+    private native void  nativeSetScale(float scale);
+    private native void  nativeSetTilt(float radian);
+    private native void  nativeSetZoom(float zoom);
     private native void  nativeInitialize();
 
 

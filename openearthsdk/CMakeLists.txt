@@ -14,10 +14,7 @@ cmake_minimum_required(VERSION 3.4.1)
 #aux_source_directory(src/main/cpp/deps/libpng/  PNG_SRC_LIST)
 #aux_source_directory(src/main/cpp/deps/libjpeg/ JPEG_SRC_LIST)
 
-INCLUDE_DIRECTORIES (src/main/cpp/deps/glm/
-                    src/main/cpp/deps/libpng/
-                    src/main/cpp/deps/libjpeg/
-                    )
+INCLUDE_DIRECTORIES (src/main/cpp/deps/)
 
 add_library(libjpeg SHARED IMPORTED)
 #这里千万要注意路径的写法
@@ -49,6 +46,7 @@ add_library( # Sets the name of the library.
 
 
              # util
+             src/main/cpp/util/image.c
               src/main/cpp/util/png_reader.c
               src/main/cpp/util/jpeg_reader.c
               src/main/cpp/util/assets_file_reader.cpp

@@ -7,3 +7,5 @@ typedef struct {
 	const GLenum gl_color_format;
 	const void* data;
 }RawImageData;
+
+void release_raw_image_data(const RawImageData *data);

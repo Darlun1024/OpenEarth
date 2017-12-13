@@ -1,11 +1,10 @@
 #include "png_reader.h"
-#include <png.h>
+#include <libpng/png.h>
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <setjmp.h>
-#include <pngconf.h>
-#include <jpeglib.h>
+#include <libpng/pngconf.h>
 
 typedef struct {
 	const png_byte* data;
@@ -62,10 +61,10 @@ RawImageData get_raw_image_data_from_png(const void* png_data, const int png_dat
         raw_image.data};
 }
 
-void release_raw_image_data(const RawImageData* data) {
-	assert(data != NULL);
-	free((void*)data->data);
-}
+//void release_png_raw_image_data(const RawImageData *data) {
+//	assert(data != NULL);
+//	free((void*)data->data);
+//}
 
 static void read_png_data_callback(png_structp png_ptr, png_byte* raw_data, png_size_t read_length) {
 	ReadDataHandle* handle = png_get_io_ptr(png_ptr);

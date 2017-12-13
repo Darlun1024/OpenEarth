@@ -2,17 +2,16 @@
 #include "sphere.hpp"
 #include <memory>
 #include <GLES3/gl3.h>
-#include "../deps/glm/ext.hpp"
+#include <glm/ext.hpp>
 #include <android/asset_manager_jni.h>
 #include <android/asset_manager.h>
-#include "../logging.hpp"
 #include <android/bitmap.h>
-#include <gtx/extended_min_max.inl>
+#include <glm/gtx/extended_min_max.inl>
 #include "../util/assets_file_reader.hpp"
 #include "tile.hpp"
 
 extern "C" {
-#include "../util/png_reader.h"
+    #include "../util/png_reader.h"
 }
 
 namespace OpenEarth {
@@ -82,29 +81,6 @@ namespace OpenEarth {
                 break;
         }
 
-    }
-
-    /**
- * 加载图片
- */
-    GLuint loadTexture(const char* name) {
-        //获取类
-        FileData fileData = OpenEarth::util::AssetsFileReader::get_asset_data(name, mAssetManager);
-
-        RawImageData data = get_raw_image_data_from_png(fileData.data, (int) fileData.data_length);
-        GLuint textureId;
-        glGenTextures(1, &textureId);
-        assert(textureId != 0);
-
-        glBindTexture(GL_TEXTURE_2D, textureId);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(
-                GL_TEXTURE_2D, 0, data.gl_color_format, data.width, data.height, 0,
-                data.gl_color_format, GL_UNSIGNED_BYTE, data.data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        return textureId;
     }
 
 
@@ -193,25 +169,13 @@ namespace OpenEarth {
         mProjectionMatrix = glm::ortho(left, right, bottom, top, near, far);
     }
 
-    GLuint create_vbo(const GLsizeiptr size, const GLvoid* data, const GLenum usage) {
-        assert(data != NULL);
-        GLuint vbo_object;
-        glGenBuffers(1, &vbo_object);
-        assert(vbo_object != 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_object);
-        glBufferData(GL_ARRAY_BUFFER, size, data, usage);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        return vbo_object;
-    }
 
     void render(JNIEnv *env, jobject instance) {
         drawEarth();
     }
 
     void drawEarth(){
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
@@ -241,7 +205,47 @@ namespace OpenEarth {
 
     }
 
+    //设置球体的各个参数
+    void setScale(JNIEnv *env, jobject instance,jfloat scale){
 
+    }
+    void setZoom(JNIEnv *env, jobject instance,jfloat zoom){
+
+    }
+    void setTilt(JNIEnv *env, jobject instance,jfloat tilt){
+
+    }
+
+
+//    //坐标互转
+//
+//     static PointF screenToWorld(float* viewMatrix,
+//                                       float* projMatrix, float screenX, float screenY) {
+//        float[] nearPos = unProject(viewMatrix, projMatrix, screenX, screenY, 0);
+//        float[] farPos = unProject(viewMatrix, projMatrix, screenX, screenY, 1);
+//        // The click occurred in somewhere on the line between the two points
+//        // nearPos and farPos. We want to find
+//        // where that line intersects the plane at z=0
+//        float distance = nearPos[2] / (nearPos[2] - farPos[2]); // Distance between nearPos and z=0
+//        float x = nearPos[0] + (farPos[0] - nearPos[0]) * distance;
+//        float y = nearPos[1] + (farPos[1] - nearPos[0]) * distance;
+//        return new PointF(x, y);
+//    }
+//
+//     static float* unProject(float* viewMatrix,
+//                                     float* projMatrix, float screenX, float screenY, float depth) {
+//        float position[] = {0, 0, 0, 0};
+//        int viewPort[] = {0, 0, 1, 1};
+//        GLU.gluUnProject(screenX, screenY, depth, viewMatrix, 0, projMatrix, 0,
+//                         viewPort, 0, position, 0);
+//
+//        position[0] /= position[3];
+//        position[1] /= position[3];
+//        position[2] /= position[3];
+//        position[3] = 1;
+//        return position;
+//
+//    }
 
 
     static JNINativeMethod gMethods[] = {
@@ -249,7 +253,10 @@ namespace OpenEarth {
             {"nativeSurfaceChanged", "(II)V", (void *) surfaceChanged},
             {"nativeRender",         "()V",   (void *) render},
             {"nativeRotateEarth",   "(IF)V",  (void *) rotateEarth},
-            {"nativeInitialize",   "()V",     (void *) initialize}
+            {"nativeInitialize",   "()V",     (void *) initialize},
+            {"nativeSetScale",   "(F)V",     (void *) setScale},
+            {"nativeSetTilt",   "(F)V",     (void *) setTilt},
+            {"nativeSetZoom",   "(F)V",     (void *) setZoom}
     };
 
 //注册native 方法
