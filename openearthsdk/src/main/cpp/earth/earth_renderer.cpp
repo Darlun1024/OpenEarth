@@ -9,6 +9,7 @@
 #include <glm/gtx/extended_min_max.inl>
 #include "../util/assets_file_reader.hpp"
 #include "tile.hpp"
+#include "../logging.hpp"
 
 extern "C" {
     #include "../util/png_reader.h"
@@ -58,12 +59,12 @@ namespace OpenEarth {
     }
 
     void initialize(){
-        mModelMatrix = glm::mat4(1.0f);
-
+        mModelMatrix = glm::mat4(1.0f);  //模型矩阵
+        mModelMatrix = glm::translate(mModelMatrix,glm::vec3(0,0,-1.0f));
         mViewMatrix  = glm::lookAt(
-                glm::vec3(1.0f, 0.0f, 2.0f), //
-                glm::vec3(0.0f, 0.0f, 0.0f), //
-                glm::vec3(0.0f, 1.0f, 0.0f)  //
+                glm::vec3(0.0f, 0.0f, 1.0f), //眼睛位置
+                glm::vec3(0.0f, 0.0f, 0.0f), //瞄准的点
+                glm::vec3(0.0f, 1.0f, 0.0f)  //头顶方向的法向量
         );
 
     }
@@ -83,6 +84,25 @@ namespace OpenEarth {
 
     }
 
+    //     static PointF screenToWorld(float* viewMatrix,float* projMatrix, float screenX, float screenY) {
+    //        float[] nearPos = unProject(viewMatrix, projMatrix, screenX, screenY, 0);
+    //        float[] farPos = unProject(viewMatrix, projMatrix, screenX, screenY, 1);
+    //        // The click occurred in somewhere on the line between the two points
+    //        // nearPos and farPos. We want to find
+    //        // where that line intersects the plane at z=0
+    //        float distance = nearPos[2] / (nearPos[2] - farPos[2]); // Distance between nearPos and z=0
+    //        float x = nearPos[0] + (farPos[0] - nearPos[0]) * distance;
+    //        float y = nearPos[1] + (farPos[1] - nearPos[0]) * distance;
+    //        return new PointF(x, y);
+    //    }
+    //
+    glm::vec3 unProject(glm::mat4x4 viewMatrix,glm::mat4x4 projMatrix, float screenX, float screenY, float depth) {
+        glm::vec4 viewPort = {0, 0, 1, 1};
+        glm::vec3 win = {screenX,screenY,depth};
+        glm::vec3 position =  glm::unProject(win,viewMatrix,projMatrix,viewPort);
+        return position;
+    }
+
 
     void surfaceCreated(JNIEnv *env, jobject instance) {
         jclass objectClass = env->GetObjectClass(instance);
@@ -95,14 +115,6 @@ namespace OpenEarth {
 //        sphere = std::make_unique<OpenEarth::Sphere>(1.0f);
         tile1 = new Tile(0, 0, 1);
         tile2 = new Tile(1, 0, 1);
-//        tile200 = new Tile(0,0,2);
-//        tile201 = new Tile(0,1,2);
-//        tile210 = new Tile(1,0,2);
-//        tile211 = new Tile(1,1,2);
-//        tile220 = new Tile(2,0,2);
-//        tile221 = new Tile(2,1,2);
-//        tile230 = new Tile(3,0,2);
-//        tile231 = new Tile(3,1,2);
         GLuint glProgram;
         GLuint vertexShader;
         GLuint fragmentShader;
@@ -155,22 +167,37 @@ namespace OpenEarth {
         d_glprogram = glProgram;
     }
 
+
     void surfaceChanged(JNIEnv *env, jobject instance, jint width, jint height) {
 
         glViewport(0, 0, width, height);
-        const GLfloat ratio = (GLfloat) width / height;
-        const GLfloat left = width < height ? -1.0f : -1.0f * ratio;
-        const GLfloat right = width < height ? 1.0f : 1.0f * ratio;
+        const GLfloat ratio  = (GLfloat) width / height;
+        const GLfloat left   = width < height ? -1.0f : -1.0f * ratio;
+        const GLfloat right  = width < height ? 1.0f : 1.0f * ratio;
         const GLfloat bottom = width < height ? -1.0f / ratio : -1.0f;
-        const GLfloat top = width < height ? 1.0f / ratio : 1.0f;
-        const GLfloat near = 1.0f;
-        const GLfloat far = 10.0f;
+        const GLfloat top    = width < height ? 1.0f / ratio : 1.0f;
+        const GLfloat near   = 1.0f;
+        const GLfloat far    = 10.0f;
 
-        mProjectionMatrix = glm::ortho(left, right, bottom, top, near, far);
-    }
+//        mProjectionMatrix = glm::ortho(left, right, bottom, top, near, far); //正交投影
+        mProjectionMatrix = glm::perspective(90.0f,ratio,near,far); //透视投影
+
+        //屏幕坐标转为归一化设备坐标
+         float normalizeX = ((float)width/2)/width*2-1;
+         float normalizeY = -((float)height/2/height*2-1);
+        glm::mat4 invVP = glm::inverse(mProjectionMatrix * mViewMatrix);
+        glm::vec4 screenPos = glm::vec4(normalizeX, normalizeY, 1.0f, 1.0f);
+        glm::vec4 worldPos = invVP * screenPos;
+
+        glm::vec3 dir = glm::normalize(glm::vec3(worldPos));
+
+        glm::vec3 postion = unProject(mViewMatrix,mProjectionMatrix,normalizeX,normalizeY,1.0f);
+        LOGE("RENDER","%f,%f,%f",postion[0],postion[1],postion[2]);
+
+}
 
 
-    void render(JNIEnv *env, jobject instance) {
+void render(JNIEnv *env, jobject instance) {
         drawEarth();
     }
 
@@ -194,15 +221,6 @@ namespace OpenEarth {
         tile1->draw(aPositionLocaiton,aTextureLocation,mAssetManager,"west.jpeg");
         tile2->draw(aPositionLocaiton,aTextureLocation,mAssetManager,"east.jpeg");
 
-//        tile200->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_0_0.png");
-//        tile201->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_0_1.png");
-//        tile210->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_1_0.png");
-//        tile211->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_1_1.png");
-//        tile220->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_2_0.png");
-//        tile221->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_2_1.png");
-//        tile230->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_3_0.png");
-//        tile231->draw(aPostionLocaiton,aTextureLocation,mAssetManager,"2_3_1.png");
-
     }
 
     //设置球体的各个参数
@@ -217,35 +235,7 @@ namespace OpenEarth {
     }
 
 
-//    //坐标互转
-//
-//     static PointF screenToWorld(float* viewMatrix,
-//                                       float* projMatrix, float screenX, float screenY) {
-//        float[] nearPos = unProject(viewMatrix, projMatrix, screenX, screenY, 0);
-//        float[] farPos = unProject(viewMatrix, projMatrix, screenX, screenY, 1);
-//        // The click occurred in somewhere on the line between the two points
-//        // nearPos and farPos. We want to find
-//        // where that line intersects the plane at z=0
-//        float distance = nearPos[2] / (nearPos[2] - farPos[2]); // Distance between nearPos and z=0
-//        float x = nearPos[0] + (farPos[0] - nearPos[0]) * distance;
-//        float y = nearPos[1] + (farPos[1] - nearPos[0]) * distance;
-//        return new PointF(x, y);
-//    }
-//
-//     static float* unProject(float* viewMatrix,
-//                                     float* projMatrix, float screenX, float screenY, float depth) {
-//        float position[] = {0, 0, 0, 0};
-//        int viewPort[] = {0, 0, 1, 1};
-//        GLU.gluUnProject(screenX, screenY, depth, viewMatrix, 0, projMatrix, 0,
-//                         viewPort, 0, position, 0);
-//
-//        position[0] /= position[3];
-//        position[1] /= position[3];
-//        position[2] /= position[3];
-//        position[3] = 1;
-//        return position;
-//
-//    }
+    //坐标互转
 
 
     static JNINativeMethod gMethods[] = {

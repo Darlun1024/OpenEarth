@@ -8,7 +8,7 @@
 
 namespace OpenEarth{
     const int TILE_SIZE = 256;
-    const float  RADIUS = 0.9f;
+    const float  RADIUS = 1.0f;
 }
 
 #endif //OPENEARTH_CONSTANTS_HPP
