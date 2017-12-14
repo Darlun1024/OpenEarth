@@ -4,8 +4,8 @@
 
 #include "tile.hpp"
 #include <math.h>
-#include "constants.hpp"
 #include "../util/assets_file_reader.hpp"
+#include "earth.hpp"
 #include <GLES2/gl2.h>
 
 extern "C" {
@@ -37,6 +37,12 @@ OpenEarth::Tile::~Tile() {
     delete[] this->vertexArray;
     delete[] this->bounds;
     delete this->stripes;
+}
+
+void OpenEarth::Tile::reset() {
+    delete[] this->vertexArray;
+    delete  this->stripes;
+    genVertexArray();
 }
 
 
@@ -72,7 +78,7 @@ static float dtor(float d) {
  *用绘制球体的方法，绘制瓦片是不行的，在右边界的点会左边界的点连接起来
  */
 void OpenEarth::Tile::genVertexArray() {
-    float R = OpenEarth::RADIUS;
+    float R = OpenEarth::Earth::getRadius();
     float width = bounds[2] - bounds[0];
     float height = bounds[1] - bounds[3];
 

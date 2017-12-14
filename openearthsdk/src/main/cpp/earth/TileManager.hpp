@@ -6,11 +6,9 @@
 #define OPENEARTH_TILEMANAGER_HPP
 
 
-
 class TileManager {
 
 };
-
 
 
 #endif //OPENEARTH_TILEMANAGER_HPP

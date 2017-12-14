@@ -51,7 +51,10 @@ add_library( # Sets the name of the library.
               src/main/cpp/util/jpeg_reader.c
               src/main/cpp/util/assets_file_reader.cpp
               src/main/cpp/util/util.cpp
+              src/main/cpp/earth/opengl_project.cpp
+              src/main/cpp/earth/geometry/latlng.cpp
               src/main/cpp/native_earth_view.cpp
+              src/main/cpp/earth/earth.cpp
               src/main/cpp/earth/transform.cpp
               src/main/cpp/earth/sphere.cpp
               src/main/cpp/earth/tile.cpp

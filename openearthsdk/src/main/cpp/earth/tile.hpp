@@ -18,6 +18,7 @@ namespace OpenEarth {
         ~Tile();
         void draw(GLuint aPostionLocaiton, GLuint aTextureLocation,AAssetManager *amgr,
         const char *path);
+        void reset();
     private:
         double *bounds = new double[4];//left,top,right,bottom
         float step = 3.0f;

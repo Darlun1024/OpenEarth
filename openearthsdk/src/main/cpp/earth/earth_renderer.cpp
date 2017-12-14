@@ -10,10 +10,14 @@
 #include "../util/assets_file_reader.hpp"
 #include "tile.hpp"
 #include "../logging.hpp"
+#include "earth.hpp"
 
 extern "C" {
     #include "../util/png_reader.h"
 }
+
+#define  DEFAULT_EYE_HEIGHT 1.0f
+#define  DEFAULT_EARTH_RADIUS 1.0f
 
 namespace OpenEarth {
     static const char *const JavaClassName = "com/geocompass/openearth/sdk/earth/EarthRenderer";
@@ -24,18 +28,24 @@ namespace OpenEarth {
     std::unique_ptr<OpenEarth::Sphere> sphere;
     Tile *tile1;
     Tile *tile2;
-    Tile *tile200,*tile201,*tile210,*tile211,*tile220,*tile221,*tile230,*tile231;
     GLuint d_glprogram;
     int aPositionLocaiton;
     int aTextureLocation;
     int uTextureUnitLocation;
     int uProjectionLocation;
-    glm::mat4x4 mModelMatrix;
-    glm::mat4x4 mViewMatrix;
-    glm::mat4x4 mProjectionMatrix;
-    glm::mat4x4 mMvpMatrix;
 
-    AAssetManager* mAssetManager;
+    AAssetManager* aAssetManager;
+
+    glm::vec2  screenSize;
+    glm::mat4x4 gModelMatrix;
+    glm::mat4x4 gViewMatrix;
+    glm::mat4x4 gProjectionMatrix;
+    glm::mat4x4 gMvpMatrix;
+
+    float earthRotateX = 0.0f;
+    float earthRotateY = 0.0f;
+    float earthRotateZ = 0.0f;
+    float earthScale   = 1.0f;
     //函数声明
     void drawEarth();
 
@@ -55,52 +65,72 @@ namespace OpenEarth {
         if(tile2)
             delete tile2;
 
-        delete mAssetManager;
+        delete aAssetManager;
     }
 
     void initialize(){
-        mModelMatrix = glm::mat4(1.0f);  //模型矩阵
-        mModelMatrix = glm::translate(mModelMatrix,glm::vec3(0,0,-1.0f));
-        mViewMatrix  = glm::lookAt(
-                glm::vec3(0.0f, 0.0f, 1.0f), //眼睛位置
+        gModelMatrix = glm::mat4(1.0f);  //模型矩阵
+        gModelMatrix = glm::translate(gModelMatrix,glm::vec3(0,0,-OpenEarth::Earth::getRadius()*earthScale));
+        gViewMatrix  = glm::lookAt(
+                glm::vec3(0.0f, 0.0f, DEFAULT_EYE_HEIGHT), //眼睛位置
                 glm::vec3(0.0f, 0.0f, 0.0f), //瞄准的点
                 glm::vec3(0.0f, 1.0f, 0.0f)  //头顶方向的法向量
         );
 
-    }
 
+    }
+    /**
+     * 这里采用调整视角的方式旋转
+     * @param env
+     * @param instance
+     * @param axis
+     * @param radian
+     */
     void rotateEarth(JNIEnv *env, jobject instance, jint axis, jfloat radian){
         switch(axis){
             case X_AXIS:
-                mModelMatrix = glm::rotate(mModelMatrix,radian,glm::vec3(1.0f,0.0f,0.0f));
+                earthRotateX += radian;
+                gModelMatrix = glm::rotate(gModelMatrix,radian,glm::vec3(1.0f,0.0f,0.0f));
                 break;
             case Y_AXIS:
-                mModelMatrix = glm::rotate(mModelMatrix,radian,glm::vec3(0.0f,1.0f,0.0f));
+                earthRotateY +=radian;
+                gModelMatrix = glm::rotate(gModelMatrix,radian,glm::vec3(0.0f,1.0f,0.0f));
                 break;
             case Z_AXIS:
-                mModelMatrix = glm::rotate(mModelMatrix,radian,glm::vec3(0.0f,0.0f,1.0f));
+                earthRotateZ +=radian;
+                gModelMatrix = glm::rotate(gModelMatrix,radian,glm::vec3(0.0f,0.0f,1.0f));
                 break;
         }
+    }
+
+    void updateModelMatrix(){
+        gModelMatrix = glm::mat4(1.0f);  //模型矩阵
+        gModelMatrix = glm::translate(gModelMatrix,glm::vec3(0,0,-OpenEarth::Earth::getRadius()*earthScale)); //移动地心，使得地球总在显示范围内部
+        //设置旋转
+        gModelMatrix = glm::rotate(gModelMatrix,earthRotateX,glm::vec3(1.0f,0.0f,0.0f));
+        gModelMatrix = glm::rotate(gModelMatrix,earthRotateY,glm::vec3(0.0f,1.0f,0.0f));
+        gModelMatrix = glm::rotate(gModelMatrix,earthRotateZ,glm::vec3(0.0f,0.0f,1.0f));
+    }
+
+    //重新绘制地球
+    void updateEarth(){
+        updateModelMatrix();
+        tile1->reset();
+        tile2->reset();
+    }
+
+    //设置球体的各个参数
+    void setScale(JNIEnv *env, jobject instance,jfloat scale){
 
     }
 
-    //     static PointF screenToWorld(float* viewMatrix,float* projMatrix, float screenX, float screenY) {
-    //        float[] nearPos = unProject(viewMatrix, projMatrix, screenX, screenY, 0);
-    //        float[] farPos = unProject(viewMatrix, projMatrix, screenX, screenY, 1);
-    //        // The click occurred in somewhere on the line between the two points
-    //        // nearPos and farPos. We want to find
-    //        // where that line intersects the plane at z=0
-    //        float distance = nearPos[2] / (nearPos[2] - farPos[2]); // Distance between nearPos and z=0
-    //        float x = nearPos[0] + (farPos[0] - nearPos[0]) * distance;
-    //        float y = nearPos[1] + (farPos[1] - nearPos[0]) * distance;
-    //        return new PointF(x, y);
-    //    }
-    //
-    glm::vec3 unProject(glm::mat4x4 viewMatrix,glm::mat4x4 projMatrix, float screenX, float screenY, float depth) {
-        glm::vec4 viewPort = {0, 0, 1, 1};
-        glm::vec3 win = {screenX,screenY,depth};
-        glm::vec3 position =  glm::unProject(win,viewMatrix,projMatrix,viewPort);
-        return position;
+    void setZoom(JNIEnv *env, jobject instance,jfloat zoom){
+        earthScale = 1.0f;
+        OpenEarth::Earth::setRadius(OpenEarth::DEFAULT_RADIUS * pow(2,zoom-1));
+        updateEarth();
+    }
+    void setTilt(JNIEnv *env, jobject instance,jfloat tilt){
+
     }
 
 
@@ -111,7 +141,7 @@ namespace OpenEarth {
                                                "()Landroid/content/res/AssetManager;");
         //从Java获取AssetManager
         jobject javaAssetManager = env->CallObjectMethod(instance, methodID);
-        mAssetManager = AAssetManager_fromJava(env, javaAssetManager);
+        aAssetManager = AAssetManager_fromJava(env, javaAssetManager);
 //        sphere = std::make_unique<OpenEarth::Sphere>(1.0f);
         tile1 = new Tile(0, 0, 1);
         tile2 = new Tile(1, 0, 1);
@@ -171,6 +201,7 @@ namespace OpenEarth {
     void surfaceChanged(JNIEnv *env, jobject instance, jint width, jint height) {
 
         glViewport(0, 0, width, height);
+        screenSize = glm::vec2(width,height);
         const GLfloat ratio  = (GLfloat) width / height;
         const GLfloat left   = width < height ? -1.0f : -1.0f * ratio;
         const GLfloat right  = width < height ? 1.0f : 1.0f * ratio;
@@ -180,19 +211,19 @@ namespace OpenEarth {
         const GLfloat far    = 10.0f;
 
 //        mProjectionMatrix = glm::ortho(left, right, bottom, top, near, far); //正交投影
-        mProjectionMatrix = glm::perspective(90.0f,ratio,near,far); //透视投影
+        gProjectionMatrix = glm::perspective(90.0f,ratio,near,far); //透视投影
 
         //屏幕坐标转为归一化设备坐标
-         float normalizeX = ((float)width/2)/width*2-1;
-         float normalizeY = -((float)height/2/height*2-1);
-        glm::mat4 invVP = glm::inverse(mProjectionMatrix * mViewMatrix);
-        glm::vec4 screenPos = glm::vec4(normalizeX, normalizeY, 1.0f, 1.0f);
-        glm::vec4 worldPos = invVP * screenPos;
+//         float normalizeX = width/2;
+//         float normalizeY = height/2;
+         float normalizeX = 0;
+         float normalizeY = 0;
+//        glm::mat4 invVP = glm::inverse(mProjectionMatrix * mViewMatrix);
+//        glm::vec4 screenPos = glm::vec4(normalizeX, normalizeY, 1.0f, 1.0f);
+//        glm::vec4 worldPos = invVP * screenPos;
 
-        glm::vec3 dir = glm::normalize(glm::vec3(worldPos));
+//        glm::vec3 dir = glm::normalize(glm::vec3(worldPos));
 
-        glm::vec3 postion = unProject(mViewMatrix,mProjectionMatrix,normalizeX,normalizeY,1.0f);
-        LOGE("RENDER","%f,%f,%f",postion[0],postion[1],postion[2]);
 
 }
 
@@ -215,27 +246,13 @@ void render(JNIEnv *env, jobject instance) {
 
         glUniform1i(uTextureUnitLocation, 0);
 
-        mMvpMatrix = mProjectionMatrix * mViewMatrix * mModelMatrix;
-        glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(mMvpMatrix));
+        gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix;
+        glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
 
-        tile1->draw(aPositionLocaiton,aTextureLocation,mAssetManager,"west.jpeg");
-        tile2->draw(aPositionLocaiton,aTextureLocation,mAssetManager,"east.jpeg");
-
-    }
-
-    //设置球体的各个参数
-    void setScale(JNIEnv *env, jobject instance,jfloat scale){
+        tile1->draw(aPositionLocaiton,aTextureLocation,aAssetManager,"west.jpeg");
+        tile2->draw(aPositionLocaiton,aTextureLocation,aAssetManager,"east.jpeg");
 
     }
-    void setZoom(JNIEnv *env, jobject instance,jfloat zoom){
-
-    }
-    void setTilt(JNIEnv *env, jobject instance,jfloat tilt){
-
-    }
-
-
-    //坐标互转
 
 
     static JNINativeMethod gMethods[] = {

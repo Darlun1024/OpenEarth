@@ -14,9 +14,36 @@
 
     <Button
         android:id="@+id/btn_rotate"
-        android:layout_width="96dp"
-        android:layout_height="36dp"
-        android:text="Rotate" />
+        android:layout_width="@dimen/btn_size"
+        android:layout_height="@dimen/btn_size"
+        android:text="转" />
 
 
+    <Button
+        android:id="@+id/btn_zoom_in"
+        android:layout_width="@dimen/btn_size"
+        android:layout_height="@dimen/btn_size"
+        android:layout_below="@id/btn_rotate"
+        android:text="+" />
+
+    <Button
+        android:id="@+id/btn_zoom_out"
+        android:layout_width="@dimen/btn_size"
+        android:layout_height="@dimen/btn_size"
+        android:layout_below="@id/btn_zoom_in"
+        android:text="-" />
+
+    <Button
+        android:id="@+id/btn_look_up"
+        android:layout_width="@dimen/btn_size"
+        android:layout_height="@dimen/btn_size"
+        android:layout_below="@id/btn_zoom_out"
+        android:text="仰" />
+
+    <Button
+        android:id="@+id/btn_look_down"
+        android:layout_width="@dimen/btn_size"
+        android:layout_height="@dimen/btn_size"
+        android:layout_below="@id/btn_look_up"
+        android:text="俯" />
 </RelativeLayout>

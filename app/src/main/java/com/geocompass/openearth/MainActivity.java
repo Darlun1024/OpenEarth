@@ -2,9 +2,7 @@ package com.geocompass.openearth;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 
 import com.geocompass.openearth.sdk.earth.Earth;
@@ -32,12 +30,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mEarth = mEarthView.getEarth();
 
         findViewById(R.id.btn_rotate).setOnClickListener(this);
-
-        Log.e("Path",Environment.getExternalStorageDirectory().getAbsolutePath());
-
-        //注释掉一些变量
-
-//        mEarthView.setOnTouchListener(this);
+        findViewById(R.id.btn_zoom_in).setOnClickListener(this);
+        findViewById(R.id.btn_zoom_out).setOnClickListener(this);
+        findViewById(R.id.btn_look_up).setOnClickListener(this);
+        findViewById(R.id.btn_look_down).setOnClickListener(this);
 
     }
 
@@ -47,58 +43,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.btn_rotate:
                 //绕Y轴，旋转10度
-            mEarth.rotateEarth(1, (float) (Math.PI/72));
-//                mEarth.rotateEarth(Earth.ROTATEZ, (float) (Math.PI / 72));
+                mEarth.rotateEarth(1, (float) (Math.PI / 72));
+                return;
+            case R.id.btn_zoom_in:
+                mEarth.zoomIn();
+                return;
+            case R.id.btn_zoom_out:
+                mEarth.zoomOut();
+                return;
+            case R.id.btn_look_up:
+                mEarth.zoomIn();
+                return;
+            case R.id.btn_look_down:
+                mEarth.zoomOut();
                 return;
         }
     }
 
 
-
-//    @Override
-//    public boolean onTouch(View v, MotionEvent event) {
-//        switch (event.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                x = event.getX();
-//                y = event.getY();
-//
-//                preX = event.getX();
-//                preY = event.getY();
-//                break;
-//            case MotionEvent.ACTION_MOVE:
-//                x1 = event.getX();
-//                y1 = event.getY();
-//
-//                if (x1 < preX) {
-//                    x = preX;
-//                }
-//                if (y1 < preY) {
-//                    y = preY;
-//                }
-//                float v1 = x1 - x;
-//                float v2 = y1 - y;
-//
-////                        if (Math.abs(v1) > 10 && Math.abs(v2) > 10) {
-//                if (v1 > 0 && v2 > 0) {
-//                    mEarth.rotateEarth(Earth.ROTATEY, (float) (Math.PI / 45));
-//                    mEarth.rotateEarth(Earth.ROTATEX, (float) (Math.PI / 45));
-//                } else if (v1 > 0 && v2 < 0) {
-//                    mEarth.rotateEarth(Earth.ROTATEY, (float) (Math.PI / 45));
-//                    mEarth.rotateEarth(Earth.ROTATEX, -(float) (Math.PI / 45));
-//                } else if (v1 < 0 && v2 < 0) {
-//                    mEarth.rotateEarth(Earth.ROTATEY, -(float) (Math.PI / 45));
-//                    mEarth.rotateEarth(Earth.ROTATEX, -(float) (Math.PI / 45));
-//                } else if (v1 < 0 && v2 > 0) {
-//                    mEarth.rotateEarth(Earth.ROTATEY, -(float) (Math.PI / 45));
-//                    mEarth.rotateEarth(Earth.ROTATEX, (float) (Math.PI / 45));
-//                }
-////                        }
-//                preX = x1;
-//                preY = y1;
-//                break;
-//            case MotionEvent.ACTION_UP:
-//                break;
-//        }
-//        return true;
-//    }
 }

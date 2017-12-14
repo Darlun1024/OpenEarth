@@ -5,12 +5,36 @@
 #ifndef OPENEARTH_OPENGL_PROJECT_HPP
 #define OPENEARTH_OPENGL_PROJECT_HPP
 
+#include <cstdint>
+#include <glm/vec2.hpp>
+#include <bits/unique_ptr.h>
+#include <glm/detail/type_mat.hpp>
+#include <glm/detail/type_mat4x4.hpp>
 
+namespace OpenEarth {
+    class OpenGLProject {
+    private:
+        glm::vec2  mScreenSize;
+        glm::mat4 mViewMatrix;
+        glm::mat4 mProjectMatrix;
+        glm::mat4 inverseVPProject;
 
-class opengl_project {
+    public:
+//        OpenGLProject()
+        //设置屏幕大小
+        void setScreenSize(glm::vec2 size);
+        //获取屏幕大小
+        glm::vec2 getScreenSize();
 
-};
+        //世界坐标转屏幕坐标
+        glm::vec2 project(glm::vec3);
 
+        //屏幕坐标转世界坐标,世界坐标有三个维度
+        glm::vec3 unProject(glm::vec2, float depth);
 
+    private:
 
+    };
+
+}
 #endif //OPENEARTH_OPENGL_PROJECT_HPP
