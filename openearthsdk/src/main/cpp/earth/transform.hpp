@@ -21,6 +21,7 @@ namespace OpenEarth {
         public:
             Transform(glm::mat4 modelMatrix,glm::mat4 viewMatrix,glm::mat4 projMatrix);
             ~Transform();
+
             /**
              * 地图坐标转屏幕坐标
              * @param latLng
