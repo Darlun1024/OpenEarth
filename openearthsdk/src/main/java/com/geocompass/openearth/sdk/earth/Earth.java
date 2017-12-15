@@ -33,10 +33,12 @@ public class Earth {
     }
 
     public void lookUp(){
-
+        tilt += 0.1f;
+        this.mEarthRenderer.setTilt(tilt);
     }
 
     public void lookDown(){
-
+        tilt -= 0.1f;
+        this.mEarthRenderer.setTilt(tilt);
     }
 }

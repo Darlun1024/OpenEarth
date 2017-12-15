@@ -36,7 +36,7 @@ namespace OpenEarth {
 
     AAssetManager* aAssetManager;
 
-    glm::vec2  screenSize;
+    glm::vec2   screenSize;
     glm::mat4x4 gModelMatrix;
     glm::mat4x4 gViewMatrix;
     glm::mat4x4 gProjectionMatrix;
@@ -49,6 +49,7 @@ namespace OpenEarth {
     //函数声明
     void drawEarth();
 
+    float cameraTargetCenterY = 0.0f;
     //构造和析构函数
     OpenEarth::EarthRenderer::EarthRenderer() {
 
@@ -70,17 +71,16 @@ namespace OpenEarth {
 
     void initialize(){
         gModelMatrix = glm::mat4(1.0f);  //模型矩阵
-        gModelMatrix = glm::translate(gModelMatrix,glm::vec3(0,0,-OpenEarth::Earth::getRadius()*earthScale));
+        gModelMatrix = glm::translate(gModelMatrix,glm::vec3(0,0,-OpenEarth::Earth::getRadius()*earthScale-1));
         gViewMatrix  = glm::lookAt(
                 glm::vec3(0.0f, 0.0f, DEFAULT_EYE_HEIGHT), //眼睛位置
-                glm::vec3(0.0f, 0.0f, 0.0f), //瞄准的点
+                glm::vec3(0.0f, cameraTargetCenterY, 0.0f), //瞄准的点
                 glm::vec3(0.0f, 1.0f, 0.0f)  //头顶方向的法向量
         );
-
-
     }
+
     /**
-     * 这里采用调整视角的方式旋转
+     * 旋转球体
      * @param env
      * @param instance
      * @param axis
@@ -105,7 +105,7 @@ namespace OpenEarth {
 
     void updateModelMatrix(){
         gModelMatrix = glm::mat4(1.0f);  //模型矩阵
-        gModelMatrix = glm::translate(gModelMatrix,glm::vec3(0,0,-OpenEarth::Earth::getRadius()*earthScale)); //移动地心，使得地球总在显示范围内部
+        gModelMatrix = glm::translate(gModelMatrix,glm::vec3(0,0,-OpenEarth::Earth::getRadius()*earthScale-1)); //移动地心，使得地球总在显示范围内部
         //设置旋转
         gModelMatrix = glm::rotate(gModelMatrix,earthRotateX,glm::vec3(1.0f,0.0f,0.0f));
         gModelMatrix = glm::rotate(gModelMatrix,earthRotateY,glm::vec3(0.0f,1.0f,0.0f));
@@ -129,8 +129,16 @@ namespace OpenEarth {
         OpenEarth::Earth::setRadius(OpenEarth::DEFAULT_RADIUS * pow(2,zoom-1));
         updateEarth();
     }
-    void setTilt(JNIEnv *env, jobject instance,jfloat tilt){
 
+    //修改摄像头瞄准的点
+    void setTilt(JNIEnv *env, jobject instance,jfloat tilt){
+        //TODO 根据角度计算
+        cameraTargetCenterY = tilt;
+        gViewMatrix  = glm::lookAt(
+                glm::vec3(0.0f, 0.0f, DEFAULT_EYE_HEIGHT), //眼睛位置
+                glm::vec3(0.0f, cameraTargetCenterY, 0.0f), //瞄准的点
+                glm::vec3(0.0f, 1.0f, 0.0f)  //头顶方向的法向量
+        );
     }
 
 
@@ -208,7 +216,7 @@ namespace OpenEarth {
         const GLfloat bottom = width < height ? -1.0f / ratio : -1.0f;
         const GLfloat top    = width < height ? 1.0f / ratio : 1.0f;
         const GLfloat near   = 1.0f;
-        const GLfloat far    = 10.0f;
+        const GLfloat far    = 5.0f;
 
 //        mProjectionMatrix = glm::ortho(left, right, bottom, top, near, far); //正交投影
         gProjectionMatrix = glm::perspective(90.0f,ratio,near,far); //透视投影
