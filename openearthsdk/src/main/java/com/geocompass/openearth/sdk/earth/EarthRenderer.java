@@ -53,25 +53,49 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     }
 
 
+    /**
+     * 设置放大比例[1.0,2.0)
+     * 用于处理在两个zoom之间的地球放大问题
+     * @param scale
+     */
     public void setScale(float scale){
         nativeSetScale(scale);
         glSurfaceView.requestRender();
     }
 
+    /**
+     * 设置显示级别,级别越大，地球半径越大
+     * @param zoom
+     */
     public void setZoom(float zoom){
         nativeSetZoom(zoom);
         glSurfaceView.requestRender();
     }
 
+    /**
+     * 设置视角的角度(向上看或者向下看)
+     * @param tilt
+     */
     public void setTilt(float tilt){
         nativeSetTilt(tilt);
         glSurfaceView.requestRender();
+    }
+
+    public float[] screen2World(float[] point){
+        float[] worldPoint =  nativeScreen2World(point);
+        return worldPoint;
+    }
+
+    public float[] world2Screen(float[] point){
+        float[] screenPoint =  nativeWorld2Screen(point);
+        return screenPoint;
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
         nativeRender();
     }
+
 
     public AssetManager getAssetManager(){
         AssetManager manager = glSurfaceView.getContext().getAssets();
@@ -86,6 +110,8 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     private native void  nativeSetTilt(float radian);
     private native void  nativeSetZoom(float zoom);
     private native void  nativeInitialize();
+    private native float[] nativeScreen2World(float[] point);
+    private native float[] nativeWorld2Screen(float[] point);
 
 
 }

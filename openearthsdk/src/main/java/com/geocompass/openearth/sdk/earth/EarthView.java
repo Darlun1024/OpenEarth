@@ -6,6 +6,7 @@ import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -81,7 +82,14 @@ public class EarthView extends FrameLayout implements View.OnGenericMotionListen
     public boolean onTouchEvent(MotionEvent event){
         int action = event.getAction();
         switch (action){
-            case MotionEvent.ACTION_DOWN:break;
+            case MotionEvent.ACTION_DOWN:
+                float x = event.getX();
+                float y = event.getY();
+                float[] array = {x,y};
+                float[] world =  mEarthRenderer.screen2World(array);
+                float[] srceen = mEarthRenderer.world2Screen(world);
+                Log.e("tag","stop");
+                break;
 
             case MotionEvent.ACTION_MOVE:break;
 

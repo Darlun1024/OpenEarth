@@ -8,8 +8,7 @@
 #include <cstdint>
 #include <glm/vec2.hpp>
 #include <bits/unique_ptr.h>
-#include <glm/detail/type_mat.hpp>
-#include <glm/detail/type_mat4x4.hpp>
+#include <glm/matrix.hpp>
 
 namespace OpenEarth {
     class OpenGLProject {
@@ -17,10 +16,15 @@ namespace OpenEarth {
         glm::vec2  mScreenSize;
         glm::mat4 mViewMatrix;
         glm::mat4 mProjectMatrix;
-        glm::mat4 inverseVPProject;
-
+        glm::mat4 mVPMatrix;
+        glm::mat4 mInserseVPMatrix;
+        glm::vec4 mViewPort;
     public:
-//        OpenGLProject()
+        OpenGLProject(glm::mat4 viewMat,glm::mat4 projMat,glm::vec2 screenSize);
+        ~OpenGLProject();
+
+        void setProjectMatrix(glm::mat4 projMat);
+        void setViewMatrix(glm::mat4 viewMat);
         //设置屏幕大小
         void setScreenSize(glm::vec2 size);
         //获取屏幕大小
