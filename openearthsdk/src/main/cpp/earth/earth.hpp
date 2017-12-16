@@ -18,6 +18,31 @@ namespace OpenEarth{
 
         static void setScale(float scale);
         static float getScale();
+
+
+        /**
+         * 绕X轴转
+         * @param rad
+         */
+        static void rotateX(float rad);
+
+        /**
+         * 绕Y轴转
+         * @param rad
+         */
+        static void rotateY(float rad);
+
+        /**
+         * 绕Z轴转
+         * @param rad
+         */
+        static void rotateZ(float rad);
+
+        /**
+         * 沿Z轴上移动球心
+         * @param distance
+         */
+        static void setTranslateZ(float distance);
     };
 }
 

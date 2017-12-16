@@ -16,7 +16,7 @@ public:
     float lat;
     float lon;
 
-    LatLng();
+    LatLng(float lat, float lon);
     ~LatLng();
 
 

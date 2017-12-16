@@ -23,6 +23,7 @@ namespace OpenEarth {
         OpenGLProject(glm::mat4 viewMat,glm::mat4 projMat,glm::vec2 screenSize);
         ~OpenGLProject();
 
+
         void setProjectMatrix(glm::mat4 projMat);
         void setViewMatrix(glm::mat4 viewMat);
         //设置屏幕大小

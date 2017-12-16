@@ -12,6 +12,7 @@
 #include "../logging.hpp"
 #include "earth.hpp"
 #include "opengl_project.hpp"
+#include "transform.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
 
@@ -22,7 +23,8 @@ namespace OpenEarth {
     static const int const Y_AXIS = 1;
     static const int const Z_AXIS = 2;
     std::unique_ptr<OpenEarth::Sphere> sphere;
-    std::unique_ptr<OpenEarth::OpenGLProject> gProject;
+    std::shared_ptr<OpenEarth::OpenGLProject> gProject;
+    std::unique_ptr<OpenEarth::Transform> gTransform;
     Tile *tile1;
     Tile *tile2;
     GLuint d_glprogram;
@@ -42,14 +44,12 @@ namespace OpenEarth {
     float earthRotateX = 0.0f;
     float earthRotateY = 0.0f;
     float earthRotateZ = 0.0f;
-    float earthScale = 1.0f;
+    float earthScale   = 1.0f;
 
     //函数声明
     void drawEarth();
 
     float cameraTargetCenterY = 0.0f;
-
-
 
     //构造和析构函数
     OpenEarth::EarthRenderer::EarthRenderer() {
@@ -74,8 +74,9 @@ namespace OpenEarth {
     void initialize() {
         gModelMatrix = glm::mat4(1.0f);  //模型矩阵
         //这里减 1 是为了在调整camera瞄准点时，屏幕下方出现地图空缺的问题，这个数字和透视投影的角度，相机距球体的位置有关
-        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() *
-                                                                    earthScale - 1));
+        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * OpenEarth::Earth::getScale() - 1));
+        gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
+
         gViewMatrix = glm::lookAt(
                 glm::vec3(0.0f, 0.0f, DEFAULT_EYE_HEIGHT), //眼睛位置
                 glm::vec3(0.0f, cameraTargetCenterY, 0.0f), //瞄准的点
@@ -83,7 +84,8 @@ namespace OpenEarth {
         );
         gProjectionMatrix = glm::mat4(1.0f);
         screenSize = glm::vec2(0,0);
-        gProject = std::make_unique<OpenEarth::OpenGLProject>(gViewMatrix,gProjectionMatrix,screenSize);
+        gProject   = std::make_shared<OpenEarth::OpenGLProject>(gViewMatrix,gProjectionMatrix,screenSize);
+        gTransform = std::make_unique<OpenEarth::Transform>(gModelMatrix,gProject);
     }
 
     /**
@@ -111,10 +113,8 @@ namespace OpenEarth {
     }
 
     void updateModelMatrix() {
-        gModelMatrix = glm::mat4(1.0f);  //模型矩阵
-        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() *
-                                                                    earthScale -
-                                                                    1)); //移动地心，使得地球总在显示范围内部
+        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * OpenEarth::Earth::getScale() - 1));
+        gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
         //设置旋转
         gModelMatrix = glm::rotate(gModelMatrix, earthRotateX, glm::vec3(1.0f, 0.0f, 0.0f));
         gModelMatrix = glm::rotate(gModelMatrix, earthRotateY, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -231,18 +231,6 @@ namespace OpenEarth {
 
         gProject->setProjectMatrix(gProjectionMatrix);
         gProject->setScreenSize(screenSize);
-
-//         float normalizeX = width/2;
-//         float normalizeY = height/2;
-        float normalizeX = 0;
-        float normalizeY = 0;
-//        glm::mat4 invVP = glm::inverse(mProjectionMatrix * mViewMatrix);
-//        glm::vec4 screenPos = glm::vec4(normalizeX, normalizeY, 1.0f, 1.0f);
-//        glm::vec4 worldPos = invVP * screenPos;
-
-//        glm::vec3 dir = glm::normalize(glm::vec3(worldPos));
-
-
     }
 
 
@@ -275,7 +263,6 @@ namespace OpenEarth {
         jboolean isCopy = true;
         jfloat* array = env->GetFloatArrayElements(point,&isCopy);
         glm::vec3 world = gProject->unProject(glm::vec2(array[0],array[1]),0);
-//        env->ReleaseFloatArrayElements(point,array,0);
         jfloat array1[3] = {world[0],world[1],world[2]};
         jfloatArray floatArray = env->NewFloatArray(3);
          env->SetFloatArrayRegion(floatArray,0,3,array1);
@@ -286,7 +273,26 @@ namespace OpenEarth {
         jboolean isCopy = true;
         float* array = env->GetFloatArrayElements(point,&isCopy);
         glm::vec2 screen = gProject->project(glm::vec3(array[0],array[1],array[2]));
-//        env->ReleaseFloatArrayElements(point,array,0);
+        jfloat array1[2] = {screen[0],screen[1]};
+        jfloatArray floatArray = env->NewFloatArray(2);
+        env->SetFloatArrayRegion(floatArray,0,2,array1);
+        return floatArray;
+    }
+
+    jfloatArray screen2LatLng(JNIEnv *env, jobject instance, jfloatArray point){
+        jboolean isCopy = true;
+        jfloat* array = env->GetFloatArrayElements(point,&isCopy);
+        glm::vec2 latlng = gTransform->screenPointToLatlng(glm::vec2(array[0],array[1]));
+        jfloat array1[2] = {latlng[0],latlng[1]};
+        jfloatArray floatArray = env->NewFloatArray(3);
+        env->SetFloatArrayRegion(floatArray,0,2,array1);
+        return floatArray;
+    }
+
+    jfloatArray latLng2Screen(JNIEnv *env, jobject instance, jfloatArray latlng){
+        jboolean isCopy = true;
+        float* array = env->GetFloatArrayElements(latlng,&isCopy);
+        glm::vec2 screen = gTransform->latLngToScreenPoint(new LatLng(array[0],array[1]));
         jfloat array1[2] = {screen[0],screen[1]};
         jfloatArray floatArray = env->NewFloatArray(2);
         env->SetFloatArrayRegion(floatArray,0,2,array1);
@@ -305,7 +311,10 @@ namespace OpenEarth {
             {"nativeSetTilt",        "(F)V",  (void *) setTilt},
             {"nativeSetZoom",        "(F)V",  (void *) setZoom},
             {"nativeScreen2World", "([F)[F",  (jfloatArray *) screen2World},
-            {"nativeWorld2Screen", "([F)[F",  (jfloatArray *) world2Screen}
+            {"nativeWorld2Screen", "([F)[F",  (jfloatArray *) world2Screen},
+            {"nativeLatLng2Screen", "([F)[F",  (jfloatArray *) latLng2Screen},
+            {"nativeScreen2LatLng", "([F)[F",  (jfloatArray *) screen2LatLng}
+
     };
 
 //注册native 方法

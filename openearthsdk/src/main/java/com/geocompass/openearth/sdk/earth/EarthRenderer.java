@@ -81,15 +81,46 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
         glSurfaceView.requestRender();
     }
 
+    /**
+     * 屏幕坐标转世界坐标
+     * @param point
+     * @return
+     */
     public float[] screen2World(float[] point){
         float[] worldPoint =  nativeScreen2World(point);
         return worldPoint;
     }
 
+    /**
+     * 世界坐标转屏幕坐标
+     * @param point
+     * @return
+     */
     public float[] world2Screen(float[] point){
         float[] screenPoint =  nativeWorld2Screen(point);
         return screenPoint;
     }
+
+    /**
+     * 屏幕坐标转经纬度
+     * @param point
+     * @return
+     */
+    public float[] screen2LatLng(float[] point){
+        float[] worldPoint =  nativeScreen2World(point);
+        return worldPoint;
+    }
+
+    /**
+     * 经纬度转屏幕坐标
+     * @param point
+     * @return
+     */
+    public float[] latLng2Screen(float[] point){
+        float[] screenPoint =  nativeWorld2Screen(point);
+        return screenPoint;
+    }
+
 
     @Override
     public void onDrawFrame(GL10 gl) {
@@ -112,6 +143,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     private native void  nativeInitialize();
     private native float[] nativeScreen2World(float[] point);
     private native float[] nativeWorld2Screen(float[] point);
-
+    private native float[] nativeLatLng2Screen(float[] point);
+    private native float[] nativeScreen2LatLng(float[] point);
 
 }

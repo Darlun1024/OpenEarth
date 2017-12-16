@@ -4,8 +4,9 @@
 
 #include "latlng.hpp"
 
-LatLng::LatLng(){
-
+LatLng::LatLng(float lat, float lon){
+    this->lat = lat;
+    this->lon = lon;
 }
 
 LatLng::~LatLng(){
