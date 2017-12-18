@@ -6,6 +6,7 @@
 #ifndef OPENEARTH_EARTH_HPP
 #define OPENEARTH_EARTH_HPP
 
+#include <glm/matrix.hpp>
 
 namespace OpenEarth{
     static float  const  DEFAULT_RADIUS = 1.0f;
@@ -43,6 +44,8 @@ namespace OpenEarth{
          * @param distance
          */
         static void setTranslateZ(float distance);
+
+        static glm::vec3 getCenter();
     };
 }
 

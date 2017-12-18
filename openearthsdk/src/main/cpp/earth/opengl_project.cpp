@@ -52,8 +52,13 @@ glm::vec2 OpenEarth::OpenGLProject::project(glm::vec3 worldPoint) {
 
 //屏幕坐标转为一条射线，世界坐标是三维的，而屏幕坐标是二维的，因此屏幕上的一个点，在世界坐标系中代表一条线
 glm::vec3 OpenEarth::OpenGLProject::unProject(glm::vec2 screenPoint, float depth) {
-    glm::vec3 vecNear =  glm::unProject(glm::vec3(screenPoint, 0.0f), this->mViewMatrix, this->mProjectMatrix,this->mViewPort);
-    glm::vec3 vecFar =  glm::unProject(glm::vec3(screenPoint, 1.0f), this->mViewMatrix, this->mProjectMatrix,this->mViewPort);
-    LOGE("OpenGLProject","Near:%f,%f,%f;Far:%f,%f,%f",vecNear[0],vecNear[1],vecNear[2],vecFar[0],vecFar[1],vecFar[2]);
     return glm::unProject(glm::vec3(screenPoint, depth), this->mViewMatrix, this->mProjectMatrix,this->mViewPort);
+}
+
+Ray* OpenEarth::OpenGLProject::screen2Ray(glm::vec2 screenPoint){
+    //归一化坐标在unProject里面计算了
+    glm::vec3 vecNear =  glm::unProject(glm::vec3(screenPoint, -1.0f), this->mViewMatrix, this->mProjectMatrix,this->mViewPort);
+    glm::vec3 vecFar  =  glm::unProject(glm::vec3(screenPoint, 1.0f), this->mViewMatrix, this->mProjectMatrix,this->mViewPort);
+    glm::vec3 vect = vecFar - vecNear;
+    Ray* ray = new Ray(vecNear,vect);
 }

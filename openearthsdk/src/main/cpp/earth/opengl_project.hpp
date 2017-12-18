@@ -9,7 +9,9 @@
 #include <glm/vec2.hpp>
 #include <bits/unique_ptr.h>
 #include <glm/matrix.hpp>
+#include "geometry/ray.hpp"
 
+using namespace OpenEarth::Geometry;
 namespace OpenEarth {
     class OpenGLProject {
     private:
@@ -34,8 +36,10 @@ namespace OpenEarth {
         //世界坐标转屏幕坐标
         glm::vec2 project(glm::vec3);
 
-        //屏幕坐标转世界坐标,世界坐标有三个维度
-        glm::vec3 unProject(glm::vec2, float depth);
+        //屏幕坐标转在某个深度的世界坐标
+        glm::vec3 unProject(glm::vec2 screenPoint, float depth);
+
+        Ray* screen2Ray(glm::vec2 screenPoint);
 
     private:
 

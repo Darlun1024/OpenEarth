@@ -16,6 +16,7 @@ namespace OpenEarth {
         class Transform {
         private:
             glm::mat4 mModelMatrix;
+            glm::mat4 mInverseModelMatrix;
             std::shared_ptr<OpenEarth::OpenGLProject> mProject;
             glm::vec2 mScreenSize;
         public:

@@ -4,16 +4,23 @@
 
 #include "transform.hpp"
 #include "earth.hpp"
+#include "geometry/ray.hpp"
+#include "../logging.hpp"
 
+using namespace OpenEarth::Geometry;
+
+float distanceBetween(Ray* ray,glm::vec3 point);
 
 OpenEarth::Transform::Transform(glm::mat4 modelMatrix,std::shared_ptr<OpenEarth::OpenGLProject> glProject){
-    this->mModelMatrix   = modelMatrix;
+    this->mModelMatrix         = modelMatrix;
+    this->mInverseModelMatrix  = glm::inverse(modelMatrix);
     this->mProject = glProject;
 }
 
 OpenEarth::Transform::~Transform(){
 
 }
+
 
 glm::vec2 OpenEarth::Transform::latLngToScreenPoint(LatLng* latLng){
     float R      = OpenEarth::Earth::getRadius();
@@ -31,8 +38,58 @@ glm::vec2 OpenEarth::Transform::latLngToScreenPoint(LatLng* latLng){
 
 
 glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
-    glm::vec3 ray;
+    Ray* ray = mProject->screen2Ray(point);
+    glm::vec3 earthCenter = OpenEarth::Earth::getCenter();
+    //通过模型矩阵转换为世界坐标
+    glm::vec4 center = mModelMatrix * glm::vec4(earthCenter,1.0f);
+    float distanceEarthCenterToRay = distanceBetween(ray,glm::vec3(center[0],center[1],center[2]));
+    float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale(); //经过模型矩阵转换后地球的半径
+
+     if(R < distanceEarthCenterToRay){ //不相交
+         return glm::vec2(-181,-181); //返回一个非法的坐标
+     }else{
+        //求解射线和地球的交点
+         //已经球心到线的距离distanceEarthCenterToRay，已经球体半径 R
+         //求交点与垂足的距离
+         float dist = sqrt(R*R - distanceEarthCenterToRay*distanceEarthCenterToRay);
+         //求圆心在向量上的投影
+         float a  = glm::dot(earthCenter - ray->mPoint,ray->mVector); //求两个向量的点积
+         float l  = glm::length(ray->mVector); //求ray的长度
+         glm::vec3 c = ray->mPoint +  a/l * ray->mVector;
+
+         glm::vec3 p1 = c + dist/glm::length(ray->mVector) * ray->mVector;
+         glm::vec3 p0 = c - dist/glm::length(ray->mVector) * ray->mVector; //p0是较近的一点
+         //反转模型矩阵，求出原始的球体坐标
+         p1 = mInverseModelMatrix * p0;
+         p0 = mInverseModelMatrix * p1;
+        LOGE("transform","%f,%f,%f",p0[1],p0[2],p0[2]);
+     }
 
 }
+
+/**
+ * 计算射线和某个点的距离
+ * @param ray
+ * @param point
+ */
+float distanceBetween(Ray* ray,glm::vec3 point){
+    //用线的起点和终点分别于 第三个点构建向量
+    glm::vec3 vect1 = ray->mPoint - point;
+    glm::vec3 vect2 = ray->mPoint + ray->mVector - point;
+    //求两个向量的叉积
+    //两个向量的叉积，这个向量的长度恰好是前两个向量定义的三角形的面积的两倍
+    glm::vec3 cross = glm::cross(vect1,vect2);
+    float areaOf2Triangle =  glm::length(cross);
+    //向量的长度
+    float rayLength = ray->length();
+    //求出向量与点的距离，三角形的高
+    float distancePointToRay = areaOf2Triangle/rayLength;
+    return  distancePointToRay;
+}
+
+
+
+
+
 
 
