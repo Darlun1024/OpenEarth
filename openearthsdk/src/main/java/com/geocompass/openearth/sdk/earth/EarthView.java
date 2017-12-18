@@ -87,6 +87,7 @@ public class EarthView extends FrameLayout implements View.OnGenericMotionListen
                 float[] array = {x,y};
                 float[] world =  mEarthRenderer.screen2World(array);
 //                float[] srceen = mEarthRenderer.world2Screen(world);
+                mEarthRenderer.screen2LatLng(array);
                 break;
 
             case MotionEvent.ACTION_MOVE:break;

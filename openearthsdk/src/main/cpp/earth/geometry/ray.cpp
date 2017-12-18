@@ -6,7 +6,8 @@
 #include <math.h>
 
 OpenEarth::Geometry::Ray::Ray(glm::vec3 point,glm::vec3 vector){
-
+    mVector = vector;
+    mPoint  = point;
 }
 
 OpenEarth::Geometry::Ray::~Ray(){

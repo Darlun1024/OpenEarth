@@ -107,7 +107,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * @return
      */
     public float[] screen2LatLng(float[] point){
-        float[] worldPoint =  nativeScreen2World(point);
+        float[] worldPoint =  nativeScreen2LatLng(point);
         return worldPoint;
     }
 
@@ -117,7 +117,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * @return
      */
     public float[] latLng2Screen(float[] point){
-        float[] screenPoint =  nativeWorld2Screen(point);
+        float[] screenPoint =  nativeLatLng2Screen(point);
         return screenPoint;
     }
 

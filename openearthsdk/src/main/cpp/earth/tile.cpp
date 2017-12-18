@@ -102,6 +102,8 @@ void OpenEarth::Tile::genVertexArray() {
         float latR2 = dtor(lat - step);
         y1 = (float) (R * sin(latR1));
         y2 = (float) (R * sin(latR2));
+        float cosLat1 = R * cos(latR1);
+        float cosLat2 = R * cos(latR2);
         imageX = 0.0f;
         GLfloat *vertexs = new GLfloat[cols * 2 * 5];
         index = 0;
@@ -109,10 +111,10 @@ void OpenEarth::Tile::genVertexArray() {
         for (lon = bounds[0]; lon <= bounds[2]; lon += step) {
 //            if(lon==bounds[2]) lon = lon - (lon/100000000);
             float lonR1 = dtor(lon);
-            x1 = (float) (R * cos(latR1) * sin(lonR1));
-            z1 = (float) (R * cos(latR1) * cos(lonR1));
-            x2 = (float) (R * cos(latR2) * sin(lonR1));
-            z2 = (float) (R * cos(latR2) * cos(lonR1));
+            x1 = (float) (cosLat1 * sin(lonR1));
+            z1 = (float) (cosLat1 * cos(lonR1));
+            x2 = (float) (cosLat2 * sin(lonR1));
+            z2 = (float) (cosLat2 * cos(lonR1));
 
             vertexs[index++] = x1;
             vertexs[index++] = y1;

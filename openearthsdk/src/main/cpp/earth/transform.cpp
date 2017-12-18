@@ -53,16 +53,32 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
          //求交点与垂足的距离
          float dist = sqrt(R*R - distanceEarthCenterToRay*distanceEarthCenterToRay);
          //求圆心在向量上的投影
-         float a  = glm::dot(earthCenter - ray->mPoint,ray->mVector); //求两个向量的点积
          float l  = glm::length(ray->mVector); //求ray的长度
+         float a  = glm::dot(glm::vec3(center[0],center[1],center[2]) - ray->mPoint,ray->mVector)/l; //求两个向量的点积
          glm::vec3 c = ray->mPoint +  a/l * ray->mVector;
 
          glm::vec3 p1 = c + dist/glm::length(ray->mVector) * ray->mVector;
          glm::vec3 p0 = c - dist/glm::length(ray->mVector) * ray->mVector; //p0是较近的一点
          //反转模型矩阵，求出原始的球体坐标
-         p1 = mInverseModelMatrix * p0;
-         p0 = mInverseModelMatrix * p1;
-        LOGE("transform","%f,%f,%f",p0[1],p0[2],p0[2]);
+         glm::vec4 p11 = mInverseModelMatrix * glm::vec4(p1,1.0f);
+         glm::vec4 p00 = mInverseModelMatrix * glm::vec4(p0,1.0f);
+         //转为经纬度
+         float lat = asinf(p00[1]/R); // >0 north; <0 south
+//         x1 = (float) (R * cos(latR1) * sin(lonR1));
+//         z1 = (float) (R * cos(latR1) * cos(lonR1));
+         float cosLat = R*cos(lat); //cos(lat)>=0;
+         float lon = asin(p00[0]/cosLat); //大于0 (0-180)  小于0 (180-360)
+         if(lon > 0){
+             if(p00[2] < 0) lon= M_PI - lon;
+         }
+
+         if(lon < 0){
+             if(p00[2] > 0)lon = -M_PI - lon;
+         }
+         float latD = 180*lat/M_PI;
+         float lonD = 180*lon/M_PI;
+         LOGE("transform","%f,%f,%f,%f,%f",p00[0],p00[1],p00[2],latD,lonD);
+         return glm::vec2(latD,lonD);
      }
 
 }

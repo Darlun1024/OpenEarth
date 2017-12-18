@@ -113,7 +113,8 @@ namespace OpenEarth {
     }
 
     void updateModelMatrix() {
-        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * OpenEarth::Earth::getScale() - 1));
+        gModelMatrix = glm::mat4(1.0f);  //模型矩阵
+        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * earthScale - 1));
         gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
         //设置旋转
         gModelMatrix = glm::rotate(gModelMatrix, earthRotateX, glm::vec3(1.0f, 0.0f, 0.0f));
