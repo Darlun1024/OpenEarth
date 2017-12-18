@@ -44,7 +44,6 @@ namespace OpenEarth {
     float earthRotateX = 0.0f;
     float earthRotateY = 0.0f;
     float earthRotateZ = 0.0f;
-    float earthScale   = 1.0f;
 
     //函数声明
     void drawEarth();
@@ -72,9 +71,10 @@ namespace OpenEarth {
     }
 
     void initialize() {
+        float earthScale = OpenEarth::Earth::getScale();
         gModelMatrix = glm::mat4(1.0f);  //模型矩阵
         //这里减 1 是为了在调整camera瞄准点时，屏幕下方出现地图空缺的问题，这个数字和透视投影的角度，相机距球体的位置有关
-        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * OpenEarth::Earth::getScale() - 1));
+        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * earthScale - 1));
         gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
 
         gViewMatrix = glm::lookAt(
@@ -113,6 +113,7 @@ namespace OpenEarth {
     }
 
     void updateModelMatrix() {
+        float earthScale = OpenEarth::Earth::getScale();
         gModelMatrix = glm::mat4(1.0f);  //模型矩阵
         gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * earthScale - 1));
         gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
@@ -120,6 +121,7 @@ namespace OpenEarth {
         gModelMatrix = glm::rotate(gModelMatrix, earthRotateX, glm::vec3(1.0f, 0.0f, 0.0f));
         gModelMatrix = glm::rotate(gModelMatrix, earthRotateY, glm::vec3(0.0f, 1.0f, 0.0f));
         gModelMatrix = glm::rotate(gModelMatrix, earthRotateZ, glm::vec3(0.0f, 0.0f, 1.0f));
+        gTransform -> setModelMatrix(gModelMatrix);
     }
 
     //重新绘制地球
@@ -135,7 +137,7 @@ namespace OpenEarth {
     }
 
     void setZoom(JNIEnv *env, jobject instance, jfloat zoom) {
-        earthScale = 1.0f;
+        OpenEarth::Earth::setScale(1.0f);
         OpenEarth::Earth::setRadius(OpenEarth::DEFAULT_RADIUS * pow(2, zoom - 1));
         updateEarth();
     }
@@ -225,7 +227,7 @@ namespace OpenEarth {
         const GLfloat bottom = width < height ? -1.0f / ratio : -1.0f;
         const GLfloat top = width < height ? 1.0f / ratio : 1.0f;
         const GLfloat near = 1.0f;
-        const GLfloat far = 5.0f;
+        const GLfloat far = 3.0f;
 
 //        mProjectionMatrix = glm::ortho(left, right, bottom, top, near, far); //正交投影
         gProjectionMatrix = glm::perspective(90.0f, ratio, near, far); //透视投影

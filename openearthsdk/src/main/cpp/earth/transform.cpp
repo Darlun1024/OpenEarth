@@ -21,6 +21,10 @@ OpenEarth::Transform::~Transform(){
 
 }
 
+void OpenEarth::Transform::setModelMatrix(glm::mat4 modelMatrix){
+    this->mModelMatrix         = modelMatrix;
+    this->mInverseModelMatrix  = glm::inverse(modelMatrix);
+}
 
 glm::vec2 OpenEarth::Transform::latLngToScreenPoint(LatLng* latLng){
     float R      = OpenEarth::Earth::getRadius();
@@ -52,13 +56,15 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
          //已经球心到线的距离distanceEarthCenterToRay，已经球体半径 R
          //求交点与垂足的距离
          float dist = sqrt(R*R - distanceEarthCenterToRay*distanceEarthCenterToRay);
+         //射线的长度
+         float rayLength  = glm::length(ray->mVector); //求ray的长度
          //求圆心在向量上的投影
-         float l  = glm::length(ray->mVector); //求ray的长度
-         float a  = glm::dot(glm::vec3(center[0],center[1],center[2]) - ray->mPoint,ray->mVector)/l; //求两个向量的点积
-         glm::vec3 c = ray->mPoint +  a/l * ray->mVector;
+         glm::vec3 rayStartToCenter = glm::vec3(center[0]-ray->mPoint[0],center[1]-ray->mPoint[1],center[2]-ray->mPoint[2]);
+         float a  = glm::dot(rayStartToCenter,ray->mVector)/rayLength; //求两个向量的点积
+         glm::vec3 c = ray->mPoint +  a/rayLength * ray->mVector; //球心到射线的垂足
 
-         glm::vec3 p1 = c + dist/glm::length(ray->mVector) * ray->mVector;
-         glm::vec3 p0 = c - dist/glm::length(ray->mVector) * ray->mVector; //p0是较近的一点
+         glm::vec3 p1 = c + dist/rayLength * ray->mVector;
+         glm::vec3 p0 = c - dist/rayLength * ray->mVector; //p0是较近的一点
          //反转模型矩阵，求出原始的球体坐标
          glm::vec4 p11 = mInverseModelMatrix * glm::vec4(p1,1.0f);
          glm::vec4 p00 = mInverseModelMatrix * glm::vec4(p0,1.0f);

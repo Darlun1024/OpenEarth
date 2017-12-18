@@ -22,7 +22,7 @@ namespace OpenEarth {
         public:
             Transform(glm::mat4 modelMatrix,std::shared_ptr<OpenEarth::OpenGLProject> glProject);
             ~Transform();
-
+            void setModelMatrix(glm::mat4 modelMatrix);
             /**
              * 地图坐标转屏幕坐标
              * @param latLng
