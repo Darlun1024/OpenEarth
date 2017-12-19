@@ -89,13 +89,45 @@ namespace OpenEarth {
     }
 
     /**
+     * 自由旋转球体
+     * @param env
+     * @param instance
+     * @param screenPoint1
+     * @param screenPoint2
+     */
+    void rotateEarthFree(JNIEnv *env, jobject instance, jfloatArray screenPoint1,jfloatArray screenPoint2){
+        jboolean isCopy = true;
+        jfloat* array1 = env->GetFloatArrayElements(screenPoint1,&isCopy);
+        glm::vec3 world1 = gTransform->screenPointToWorld(glm::vec2(array1[0],array1[1]));
+        jfloat* array2 = env->GetFloatArrayElements(screenPoint2,&isCopy);
+        glm::vec3 world2 = gTransform->screenPointToWorld(glm::vec2(array2[0],array2[1]));
+        if(!gTransform->isValidWorldCoordinate(world1) || ! gTransform->isValidWorldCoordinate(world2))
+            return;
+        LOGE(TAG,"world1(%f,%f,%f)",world1[0],world1[1],world1[2]);
+        LOGE(TAG,"world2(%f,%f,%f)",world2[0],world2[1],world2[2]);
+        //球心
+        glm::vec3 earthCenter = OpenEarth::Earth::getCenter();
+        glm::vec4 center4 = gModelMatrix * glm::vec4(earthCenter,1.0f);
+        glm::vec3 center = glm::vec3(center4);
+        LOGE(TAG,"center(%f,%f,%f)",center[0],center[1],center[2]);
+        glm::vec3 vect1 = world1 - center;
+        glm::vec3 vect2 = world2 - center;
+
+        glm::vec3 vect3 = glm::cross(vect1,vect2); //
+        float dot = glm::dot(vect1,vect2)/(glm::length(vect1)*glm::length(vect2));
+        float rad = acos(dot);
+        LOGE(TAG,"rad(%f),vect3(%f,%f,%f)",rad,vect3[0],vect3[1],vect3[2]);
+        gModelMatrix = glm::rotate(gModelMatrix,rad,glm::vec3(vect3[0],vect3[1],vect3[2]));
+        gTransform->setModelMatrix(gModelMatrix);
+    }
+    /**
      * 旋转球体
      * @param env
      * @param instance
      * @param axis
      * @param radian
      */
-    void rotateEarth(JNIEnv *env, jobject instance, jint axis, jfloat radian) {
+     void rotateEarth(JNIEnv *env, jobject instance, jint axis, jfloat radian) {
         switch (axis) {
             case X_AXIS:
                 earthRotateX += radian;
@@ -304,18 +336,18 @@ namespace OpenEarth {
     }
 
 
-
     static JNINativeMethod gMethods[] = {
             {"nativeSurfaceCreated", "()V",   (void *) surfaceCreated},
             {"nativeSurfaceChanged", "(II)V", (void *) surfaceChanged},
             {"nativeRender",         "()V",   (void *) render},
             {"nativeRotateEarth",    "(IF)V", (void *) rotateEarth},
+            {"nativeRotateEarth",    "([F[F)V", (void *) rotateEarthFree},
             {"nativeInitialize",     "()V",   (void *) initialize},
             {"nativeSetScale",       "(F)V",  (void *) setScale},
             {"nativeSetTilt",        "(F)V",  (void *) setTilt},
             {"nativeSetZoom",        "(F)V",  (void *) setZoom},
-            {"nativeScreen2World", "([F)[F",  (jfloatArray *) screen2World},
-            {"nativeWorld2Screen", "([F)[F",  (jfloatArray *) world2Screen},
+            {"nativeScreen2World",  "([F)[F",  (jfloatArray *) screen2World},
+            {"nativeWorld2Screen",  "([F)[F",  (jfloatArray *) world2Screen},
             {"nativeLatLng2Screen", "([F)[F",  (jfloatArray *) latLng2Screen},
             {"nativeScreen2LatLng", "([F)[F",  (jfloatArray *) screen2LatLng}
 

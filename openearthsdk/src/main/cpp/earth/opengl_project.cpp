@@ -50,7 +50,12 @@ glm::vec2 OpenEarth::OpenGLProject::project(glm::vec3 worldPoint) {
     return glm::vec2(screenPoint);
 }
 
-
+/**
+ * 屏幕坐标转世界坐标
+ * @param screenPoint
+ * @param depth
+ * @return
+ */
 glm::vec3 OpenEarth::OpenGLProject::unProject(glm::vec2 screenPoint, float depth) {
     return glm::unProject(glm::vec3(screenPoint[0],mScreenSize[1]-screenPoint[1], depth), this->mViewMatrix, this->mProjectMatrix,this->mViewPort);
 }
@@ -61,7 +66,6 @@ Ray* OpenEarth::OpenGLProject::screen2Ray(glm::vec2 screenPoint){
     glm::vec3 vecNear =  glm::unProject(glm::vec3(screenPoint[0],mScreenSize[1] -screenPoint[1], 0.0f), this->mViewMatrix, this->mProjectMatrix,this->mViewPort);
     glm::vec3 vecFar  =  glm::unProject(glm::vec3(screenPoint[0],mScreenSize[1]-screenPoint[1], 1.0f), this->mViewMatrix, this->mProjectMatrix,this->mViewPort);
     //屏幕的y轴正方向和世界坐标的y轴正方向是相反的
-
     glm::vec3 vect = vecFar - vecNear;
     Ray* ray = new Ray(vecNear,vect);
     return  ray;

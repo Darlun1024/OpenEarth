@@ -38,7 +38,7 @@ public class EarthView extends FrameLayout implements View.OnGenericMotionListen
 
     private void initialize() {
         //调整其它View的位置
-
+        this.setClickable(true);
         //初始化SurfaceView
         View view = LayoutInflater.from(getContext()).inflate(R.layout.earth_view, this);
         mSurfaceView = view.findViewById(R.id.surface_view);
@@ -76,7 +76,7 @@ public class EarthView extends FrameLayout implements View.OnGenericMotionListen
         return mEarth;
     }
 
-
+    private float[] preXY;
     @Override
     public boolean onTouchEvent(MotionEvent event){
         int action = event.getAction();
@@ -84,18 +84,19 @@ public class EarthView extends FrameLayout implements View.OnGenericMotionListen
             case MotionEvent.ACTION_DOWN:
                 float x = event.getX();
                 float y = event.getY();
-                float[] array = {x,y};
-                float[] world =  mEarthRenderer.screen2World(array);
-                float[] srceen1 = mEarthRenderer.world2Screen(world);
-                float[] latlng = mEarthRenderer.screen2LatLng(array);
-                float[] srceen = mEarthRenderer.latLng2Screen(latlng);
+                preXY = new float[]{x,y};
                 break;
-
-            case MotionEvent.ACTION_MOVE:break;
-
+            case MotionEvent.ACTION_MOVE:
+                float x1 = event.getX();
+                float y1 = event.getY();
+                float[] xy = new float[]{x1,y1};
+                if(Math.abs(x1-preXY[0]) < 2 && Math.abs(y1-preXY[1]) < 2) break;
+                mEarthRenderer.rotateEarth(preXY,xy);
+                preXY = xy;
+                break;
             case MotionEvent.ACTION_UP:break;
         }
-        return false;
+        return true;
     }
 
     @Override

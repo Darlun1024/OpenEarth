@@ -45,49 +45,45 @@ glm::vec2 OpenEarth::Transform::latLngToScreenPoint(LatLng* latLng){
     return screen;
 }
 
-
+/**
+ * 屏幕坐标转为经纬度，只返回离屏幕较近的一点的坐标
+ * @param point
+ * @return
+ */
 glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
-    Ray* ray = mProject->screen2Ray(point);
-    glm::vec3 earthCenter = OpenEarth::Earth::getCenter();
-    //通过模型矩阵转换为世界坐标
-    glm::vec4 center = mModelMatrix * glm::vec4(earthCenter,1.0f);
-    float distanceEarthCenterToRay = distanceBetween(ray,glm::vec3(center[0],center[1],center[2]));
+    Ray* ray = mProject->screen2Ray(point); //先构建一条射线
+    glm::vec3 earthCenter = OpenEarth::Earth::getCenter(); //获取球心
+    glm::vec4 center = mModelMatrix * glm::vec4(earthCenter,1.0f);//通过模型矩阵将球心转换为世界坐标 这样球心和射线就处于同一套坐标系中
+    float distanceEarthCenterToRay = distanceBetween(ray,glm::vec3(center[0],center[1],center[2]));//球心到射线的距离
     float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale(); //经过模型矩阵转换后地球的半径
 
      if(R < distanceEarthCenterToRay){ //不相交
          return glm::vec2(-181,-181); //返回一个非法的坐标
      }else{
-        //求解射线和地球的交点
-         //已经球心到线的距离distanceEarthCenterToRay，已经球体半径 R
-         //求交点与垂足的距离
-         float dist = sqrt(R*R - distanceEarthCenterToRay*distanceEarthCenterToRay);
-         //射线的长度
-         float rayLength  = glm::length(ray->mVector); //求ray的长度
+         float dist = sqrt(R*R - distanceEarthCenterToRay*distanceEarthCenterToRay);//球心与射线构成的三角形的高，球心到射线的距离
+         float rayLength  = glm::length(ray->mVector); //求射线的长度
          //求圆心在向量上的投影
          glm::vec3 rayStartToCenter = glm::vec3(center[0]-ray->mPoint[0],center[1]-ray->mPoint[1],center[2]-ray->mPoint[2]);
-         float a  = glm::dot(rayStartToCenter,ray->mVector)/rayLength; //求圆心投影在射线上的长度
-         glm::vec3 c = ray->mPoint +  a/rayLength * ray->mVector; //球心到射线的垂足
+         float a     = glm::dot(rayStartToCenter,ray->mVector)/rayLength; //求圆心投影在射线上的长度
+         glm::vec3 vectStartToFoootPoint = ray->mPoint +  a/rayLength * ray->mVector; //射线起点到垂足的向量
 
-         glm::vec3 p1 = c + dist/rayLength * ray->mVector;
-         glm::vec3 p0 = c - dist/rayLength * ray->mVector; //p0是较近的一点
-         //反转模型矩阵，求出原始的球体坐标
-         glm::vec4 p11 = mInverseModelMatrix * glm::vec4(p1,1.0f);
-         glm::vec4 p00 = mInverseModelMatrix * glm::vec4(p0,1.0f);
+         glm::vec3 p1 = vectStartToFoootPoint + dist/rayLength * ray->mVector; //远交点
+         glm::vec3 p0 = vectStartToFoootPoint - dist/rayLength * ray->mVector; //近交点
+         //反转模型矩阵，求出原始的球体坐标0是较近的一点
+         glm::vec4 pFar  = mInverseModelMatrix * glm::vec4(p1,1.0f);
+         glm::vec4 pNear = mInverseModelMatrix * glm::vec4(p0,1.0f);
          //转为经纬度
-         float lat = asinf(p00[1]/R); // >0 north; <0 south
-//         x1 = (float) (R * cos(latR1) * sin(lonR1));
-//         z1 = (float) (R * cos(latR1) * cos(lonR1));
-         float cosLat = R*cos(lat); //cos(lat)>=0;
-         float lon = asin(p00[0]/cosLat); //大于0 (0-pi/2)  小于0 (-pi/2 0)
-         if(lon > 0){
-             if(p00[2] < 0) lon= M_PI - lon;
+         float lat = asinf(pNear[1]/R); //lat [-pi/2, pi/2]
+         float cosLat = R*cos(lat);     //cos(lat)>=0;
+         float lon = asin(pNear[0]/cosLat); //lon
+         if(lon >= 0){
+             if(pNear[2] < 0) lon= M_PI - lon;
          }else if(lon < 0){
-             if(p00[2] < 0) lon= M_PI - lon;
-             if(p00[2] > 0) lon = M_PI*2 + lon;
+             if(pNear[2] < 0) lon= M_PI - lon;
+             if(pNear[2] > 0) lon = M_PI*2 + lon;
          }
          float latD = 180 * lat/M_PI;
          float lonD = 180 * lon/M_PI;
-         LOGE("transform","%f,%f,%f,%f,%f",p00[0],p00[1],p00[2],latD,lonD);
          return glm::vec2(latD,lonD);
      }
 
@@ -113,6 +109,32 @@ float distanceBetween(Ray* ray,glm::vec3 point){
     return  distancePointToRay;
 }
 
+
+glm::vec3 OpenEarth::Transform::screenPointToWorld(glm::vec2 point){
+    Ray* ray = mProject->screen2Ray(point); //先构建一条射线
+    glm::vec3 earthCenter = OpenEarth::Earth::getCenter(); //获取球心
+    glm::vec4 center = mModelMatrix * glm::vec4(earthCenter,1.0f);//通过模型矩阵将球心转换为世界坐标 这样球心和射线就处于同一套坐标系中
+    float distanceEarthCenterToRay = distanceBetween(ray,glm::vec3(center[0],center[1],center[2]));//球心到射线的距离
+    float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale(); //经过模型矩阵转换后地球的半径
+    if(R < distanceEarthCenterToRay){ //不相交
+        return glm::vec3(MAXFLOAT,MAXFLOAT,MAXFLOAT); //返回一个非法的坐标
+    }else{
+        float dist = sqrt(R*R - distanceEarthCenterToRay*distanceEarthCenterToRay);//球心与射线构成的三角形的高，球心到射线的距离
+        float rayLength  = glm::length(ray->mVector); //求射线的长度
+        //求圆心在向量上的投影
+        glm::vec3 rayStartToCenter = glm::vec3(center[0]-ray->mPoint[0],center[1]-ray->mPoint[1],center[2]-ray->mPoint[2]);
+        float a     = glm::dot(rayStartToCenter,ray->mVector)/rayLength; //求圆心投影在射线上的长度
+        glm::vec3 vectStartToFoootPoint = ray->mPoint +  a/rayLength * ray->mVector; //射线起点到垂足的向量
+
+//        glm::vec3 p1 = vectStartToFoootPoint + dist/rayLength * ray->mVector; //远交点
+        glm::vec3 p0 = vectStartToFoootPoint - dist/rayLength * ray->mVector; //近交点
+        return  p0;
+    }
+}
+
+bool OpenEarth::Transform::isValidWorldCoordinate(glm::vec3 world){
+    return world[0]<MAXFLOAT && world[1]<MAXFLOAT && world[2]<MAXFLOAT;
+}
 
 
 

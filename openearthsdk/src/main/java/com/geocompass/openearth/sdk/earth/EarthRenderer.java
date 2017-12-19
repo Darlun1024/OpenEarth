@@ -26,7 +26,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
         glSurfaceView.getHolder().setFormat(PixelFormat.TRANSLUCENT);
         glSurfaceView.setEGLConfigChooser(new EGLConfigChooser());
         glSurfaceView.setRenderer(this);
-        glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
+        glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY); //需要时再绘制，还有另外一种模式是持续绘制 16ms重新绘制一次
         nativeInitialize();
     }
 
@@ -49,6 +49,16 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      */
     public void rotateEarth(int axis,float radian){
         nativeRotateEarth(axis,radian);
+        glSurfaceView.requestRender();
+    }
+
+    /**
+     * 自由旋转球体
+     * @param point1
+     * @param point2
+     */
+    public void rotateEarth(float[] point1,float[] point2){
+        nativeRotateEarth(point1,point2);
         glSurfaceView.requestRender();
     }
 
@@ -137,6 +147,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     private native void  nativeSurfaceChanged(int width,int height);
     private native void  nativeRender();
     private native void  nativeRotateEarth(int axis,float radian);
+    private native void  nativeRotateEarth(float[] screenPoint1,float[] screenPoint2);
     private native void  nativeSetScale(float scale);
     private native void  nativeSetTilt(float radian);
     private native void  nativeSetZoom(float zoom);
