@@ -45,8 +45,8 @@ glm::vec2 OpenEarth::OpenGLProject::project(glm::vec3 worldPoint) {
     glm::vec4 worldPoint_w = glm::vec4(worldPoint, 1.0f);
     glm::vec4 normalizeScreenPoint = mVPMatrix * worldPoint_w;
     glm::vec2 screenPoint;
-    screenPoint[0] = (normalizeScreenPoint[0]+1)*mScreenSize[0]*0.5;
-    screenPoint[1] = (1-normalizeScreenPoint[1])*mScreenSize[1]*0.5;
+    screenPoint[0] = (normalizeScreenPoint[0]/normalizeScreenPoint[3]+1)*mScreenSize[0]*0.5;
+    screenPoint[1] = (1-normalizeScreenPoint[1]/normalizeScreenPoint[3])*mScreenSize[1]*0.5;
     return glm::vec2(screenPoint);
 }
 

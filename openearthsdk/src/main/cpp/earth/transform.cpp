@@ -6,6 +6,7 @@
 #include "earth.hpp"
 #include "geometry/ray.hpp"
 #include "../logging.hpp"
+#include "../util/util.hpp"
 
 using namespace OpenEarth::Geometry;
 
@@ -29,15 +30,19 @@ void OpenEarth::Transform::setModelMatrix(glm::mat4 modelMatrix){
 glm::vec2 OpenEarth::Transform::latLngToScreenPoint(LatLng* latLng){
     float R      = OpenEarth::Earth::getRadius();
 //    float scale  = OpenEarth::Earth::getScale(); //scale
+    //转为弧度
+    float lat = OpenEarth::Util::degree2Rad(latLng->lat);
+    float lon = OpenEarth::Util::degree2Rad(latLng->lon);
     //先转为地球坐标
-    float y = (float) (R * sin(latLng->lat));
-    float x = (float) (R * cos(latLng->lat) * sin(latLng->lon));
-    float z = (float) (R * cos(latLng->lat) * cos(latLng->lon));
+    float y = R * sin(lat);
+    float x = R * cos(lat) * sin(lon);
+    float z = R * cos(lat) * cos(lon);
 
     glm::vec4 origin = glm::vec4(x,y,z,1.0f);
     glm::vec4 world  = this->mModelMatrix * origin; //通过模型矩阵，转为世界坐标
     //TODO
     glm::vec2 screen = mProject->project(glm::vec3(world));
+    return screen;
 }
 
 
@@ -60,7 +65,7 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
          float rayLength  = glm::length(ray->mVector); //求ray的长度
          //求圆心在向量上的投影
          glm::vec3 rayStartToCenter = glm::vec3(center[0]-ray->mPoint[0],center[1]-ray->mPoint[1],center[2]-ray->mPoint[2]);
-         float a  = glm::dot(rayStartToCenter,ray->mVector)/rayLength; //求两个向量的点积
+         float a  = glm::dot(rayStartToCenter,ray->mVector)/rayLength; //求圆心投影在射线上的长度
          glm::vec3 c = ray->mPoint +  a/rayLength * ray->mVector; //球心到射线的垂足
 
          glm::vec3 p1 = c + dist/rayLength * ray->mVector;
@@ -73,16 +78,15 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
 //         x1 = (float) (R * cos(latR1) * sin(lonR1));
 //         z1 = (float) (R * cos(latR1) * cos(lonR1));
          float cosLat = R*cos(lat); //cos(lat)>=0;
-         float lon = asin(p00[0]/cosLat); //大于0 (0-180)  小于0 (180-360)
+         float lon = asin(p00[0]/cosLat); //大于0 (0-pi/2)  小于0 (-pi/2 0)
          if(lon > 0){
              if(p00[2] < 0) lon= M_PI - lon;
+         }else if(lon < 0){
+             if(p00[2] < 0) lon= M_PI - lon;
+             if(p00[2] > 0) lon = M_PI*2 + lon;
          }
-
-         if(lon < 0){
-             if(p00[2] > 0)lon = -M_PI - lon;
-         }
-         float latD = 180*lat/M_PI;
-         float lonD = 180*lon/M_PI;
+         float latD = 180 * lat/M_PI;
+         float lonD = 180 * lon/M_PI;
          LOGE("transform","%f,%f,%f,%f,%f",p00[0],p00[1],p00[2],latD,lonD);
          return glm::vec2(latD,lonD);
      }

@@ -14,6 +14,7 @@ namespace OpenEarth{
     public:
         template <class T>
         static  string tostr(const T& t);
+        static  float degree2Rad(float degree);
     };
 }
 

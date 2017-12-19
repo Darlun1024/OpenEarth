@@ -110,6 +110,7 @@ namespace OpenEarth {
                 gModelMatrix = glm::rotate(gModelMatrix, radian, glm::vec3(0.0f, 0.0f, 1.0f));
                 break;
         }
+        gTransform->setModelMatrix(gModelMatrix);
     }
 
     void updateModelMatrix() {
