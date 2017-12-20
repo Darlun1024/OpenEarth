@@ -97,7 +97,7 @@ namespace OpenEarth {
      * @param screenPoint1
      * @param screenPoint2
      */
-    void rotateEarthFree(JNIEnv *env, jobject instance, jfloatArray screenPoint1,jfloatArray screenPoint2){
+    void rotateEarth(JNIEnv *env, jobject instance, jfloatArray screenPoint1,jfloatArray screenPoint2){
         jboolean isCopy = true;
         jfloat* array1 = env->GetFloatArrayElements(screenPoint1,&isCopy);
         jfloat* array2 = env->GetFloatArrayElements(screenPoint2,&isCopy);
@@ -123,6 +123,39 @@ namespace OpenEarth {
         gTransform->setModelMatrix(gModelMatrix);
     }
 
+
+    /**
+     * 设置中心点坐标
+     * @param env
+     * @param instance
+     * @param latlng
+     */
+    void setCenter(JNIEnv *env, jobject instance, jfloatArray latlng){
+        //默认地图中心是 (0,0)
+        jboolean isCopy = true;
+        jfloat* array = env->GetFloatArrayElements(latlng,&isCopy);
+        earthRotateX =  - array[0]*M_PI/180;
+        earthRotateY =  - array[1]*M_PI/180;
+        gModelMatrix = glm::mat4(1.0f);
+        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * OpenEarth::Earth::getScale() - 1));
+        gModelMatrix = glm::rotate(gModelMatrix,earthRotateX,glm::vec3(1,0,0));
+        gModelMatrix = glm::rotate(gModelMatrix,earthRotateY,glm::vec3(0,1,0));
+        gTransform->setModelMatrix(gModelMatrix);
+
+    }
+
+    /**
+     * 获取中心坐标
+     * @param env
+     * @param instance
+     * @return
+     */
+    jfloatArray getCenter(JNIEnv *env, jobject instance){
+        jfloat array1[2] = {-earthRotateX,-earthRotateY};
+        jfloatArray floatArray = env->NewFloatArray(2);
+        env->SetFloatArrayRegion(floatArray,0,2,array1);
+        return floatArray;
+    }
 
     void updateModelMatrix() {
         float earthScale = OpenEarth::Earth::getScale();
@@ -318,11 +351,12 @@ namespace OpenEarth {
             {"nativeSurfaceCreated", "()V",   (void *) surfaceCreated},
             {"nativeSurfaceChanged", "(II)V", (void *) surfaceChanged},
             {"nativeRender",         "()V",   (void *) render},
-            {"nativeRotateEarth",    "([F[F)V", (void *) rotateEarthFree},
+            {"nativeRotateEarth",    "([F[F)V", (void *) rotateEarth},
             {"nativeInitialize",     "()V",   (void *) initialize},
             {"nativeSetScale",       "(F)V",  (void *) setScale},
             {"nativeSetTilt",        "(F)V",  (void *) setTilt},
             {"nativeSetZoom",        "(F)V",  (void *) setZoom},
+            {"nativeSetCenter",     "([F)V",  (void *) setCenter},
             {"nativeScreen2World",  "([F)[F",  (jfloatArray *) screen2World},
             {"nativeWorld2Screen",  "([F)[F",  (jfloatArray *) world2Screen},
             {"nativeLatLng2Screen", "([F)[F",  (jfloatArray *) latLng2Screen},

@@ -53,7 +53,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * @param point1
      * @param point2
      */
-    public void rotateEarth(float[] point1,float[] point2){
+    protected void rotateEarth(float[] point1,float[] point2){
         nativeRotateEarth(point1,point2);
         glSurfaceView.requestRender();
     }
@@ -64,7 +64,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * 用于处理在两个zoom之间的地球放大问题
      * @param scale
      */
-    public void setScale(float scale){
+    protected void setScale(float scale){
         nativeSetScale(scale);
         glSurfaceView.requestRender();
     }
@@ -73,7 +73,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * 设置显示级别,级别越大，地球半径越大
      * @param zoom
      */
-    public void setZoom(float zoom){
+    protected void setZoom(float zoom){
         nativeSetZoom(zoom);
         glSurfaceView.requestRender();
     }
@@ -82,7 +82,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * 设置视角的角度(向上看或者向下看)
      * @param tilt
      */
-    public void setTilt(float tilt){
+    protected void setTilt(float tilt){
         nativeSetTilt(tilt);
         glSurfaceView.requestRender();
     }
@@ -92,7 +92,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * @param point
      * @return
      */
-    public float[] screen2World(float[] point){
+    protected float[] screen2World(float[] point){
         float[] worldPoint =  nativeScreen2World(point);
         return worldPoint;
     }
@@ -102,7 +102,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * @param point
      * @return
      */
-    public float[] world2Screen(float[] point){
+    protected float[] world2Screen(float[] point){
         float[] screenPoint =  nativeWorld2Screen(point);
         return screenPoint;
     }
@@ -112,7 +112,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * @param point
      * @return
      */
-    public float[] screen2LatLng(float[] point){
+    protected float[] screen2LatLng(float[] point){
         float[] worldPoint =  nativeScreen2LatLng(point);
         return worldPoint;
     }
@@ -122,7 +122,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * @param point
      * @return
      */
-    public float[] latLng2Screen(float[] point){
+    protected float[] latLng2Screen(float[] point){
         float[] screenPoint =  nativeLatLng2Screen(point);
         return screenPoint;
     }
@@ -132,8 +132,9 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * 设置屏幕中心的经纬度
      * @param latlng
      */
-    public void setCenter(float[] latlng){
-
+    protected void setCenter(float[] latlng){
+        nativeSetCenter(latlng);
+        glSurfaceView.requestRender();
     }
 
 
@@ -147,11 +148,11 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     private native void  nativeSurfaceCreated();
     private native void  nativeSurfaceChanged(int width,int height);
     private native void  nativeRender();
-    private native void  nativeRotateEarth(int axis,float radian);
     private native void  nativeRotateEarth(float[] screenPoint1,float[] screenPoint2);
     private native void  nativeSetScale(float scale);
     private native void  nativeSetTilt(float radian);
     private native void  nativeSetZoom(float zoom);
+    private native void  nativeSetCenter(float[] latlng);
     private native void  nativeInitialize();
     private native float[] nativeScreen2World(float[] point);
     private native float[] nativeWorld2Screen(float[] point);
