@@ -47,6 +47,7 @@ glm::vec2 OpenEarth::Transform::latLngToScreenPoint(LatLng* latLng){
 
 /**
  * 屏幕坐标转为经纬度，只返回离屏幕较近的一点的坐标
+ * 纬度范围[-90 90] 经度 [0-360]
  * @param point
  * @return
  */
@@ -58,7 +59,7 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
     float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale(); //经过模型矩阵转换后地球的半径
 
      if(R < distanceEarthCenterToRay){ //不相交
-         return glm::vec2(-181,-181); //返回一个非法的坐标
+         return glm::vec2(MAXFLOAT,MAXFLOAT); //返回一个非法的坐标
      }else{
          float dist = sqrt(R*R - distanceEarthCenterToRay*distanceEarthCenterToRay);//球心与射线构成的三角形的高，球心到射线的距离
          float rayLength  = glm::length(ray->mVector); //求射线的长度
@@ -134,6 +135,10 @@ glm::vec3 OpenEarth::Transform::screenPointToWorld(glm::vec2 point){
 
 bool OpenEarth::Transform::isValidWorldCoordinate(glm::vec3 world){
     return world[0]<MAXFLOAT && world[1]<MAXFLOAT && world[2]<MAXFLOAT;
+}
+
+bool OpenEarth::Transform::isValidLatlng(glm::vec2 latlng){
+    return (-90<=latlng[0])&&(90>=latlng[0])&&(0<=latlng[1])&&(360>=latlng[1]);
 }
 
 

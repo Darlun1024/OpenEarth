@@ -36,6 +36,7 @@ namespace OpenEarth {
             glm::vec3 screenPointToWorld(glm::vec2 point);
 
             static bool isValidWorldCoordinate(glm::vec3 world);
+            static bool isValidLatlng(glm::vec2 latlng);
 
         };
 }

@@ -13,6 +13,7 @@
 #include "earth.hpp"
 #include "opengl_project.hpp"
 #include "transform.hpp"
+#include "../util/util.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
 
@@ -44,6 +45,7 @@ namespace OpenEarth {
     float earthRotateX = 0.0f;
     float earthRotateY = 0.0f;
     float earthRotateZ = 0.0f;
+
 
     //函数声明
     void drawEarth();
@@ -98,26 +100,24 @@ namespace OpenEarth {
     void rotateEarthFree(JNIEnv *env, jobject instance, jfloatArray screenPoint1,jfloatArray screenPoint2){
         jboolean isCopy = true;
         jfloat* array1 = env->GetFloatArrayElements(screenPoint1,&isCopy);
-        glm::vec3 world1 = gTransform->screenPointToWorld(glm::vec2(array1[0],array1[1]));
         jfloat* array2 = env->GetFloatArrayElements(screenPoint2,&isCopy);
-        glm::vec3 world2 = gTransform->screenPointToWorld(glm::vec2(array2[0],array2[1]));
-        if(!gTransform->isValidWorldCoordinate(world1) || ! gTransform->isValidWorldCoordinate(world2))
+        glm::vec2 latlng1 = gTransform->screenPointToLatlng(glm::vec2(array1[0],array1[1]));
+        glm::vec2 latlng2 = gTransform->screenPointToLatlng(glm::vec2(array2[0],array2[1]));
+        if(!gTransform->isValidLatlng(latlng1) || ! gTransform->isValidLatlng(latlng2))
             return;
-        LOGE(TAG,"world1(%f,%f,%f)",world1[0],world1[1],world1[2]);
-        LOGE(TAG,"world2(%f,%f,%f)",world2[0],world2[1],world2[2]);
-        //球心
-        glm::vec3 earthCenter = OpenEarth::Earth::getCenter();
-        glm::vec4 center4 = gModelMatrix * glm::vec4(earthCenter,1.0f);
-        glm::vec3 center = glm::vec3(center4);
-        LOGE(TAG,"center(%f,%f,%f)",center[0],center[1],center[2]);
-        glm::vec3 vect1 = world1 - center;
-        glm::vec3 vect2 = world2 - center;
 
-        glm::vec3 vect3 = glm::cross(vect1,vect2); //
-        float dot = glm::dot(vect1,vect2)/(glm::length(vect1)*glm::length(vect2));
-        float rad = acos(dot);
-        LOGE(TAG,"rad(%f),vect3(%f,%f,%f)",rad,vect3[0],vect3[1],vect3[2]);
-        gModelMatrix = glm::rotate(gModelMatrix,rad,glm::vec3(vect3[0],vect3[1],vect3[2]));
+        float lat1 = OpenEarth::Util::degree2Rad(latlng1[0]);
+        float lat2 = OpenEarth::Util::degree2Rad(latlng2[0]);
+        float lon1 = OpenEarth::Util::degree2Rad(latlng1[1]);
+        float lon2 = OpenEarth::Util::degree2Rad(latlng2[1]);
+
+        glm::mat4 model = glm::mat4(1.0f);
+        earthRotateX += lat1-lat2;
+        earthRotateY += lon2-lon1;
+        gModelMatrix = glm::mat4(1.0f);
+        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * OpenEarth::Earth::getScale() - 1));
+        gModelMatrix = glm::rotate(gModelMatrix,earthRotateX,glm::vec3(1,0,0));
+        gModelMatrix = glm::rotate(gModelMatrix,earthRotateY,glm::vec3(0,1,0));
         gTransform->setModelMatrix(gModelMatrix);
     }
     /**
