@@ -110,40 +110,19 @@ namespace OpenEarth {
         float lat2 = OpenEarth::Util::degree2Rad(latlng2[0]);
         float lon1 = OpenEarth::Util::degree2Rad(latlng1[1]);
         float lon2 = OpenEarth::Util::degree2Rad(latlng2[1]);
-
+        float deltaLat = lat1 - lat2;
+        float delteLon = lon2 - lon1;
+        if(deltaLat * (array2[1]-array1[1])<0) deltaLat = -deltaLat;
         glm::mat4 model = glm::mat4(1.0f);
-        earthRotateX += lat1-lat2;
-        earthRotateY += lon2-lon1;
+        earthRotateX += deltaLat;
+        earthRotateY += delteLon;
         gModelMatrix = glm::mat4(1.0f);
         gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * OpenEarth::Earth::getScale() - 1));
         gModelMatrix = glm::rotate(gModelMatrix,earthRotateX,glm::vec3(1,0,0));
         gModelMatrix = glm::rotate(gModelMatrix,earthRotateY,glm::vec3(0,1,0));
         gTransform->setModelMatrix(gModelMatrix);
     }
-    /**
-     * 旋转球体
-     * @param env
-     * @param instance
-     * @param axis
-     * @param radian
-     */
-     void rotateEarth(JNIEnv *env, jobject instance, jint axis, jfloat radian) {
-        switch (axis) {
-            case X_AXIS:
-                earthRotateX += radian;
-                gModelMatrix = glm::rotate(gModelMatrix, radian, glm::vec3(1.0f, 0.0f, 0.0f));
-                break;
-            case Y_AXIS:
-                earthRotateY += radian;
-                gModelMatrix = glm::rotate(gModelMatrix, radian, glm::vec3(0.0f, 1.0f, 0.0f));
-                break;
-            case Z_AXIS:
-                earthRotateZ += radian;
-                gModelMatrix = glm::rotate(gModelMatrix, radian, glm::vec3(0.0f, 0.0f, 1.0f));
-                break;
-        }
-        gTransform->setModelMatrix(gModelMatrix);
-    }
+
 
     void updateModelMatrix() {
         float earthScale = OpenEarth::Earth::getScale();
@@ -261,8 +240,7 @@ namespace OpenEarth {
         const GLfloat top = width < height ? 1.0f / ratio : 1.0f;
         const GLfloat near = 1.0f;
         const GLfloat far = 3.0f;
-
-//        mProjectionMatrix = glm::ortho(left, right, bottom, top, near, far); //正交投影
+//      mProjectionMatrix = glm::ortho(left, right, bottom, top, near, far); //正交投影
         gProjectionMatrix = glm::perspective(90.0f, ratio, near, far); //透视投影
 
         gProject->setProjectMatrix(gProjectionMatrix);
@@ -340,7 +318,6 @@ namespace OpenEarth {
             {"nativeSurfaceCreated", "()V",   (void *) surfaceCreated},
             {"nativeSurfaceChanged", "(II)V", (void *) surfaceChanged},
             {"nativeRender",         "()V",   (void *) render},
-            {"nativeRotateEarth",    "(IF)V", (void *) rotateEarth},
             {"nativeRotateEarth",    "([F[F)V", (void *) rotateEarthFree},
             {"nativeInitialize",     "()V",   (void *) initialize},
             {"nativeSetScale",       "(F)V",  (void *) setScale},

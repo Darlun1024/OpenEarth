@@ -28,11 +28,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mEarthView = findViewById(R.id.earth_view);
 
         mEarth = mEarthView.getEarth();
-
-        findViewById(R.id.btn_rotate_right).setOnClickListener(this);
-        findViewById(R.id.btn_rotate_left).setOnClickListener(this);
-        findViewById(R.id.btn_rotate_up).setOnClickListener(this);
-        findViewById(R.id.btn_rotate_down).setOnClickListener(this);
         findViewById(R.id.btn_zoom_in).setOnClickListener(this);
         findViewById(R.id.btn_zoom_out).setOnClickListener(this);
         findViewById(R.id.btn_look_up).setOnClickListener(this);
@@ -44,18 +39,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_rotate_right:
-                mEarth.rotateEarth(1, (float) (Math.PI / 72));
-                return;
-            case R.id.btn_rotate_left:
-                mEarth.rotateEarth(1, -(float) (Math.PI / 72));
-                return;
-            case R.id.btn_rotate_up:
-                mEarth.rotateEarth(0, -(float) (Math.PI / 72));
-                return;
-            case R.id.btn_rotate_down:
-                mEarth.rotateEarth(0, (float) (Math.PI / 72));
-                return;
             case R.id.btn_zoom_in:
                 mEarth.zoomIn();
                 return;

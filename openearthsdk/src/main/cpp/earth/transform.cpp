@@ -133,6 +133,24 @@ glm::vec3 OpenEarth::Transform::screenPointToWorld(glm::vec2 point){
     }
 }
 
+glm::vec2 OpenEarth::Transform::worldToLatlng(glm::vec3 world){
+    float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale();
+    glm::vec4 point  = mInverseModelMatrix * glm::vec4(world,1.0f);
+    //转为经纬度
+    float lat = asinf(point[1]/R); //lat [-pi/2, pi/2]
+    float cosLat = R*cos(lat);     //cos(lat)>=0;
+    float lon = asin(point[0]/cosLat); //lon
+    if(lon >= 0){
+        if(point[2] < 0) lon= M_PI - lon;
+    }else if(lon < 0){
+        if(point[2] < 0) lon= M_PI - lon;
+        if(point[2] > 0) lon = M_PI*2 + lon;
+    }
+    float latD = 180 * lat/M_PI;
+    float lonD = 180 * lon/M_PI;
+    return glm::vec2(latD,lonD);
+}
+
 bool OpenEarth::Transform::isValidWorldCoordinate(glm::vec3 world){
     return world[0]<MAXFLOAT && world[1]<MAXFLOAT && world[2]<MAXFLOAT;
 }

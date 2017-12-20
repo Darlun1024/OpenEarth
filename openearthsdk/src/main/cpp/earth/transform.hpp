@@ -32,8 +32,10 @@ namespace OpenEarth {
 
             //屏幕坐标转地图坐标
             glm::vec2 screenPointToLatlng(glm::vec2 point);
-
+            //屏幕坐标转到球面上的世界坐标
             glm::vec3 screenPointToWorld(glm::vec2 point);
+            //球面上的世界坐标转为经纬度
+            glm::vec2 worldToLatlng(glm::vec3 world);
 
             static bool isValidWorldCoordinate(glm::vec3 world);
             static bool isValidLatlng(glm::vec2 latlng);

@@ -42,15 +42,11 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
         nativeSurfaceChanged(width,height);
     }
 
-    /**
-     *
-     * @param axis 围绕旋转的坐标轴  0 X轴,1 Y轴 ，2 Z轴
-     * @param radian 旋转的弧度
-     */
-    public void rotateEarth(int axis,float radian){
-        nativeRotateEarth(axis,radian);
-        glSurfaceView.requestRender();
+    @Override
+    public void onDrawFrame(GL10 gl) {
+        nativeRender();
     }
+
 
     /**
      * 自由旋转球体
@@ -132,10 +128,15 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     }
 
 
-    @Override
-    public void onDrawFrame(GL10 gl) {
-        nativeRender();
+    /**
+     * 设置屏幕中心的经纬度
+     * @param latlng
+     */
+    public void setCenter(float[] latlng){
+
     }
+
+
 
 
     public AssetManager getAssetManager(){

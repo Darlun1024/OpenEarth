@@ -16,9 +16,6 @@ public class Earth {
     }
 
 
-    public void rotateEarth(int axis,float degree){
-        this.mEarthRenderer.rotateEarth(axis,degree);
-    }
 
     public void zoomIn(){
         if(zoom+1 > MAX_ZOOM) return;

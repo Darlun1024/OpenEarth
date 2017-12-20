@@ -40,43 +40,5 @@
         android:layout_below="@id/btn_look_up"
         android:text="俯" />
 
-    <ImageView
-        android:id="@+id/btn_rotate_right"
-        android:layout_width="@dimen/btn_size"
-        android:layout_height="@dimen/btn_size"
-        android:layout_marginBottom="@dimen/btn_size"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:src="@mipmap/arrow_right"
-        android:background="@color/button_back_color"/>
 
-    <ImageView
-        android:id="@+id/btn_rotate_down"
-        android:layout_width="@dimen/btn_size"
-        android:layout_height="@dimen/btn_size"
-        android:layout_marginRight="@dimen/btn_size"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:src="@mipmap/arrow_down"
-        android:background="@color/button_back_color"/>
-
-    <ImageView
-        android:id="@+id/btn_rotate_up"
-        android:layout_width="@dimen/btn_size"
-        android:layout_height="@dimen/btn_size"
-        android:layout_marginRight="@dimen/btn_size"
-        android:layout_alignParentRight="true"
-        android:layout_above="@id/btn_rotate_right"
-        android:src="@mipmap/arrow_up"
-        android:background="@color/button_back_color"/>
-
-    <ImageView
-        android:id="@+id/btn_rotate_left"
-        android:layout_width="@dimen/btn_size"
-        android:layout_height="@dimen/btn_size"
-        android:layout_toLeftOf="@id/btn_rotate_down"
-        android:layout_below="@id/btn_rotate_up"
-        android:layout_marginBottom="@dimen/btn_size"
-        android:src="@mipmap/arrow_left"
-        android:background="@color/button_back_color"/>
 </RelativeLayout>
