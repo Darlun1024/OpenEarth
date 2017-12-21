@@ -15,11 +15,12 @@ import com.almeros.android.multitouch.ShoveGestureDetector;
 public class GestureDetector  implements MoveGestureDetector.OnMoveGestureListener,
         RotateGestureDetector.OnRotateGestureListener,
         ShoveGestureDetector.OnShoveGestureListener,ScaleGestureDetector.OnScaleGestureListener {
-    MoveGestureDetector   mMoveGestureDetector;
-    RotateGestureDetector mRotateGestureDetector;
-    ShoveGestureDetector  mShoveGestureDetector;
-    ScaleGestureDetector  mScaleGestureDetector;
-    public GestureDetector(Context context){
+    private MoveGestureDetector   mMoveGestureDetector;
+    private RotateGestureDetector mRotateGestureDetector;
+    private ShoveGestureDetector  mShoveGestureDetector;
+    private ScaleGestureDetector  mScaleGestureDetector;
+    private Earth mEarth;
+    public GestureDetector(Context context,Earth earth){
         mMoveGestureDetector   = new MoveGestureDetector(context,this);
         mRotateGestureDetector = new RotateGestureDetector(context,this);
         mShoveGestureDetector  = new ShoveGestureDetector(context,this);
@@ -86,13 +87,17 @@ public class GestureDetector  implements MoveGestureDetector.OnMoveGestureListen
     }
 
     //scale
+    float mStartSpan; //开始的距离
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
+        float span = detector.getCurrentSpan();
+        float sacle = span/mStartSpan;
         return false;
     }
 
     @Override
     public boolean onScaleBegin(ScaleGestureDetector detector) {
+        mStartSpan = detector.getCurrentSpan();
         return false;
     }
 

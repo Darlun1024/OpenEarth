@@ -38,6 +38,11 @@ public class Earth {
         this.mEarthRenderer.setZoom(zoom);
     }
 
+    public void setZoom(int zoom){
+        assert (zoom >= MIN_ZOOM && zoom <= MAX_ZOOM );
+        this.mEarthRenderer.setZoom(zoom);
+    }
+
     public void lookUp(){
         tilt += 0.1f;
         this.mEarthRenderer.setTilt(tilt);
@@ -50,6 +55,10 @@ public class Earth {
 
     public void setCenter(LatLng latLng){
         this.mEarthRenderer.setCenter(new float[]{latLng.lat,latLng.lon});
+    }
+
+    public void scale(float scale){
+        this.mEarthRenderer.setScale(scale);
     }
 
 
