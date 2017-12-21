@@ -40,5 +40,10 @@
         android:layout_below="@id/btn_look_up"
         android:text="俯" />
 
-
+    <Button
+        android:id="@+id/btn_set_center"
+        android:layout_width="@dimen/btn_size"
+        android:layout_height="@dimen/btn_size"
+        android:layout_below="@id/btn_look_down"
+        android:text="中心" />
 </RelativeLayout>

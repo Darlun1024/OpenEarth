@@ -23,34 +23,31 @@ public class EarthView extends FrameLayout implements View.OnGenericMotionListen
         System.loadLibrary("lib-earth");
     }
 
-    private EarthRenderer mEarthRenderer;
     private GLSurfaceView mSurfaceView;
-    private NativeEarthView mNativeEarthView;
     private Earth mEarth;
 
     private MotionEvent.PointerCoords mPrePointer;
 
     public EarthView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialize();
+        if(isSupportES2())
+            initialize();
     }
 
 
     private void initialize() {
-        //调整其它View的位置
-        this.setClickable(true);
         //初始化SurfaceView
         View view = LayoutInflater.from(getContext()).inflate(R.layout.earth_view, this);
         mSurfaceView = view.findViewById(R.id.surface_view);
-        mEarthRenderer = new EarthRenderer(mSurfaceView);
-        mNativeEarthView = new NativeEarthView(this, mEarthRenderer);
+        mEarth = new Earth(mSurfaceView);
 
-        mEarth = new Earth(mEarthRenderer);
+        setClickable(true);
+        setLongClickable(true);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+        requestDisallowInterceptTouchEvent(true);
     }
 
-    private void initSurfaceView() {
-
-    }
 
     /**
      * 检查设备使用支持 OpenGLES 2
@@ -76,27 +73,9 @@ public class EarthView extends FrameLayout implements View.OnGenericMotionListen
         return mEarth;
     }
 
-    private float[] preXY;
     @Override
     public boolean onTouchEvent(MotionEvent event){
-        int action = event.getAction();
-        switch (action){
-            case MotionEvent.ACTION_DOWN:
-                float x = event.getX();
-                float y = event.getY();
-                preXY = new float[]{x,y};
-                break;
-            case MotionEvent.ACTION_MOVE:
-                float x1 = event.getX();
-                float y1 = event.getY();
-                float[] xy = new float[]{x1,y1};
-                if(Math.abs(x1-preXY[0]) < 2 && Math.abs(y1-preXY[1]) < 2) break;
-                mEarthRenderer.rotateEarth(preXY,xy);
-                preXY = xy;
-                break;
-            case MotionEvent.ACTION_UP:break;
-        }
-        return true;
+       return mEarth.handleTouchEvent(event);
     }
 
     @Override

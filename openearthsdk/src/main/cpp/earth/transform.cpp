@@ -61,7 +61,7 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
      if(R < distanceEarthCenterToRay){ //不相交
          return glm::vec2(MAXFLOAT,MAXFLOAT); //返回一个非法的坐标
      }else{
-         float dist = sqrt(R*R - distanceEarthCenterToRay*distanceEarthCenterToRay);//球心与射线构成的三角形的高，球心到射线的距离
+         float dist = sqrt(R*R - distanceEarthCenterToRay*distanceEarthCenterToRay);//球心与射线构成的三角形的底边的一半长度
          float rayLength  = glm::length(ray->mVector); //求射线的长度
          //求圆心在向量上的投影
          glm::vec3 rayStartToCenter = glm::vec3(center[0]-ray->mPoint[0],center[1]-ray->mPoint[1],center[2]-ray->mPoint[2]);
@@ -95,7 +95,7 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
  * @param ray
  * @param point
  */
-float distanceBetween(Ray* ray,glm::vec3 point){
+float OpenEarth::Transform::distanceBetween(Ray* ray,glm::vec3 point){
     //用线的起点和终点分别于 第三个点构建向量
     glm::vec3 vect1 = ray->mPoint - point;
     glm::vec3 vect2 = ray->mPoint + ray->mVector - point;

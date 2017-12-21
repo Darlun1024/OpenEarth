@@ -37,6 +37,8 @@ namespace OpenEarth {
             //球面上的世界坐标转为经纬度
             glm::vec2 worldToLatlng(glm::vec3 world);
 
+            float distanceBetween(Ray* ray,glm::vec3 point);
+
             static bool isValidWorldCoordinate(glm::vec3 world);
             static bool isValidLatlng(glm::vec2 latlng);
 
