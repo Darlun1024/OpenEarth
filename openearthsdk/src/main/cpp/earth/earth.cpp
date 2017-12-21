@@ -7,11 +7,11 @@
 
 namespace OpenEarth {
     static const float MIN_RADIUS  = 1.0f;
-    static  float min_zoom  = 1f;
-    static  float max_zoom  = 16f;
+    static  int min_zoom  = 1;
+    static  int max_zoom  = 16;
     static float earth_radius = DEFAULT_RADIUS;
     static float earth_scale  = DEFAULT_SCALE;
-    static float earth_zoom   = 1.0f;
+    static int earth_zoom   = 1;
     static glm::vec3 center = glm::vec3(0, 0, 0); //球心
 
     void OpenEarth::Earth::setRadius(float r) {
@@ -22,10 +22,23 @@ namespace OpenEarth {
         return earth_radius;
     }
 
+    bool OpenEarth::Earth::setZoom(int zoom){
+        assert(min_zoom <=zoom<=max_zoom);
+        earth_scale = 1.0f;
+        bool needUpdate = (earth_zoom!=zoom);
+        earth_zoom = zoom;
+        earth_radius =  OpenEarth::DEFAULT_RADIUS * pow(2, zoom - 1); //重新计算半径
+        return needUpdate;
+    }
+
+    int OpenEarth::Earth::getZoom(){
+        return earth_zoom;
+    }
+
     bool OpenEarth::Earth::setScale(float scale) {
         assert(scale>0.0f);
         float newScale = earth_scale * scale;
-        float newZoom  = earth_zoom;
+        int newZoom  = earth_zoom;
         if(newScale >= 2.0f){   //[2.0 )
             int zoom = (int)log2f(newScale);
             newZoom += zoom;
@@ -53,6 +66,7 @@ namespace OpenEarth {
         earth_scale = newScale;
         if(newZoom!=earth_zoom){
             earth_zoom = newZoom;
+            earth_radius =  OpenEarth::DEFAULT_RADIUS * pow(2, earth_zoom - 1); //重新计算半径
             return true;
         }
         return false;

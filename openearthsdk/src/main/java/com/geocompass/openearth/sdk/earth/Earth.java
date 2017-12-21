@@ -19,9 +19,12 @@ public class Earth {
     private GLSurfaceView mGLSurfaceView;
     private float[] preXY;
 
+    private GestureDetector mGestureDetector;
+
     protected Earth(GLSurfaceView glSurfaceView){
         this.mGLSurfaceView = glSurfaceView;
         mEarthRenderer = new EarthRenderer(mGLSurfaceView);
+        mGestureDetector = new GestureDetector(glSurfaceView.getContext(),this);
     }
 
 
@@ -64,6 +67,7 @@ public class Earth {
 
     protected boolean handleTouchEvent(MotionEvent event){
         int action = event.getAction();
+        mGestureDetector.onTouchEvent(event);
         switch (action){
             case MotionEvent.ACTION_DOWN:
                 float x = event.getX();

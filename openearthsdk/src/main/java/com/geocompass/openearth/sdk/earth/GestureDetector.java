@@ -1,6 +1,7 @@
 package com.geocompass.openearth.sdk.earth;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
@@ -15,12 +16,14 @@ import com.almeros.android.multitouch.ShoveGestureDetector;
 public class GestureDetector  implements MoveGestureDetector.OnMoveGestureListener,
         RotateGestureDetector.OnRotateGestureListener,
         ShoveGestureDetector.OnShoveGestureListener,ScaleGestureDetector.OnScaleGestureListener {
+    private static final String TAG = "GestureDetector";
     private MoveGestureDetector   mMoveGestureDetector;
     private RotateGestureDetector mRotateGestureDetector;
     private ShoveGestureDetector  mShoveGestureDetector;
     private ScaleGestureDetector  mScaleGestureDetector;
     private Earth mEarth;
     public GestureDetector(Context context,Earth earth){
+        mEarth = earth;
         mMoveGestureDetector   = new MoveGestureDetector(context,this);
         mRotateGestureDetector = new RotateGestureDetector(context,this);
         mShoveGestureDetector  = new ShoveGestureDetector(context,this);
@@ -87,22 +90,22 @@ public class GestureDetector  implements MoveGestureDetector.OnMoveGestureListen
     }
 
     //scale
-    float mStartSpan; //开始的距离
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         float span = detector.getCurrentSpan();
-        float sacle = span/mStartSpan;
-        return false;
+        float preSpan = detector.getPreviousSpan();
+        float scale = span/preSpan;
+        mEarth.scale(scale);
+        Log.e(TAG,"scale:"+scale);
+        return true;
     }
 
     @Override
     public boolean onScaleBegin(ScaleGestureDetector detector) {
-        mStartSpan = detector.getCurrentSpan();
-        return false;
+        return true;
     }
 
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
-
     }
 }

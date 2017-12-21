@@ -245,15 +245,15 @@ namespace OpenEarth {
 
     //设置球体的各个参数
     void setScale(JNIEnv *env, jobject instance, jfloat scale) {
-        if(scale >= 2.0)
-
-        OpenEarth::Earth::setScale(scale);
+        if(OpenEarth::Earth::setScale(scale))
+            updateEarth();
+        else
+            updateModelMatrix();
     }
 
     void setZoom(JNIEnv *env, jobject instance, jfloat zoom) {
-        OpenEarth::Earth::setScale(1.0f);
-        OpenEarth::Earth::setRadius(OpenEarth::DEFAULT_RADIUS * pow(2, zoom - 1));
-        updateEarth();
+        if(OpenEarth::Earth::setZoom(zoom))
+            updateEarth();
     }
 
     //修改摄像头瞄准的点

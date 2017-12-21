@@ -39,7 +39,9 @@ namespace OpenEarth{
          */
         static float getScale();
 
+        static bool  setZoom(int zoom);
 
+        static int getZoom();
         /**
          * 绕X轴转
          * @param rad
