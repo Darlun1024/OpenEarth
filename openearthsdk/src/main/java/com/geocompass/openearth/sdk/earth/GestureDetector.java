@@ -95,6 +95,7 @@ public class GestureDetector  implements MoveGestureDetector.OnMoveGestureListen
         float span = detector.getCurrentSpan();
         float preSpan = detector.getPreviousSpan();
         float scale = span/preSpan;
+        if(0.95f < scale && scale < 1.05)return false;
         mEarth.scale(scale);
         Log.e(TAG,"scale:"+scale);
         return true;

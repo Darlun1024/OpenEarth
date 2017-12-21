@@ -78,6 +78,14 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
         glSurfaceView.requestRender();
     }
 
+    protected int getZoom(){
+        return nativeGetZoom();
+    }
+
+    protected float getScale(){
+        return nativeGetScale();
+    }
+
     /**
      * 设置视角的角度(向上看或者向下看)
      * @param tilt
@@ -138,8 +146,6 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     }
 
 
-
-
     public AssetManager getAssetManager(){
         AssetManager manager = glSurfaceView.getContext().getAssets();
         return manager;
@@ -150,8 +156,10 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     private native void  nativeRender();
     private native void  nativeRotateEarth(float[] screenPoint1,float[] screenPoint2);
     private native void  nativeSetScale(float scale);
+    private native float   nativeGetScale();
     private native void  nativeSetTilt(float radian);
     private native void  nativeSetZoom(float zoom);
+    private native int   nativeGetZoom();
     private native void  nativeSetCenter(float[] latlng);
     private native void  nativeInitialize();
     private native float[] nativeScreen2World(float[] point);

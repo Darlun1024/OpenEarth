@@ -30,12 +30,14 @@ public class Earth {
 
 
     public void zoomIn(){
+        zoom = mEarthRenderer.getZoom();
         if(zoom+1 > MAX_ZOOM) return;
         zoom = zoom+1;
         this.mEarthRenderer.setZoom(zoom);
     }
 
     public void zoomOut(){
+        zoom = mEarthRenderer.getZoom();
         if(zoom-1 < MIN_ZOOM)return;
         zoom = zoom-1;
         this.mEarthRenderer.setZoom(zoom);

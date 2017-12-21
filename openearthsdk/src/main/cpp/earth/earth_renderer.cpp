@@ -251,11 +251,20 @@ namespace OpenEarth {
             updateModelMatrix();
     }
 
+    jfloat getScale(){
+        return OpenEarth::Earth::getScale();
+    }
+
+
+
     void setZoom(JNIEnv *env, jobject instance, jfloat zoom) {
         if(OpenEarth::Earth::setZoom(zoom))
             updateEarth();
     }
 
+    jint getZoom(){
+        return OpenEarth::Earth::getZoom();
+    }
     //修改摄像头瞄准的点
     void setTilt(JNIEnv *env, jobject instance, jfloat tilt) {
         //TODO 根据角度计算
@@ -423,8 +432,10 @@ namespace OpenEarth {
             {"nativeRotateEarth",    "([F[F)V", (void *) rotateEarth},
             {"nativeInitialize",     "()V",   (void *) initialize},
             {"nativeSetScale",       "(F)V",  (void *) setScale},
+            {"nativeGetScale",       "()F",   (jfloat*) getScale},
             {"nativeSetTilt",        "(F)V",  (void *) setTilt},
             {"nativeSetZoom",        "(F)V",  (void *) setZoom},
+            {"nativeGetZoom",        "()I",   (jint *) getZoom},
             {"nativeSetCenter",     "([F)V",  (void *) setCenter},
             {"nativeScreen2World",  "([F)[F",  (jfloatArray *) screen2World},
             {"nativeWorld2Screen",  "([F)[F",  (jfloatArray *) world2Screen},
