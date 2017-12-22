@@ -16,10 +16,8 @@ public class Earth {
     private float zoom = 1.0f;
     private float tilt = 0.0f;
     private EarthRenderer mEarthRenderer;
-
     private GLSurfaceView mGLSurfaceView;
     private float[] preXY;
-
     private GestureDetector mGestureDetector;
 
     protected Earth(GLSurfaceView glSurfaceView){
@@ -33,9 +31,9 @@ public class Earth {
     public void zoomIn(){
         zoom = mEarthRenderer.getZoom();
         if(zoom+1 > MAX_ZOOM) return;
-//        zoom = zoom+1;
-//        this.mEarthRenderer.setZoom(zoom);
-        this.mEarthRenderer.setScale(1.5f);
+        zoom = zoom+1;
+        this.mEarthRenderer.setZoom(zoom);
+//        this.mEarthRenderer.setScale(1.5f);
     }
 
     public void zoomOut(){

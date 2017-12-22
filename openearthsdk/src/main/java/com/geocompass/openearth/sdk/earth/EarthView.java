@@ -19,6 +19,7 @@ import com.geocompass.openearth.sdk.R;
  */
 
 public class EarthView extends FrameLayout implements View.OnGenericMotionListener{
+
     static {
         System.loadLibrary("lib-earth");
     }
@@ -26,7 +27,6 @@ public class EarthView extends FrameLayout implements View.OnGenericMotionListen
     private GLSurfaceView mSurfaceView;
     private Earth mEarth;
 
-    private MotionEvent.PointerCoords mPrePointer;
 
     public EarthView(Context context, AttributeSet attrs) {
         super(context, attrs);

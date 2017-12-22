@@ -5,7 +5,6 @@
 #include "transform.hpp"
 #include "earth.hpp"
 #include "geometry/ray.hpp"
-#include "../logging.hpp"
 #include "../util/util.hpp"
 
 using namespace OpenEarth::Geometry;
@@ -78,9 +77,9 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
          float cosLat = r*cos(lat);     //cos(lat)>=0;
          float lon    = asin(pNear[0]/cosLat); //lon
          if(lon >= 0){
-             if(pNear[2] < 0) lon= M_PI - lon;
+             if(pNear[2] < 0) lon = M_PI - lon;
          }else if(lon < 0){
-             if(pNear[2] < 0) lon= M_PI - lon;
+             if(pNear[2] < 0) lon = M_PI - lon;
              if(pNear[2] > 0) lon = M_PI*2 + lon;
          }
          float latD = 180 * lat/M_PI;

@@ -77,11 +77,8 @@ namespace OpenEarth {
     }
 
     void initialize() {
-        float earthScale = OpenEarth::Earth::getScale();
-        gModelMatrix = glm::mat4(1.0f);  //模型矩阵
-        //这里减 1 是为了在调整camera瞄准点时，屏幕下方出现地图空缺的问题，这个数字和透视投影的角度，相机距球体的位置有关
-        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * earthScale - 1));
-        gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
+        OpenEarth::Earth::initialize();
+        gModelMatrix =  OpenEarth::Earth::getModelMatrix();
 
         gViewMatrix = glm::lookAt(
                 glm::vec3(0.0f, 0.0f, 1.0f), //眼睛位置
@@ -95,14 +92,8 @@ namespace OpenEarth {
     }
 
     void updateModelMatrix() {
-        float earthScale = OpenEarth::Earth::getScale();
-        gModelMatrix = glm::mat4(1.0f);  //模型矩阵
-        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * earthScale - 1));
-        gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
-        //设置旋转
-        gModelMatrix = glm::rotate(gModelMatrix, earthRotateX, glm::vec3(1.0f, 0.0f, 0.0f));
-        gModelMatrix = glm::rotate(gModelMatrix, earthRotateY, glm::vec3(0.0f, 1.0f, 0.0f));
-        gModelMatrix = glm::rotate(gModelMatrix, earthRotateZ, glm::vec3(0.0f, 0.0f, 1.0f));
+        OpenEarth::Earth::updateModelMatrix();
+        gModelMatrix = OpenEarth::Earth::getModelMatrix();
         gTransform -> setModelMatrix(gModelMatrix);
     }
 
@@ -122,16 +113,10 @@ namespace OpenEarth {
         if(!gTransform->isValidLatlng(latlng1) || ! gTransform->isValidLatlng(latlng2))
             return;
 
-        float lat1 = OpenEarth::Util::degree2Rad(latlng1[0]);
-        float lat2 = OpenEarth::Util::degree2Rad(latlng2[0]);
-        float lon1 = OpenEarth::Util::degree2Rad(latlng1[1]);
-        float lon2 = OpenEarth::Util::degree2Rad(latlng2[1]);
-        float deltaLat = lat1 - lat2;
-        float delteLon = lon2 - lon1;
-        if(deltaLat * (array2[1]-array1[1])<0) deltaLat = -deltaLat;
-        glm::mat4 model = glm::mat4(1.0f);
-        earthRotateX += deltaLat;
-        earthRotateY += delteLon;
+        float deltaLat = latlng2[0] - latlng1[0];
+        float deltaLon = latlng2[1] - latlng1[1];
+        if(deltaLat * (array2[1]-array1[1]) > 0) deltaLat = -deltaLat;
+        OpenEarth::Earth::rotate(deltaLat,deltaLon);
         updateModelMatrix();
     }
 
@@ -209,16 +194,8 @@ namespace OpenEarth {
         //默认地图中心是 (0,0)
         jboolean isCopy = true;
         jfloat* array = env->GetFloatArrayElements(latlng,&isCopy);
-        earthRotateX =   array[0]  * M_PI/180;
-        earthRotateY =   -array[1] * M_PI/180;
-        gModelMatrix = glm::mat4(1.0f);
-        float earthScale = OpenEarth::Earth::getScale();
-        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * OpenEarth::Earth::getScale() - 1));
-        gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
-        gModelMatrix = glm::rotate(gModelMatrix,earthRotateX,glm::vec3(1,0,0));
-        gModelMatrix = glm::rotate(gModelMatrix,earthRotateY,glm::vec3(0,1,0));
-        gTransform->setModelMatrix(gModelMatrix);
-
+        OpenEarth::Earth::setCenterLatLng(new LatLng(array[0],array[1]));
+        updateModelMatrix();
     }
 
     /**
@@ -341,7 +318,6 @@ namespace OpenEarth {
 
 
     void surfaceChanged(JNIEnv *env, jobject instance, jint width, jint height) {
-
         glViewport(0, 0, width, height);
         screenSize = glm::vec2(width, height);
         const GLfloat ratio = (GLfloat) width / height;
@@ -359,7 +335,7 @@ namespace OpenEarth {
     }
 
 
-    void render(JNIEnv *env, jobject instance) {
+    void render(JNIEnv *env, jobject instance){
         drawEarth();
     }
 
