@@ -1,5 +1,6 @@
 package com.geocompass.openearth.sdk.earth;
 
+import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
@@ -32,8 +33,9 @@ public class Earth {
     public void zoomIn(){
         zoom = mEarthRenderer.getZoom();
         if(zoom+1 > MAX_ZOOM) return;
-        zoom = zoom+1;
-        this.mEarthRenderer.setZoom(zoom);
+//        zoom = zoom+1;
+//        this.mEarthRenderer.setZoom(zoom);
+        this.mEarthRenderer.setScale(1.5f);
     }
 
     public void zoomOut(){
@@ -41,6 +43,7 @@ public class Earth {
         if(zoom-1 < MIN_ZOOM)return;
         zoom = zoom-1;
         this.mEarthRenderer.setZoom(zoom);
+//        this.mEarthRenderer.setScale(0.75f);
     }
 
     public void setZoom(int zoom){
@@ -66,26 +69,22 @@ public class Earth {
         this.mEarthRenderer.setScale(scale);
     }
 
+    public void rotateEarth(float[] point1,float[] point2){
+        this.mEarthRenderer.rotateEarth(point1,point2);
+    }
+
+    public LatLng screenToLatLng(PointF screenPoint){
+        float[] latlng =  mEarthRenderer.screen2LatLng(new float[]{screenPoint.x,screenPoint.y});
+        return new LatLng(latlng[0],latlng[1]);
+    }
+
+    public PointF latLngToScreen(LatLng latLng){
+        float[] screen = mEarthRenderer.latLng2Screen(new float[]{latLng.lat,latLng.lon});
+        return new PointF(screen[0],screen[1]);
+    }
+
 
     protected boolean handleTouchEvent(MotionEvent event){
-        int action = event.getAction();
-        mGestureDetector.onTouchEvent(event);
-        switch (action){
-            case MotionEvent.ACTION_DOWN:
-                float x = event.getX();
-                float y = event.getY();
-                preXY = new float[]{x,y};
-                break;
-            case MotionEvent.ACTION_MOVE:
-                float x1 = event.getX();
-                float y1 = event.getY();
-                float[] xy = new float[]{x1,y1};
-                if(Math.abs(x1-preXY[0]) < 2 && Math.abs(y1-preXY[1]) < 2) break;
-                mEarthRenderer.rotateEarth(preXY,xy);
-                preXY = xy;
-                break;
-            case MotionEvent.ACTION_UP:break;
-        }
-        return true;
+        return  mGestureDetector.onTouchEvent(event);
     }
 }

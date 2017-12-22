@@ -57,7 +57,7 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
     glm::vec4 center = mModelMatrix * glm::vec4(earthCenter,1.0f);//通过模型矩阵将球心转换为世界坐标 这样球心和射线就处于同一套坐标系中
     float distanceEarthCenterToRay = distanceBetween(ray,glm::vec3(center[0],center[1],center[2]));//球心到射线的距离
     float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale(); //经过模型矩阵转换后地球的半径
-
+    float r = OpenEarth::Earth::getRadius();
      if(R < distanceEarthCenterToRay){ //不相交
          return glm::vec2(MAXFLOAT,MAXFLOAT); //返回一个非法的坐标
      }else{
@@ -74,9 +74,9 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
          glm::vec4 pFar  = mInverseModelMatrix * glm::vec4(p1,1.0f);
          glm::vec4 pNear = mInverseModelMatrix * glm::vec4(p0,1.0f);
          //转为经纬度
-         float lat = asinf(pNear[1]/R); //lat [-pi/2, pi/2]
-         float cosLat = R*cos(lat);     //cos(lat)>=0;
-         float lon = asin(pNear[0]/cosLat); //lon
+         float lat    = asinf(pNear[1]/r); //lat [-pi/2, pi/2]
+         float cosLat = r*cos(lat);     //cos(lat)>=0;
+         float lon    = asin(pNear[0]/cosLat); //lon
          if(lon >= 0){
              if(pNear[2] < 0) lon= M_PI - lon;
          }else if(lon < 0){

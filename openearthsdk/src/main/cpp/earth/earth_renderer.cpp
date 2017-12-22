@@ -94,6 +94,18 @@ namespace OpenEarth {
         gTransform = std::make_unique<OpenEarth::Transform>(gModelMatrix,gProject);
     }
 
+    void updateModelMatrix() {
+        float earthScale = OpenEarth::Earth::getScale();
+        gModelMatrix = glm::mat4(1.0f);  //模型矩阵
+        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * earthScale - 1));
+        gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
+        //设置旋转
+        gModelMatrix = glm::rotate(gModelMatrix, earthRotateX, glm::vec3(1.0f, 0.0f, 0.0f));
+        gModelMatrix = glm::rotate(gModelMatrix, earthRotateY, glm::vec3(0.0f, 1.0f, 0.0f));
+        gModelMatrix = glm::rotate(gModelMatrix, earthRotateZ, glm::vec3(0.0f, 0.0f, 1.0f));
+        gTransform -> setModelMatrix(gModelMatrix);
+    }
+
     /**
      * 自由旋转球体
      * @param env
@@ -120,11 +132,7 @@ namespace OpenEarth {
         glm::mat4 model = glm::mat4(1.0f);
         earthRotateX += deltaLat;
         earthRotateY += delteLon;
-        gModelMatrix = glm::mat4(1.0f);
-        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * OpenEarth::Earth::getScale() - 1));
-        gModelMatrix = glm::rotate(gModelMatrix,earthRotateX,glm::vec3(1,0,0));
-        gModelMatrix = glm::rotate(gModelMatrix,earthRotateY,glm::vec3(0,1,0));
-        gTransform->setModelMatrix(gModelMatrix);
+        updateModelMatrix();
     }
 
 //    /**
@@ -204,7 +212,9 @@ namespace OpenEarth {
         earthRotateX =   array[0]  * M_PI/180;
         earthRotateY =   -array[1] * M_PI/180;
         gModelMatrix = glm::mat4(1.0f);
+        float earthScale = OpenEarth::Earth::getScale();
         gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * OpenEarth::Earth::getScale() - 1));
+        gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
         gModelMatrix = glm::rotate(gModelMatrix,earthRotateX,glm::vec3(1,0,0));
         gModelMatrix = glm::rotate(gModelMatrix,earthRotateY,glm::vec3(0,1,0));
         gTransform->setModelMatrix(gModelMatrix);
@@ -224,17 +234,7 @@ namespace OpenEarth {
         return floatArray;
     }
 
-    void updateModelMatrix() {
-        float earthScale = OpenEarth::Earth::getScale();
-        gModelMatrix = glm::mat4(1.0f);  //模型矩阵
-        gModelMatrix = glm::translate(gModelMatrix, glm::vec3(0, 0, -OpenEarth::Earth::getRadius() * earthScale - 1));
-        gModelMatrix = glm::scale(gModelMatrix,glm::vec3(earthScale,earthScale,earthScale));
-        //设置旋转
-        gModelMatrix = glm::rotate(gModelMatrix, earthRotateX, glm::vec3(1.0f, 0.0f, 0.0f));
-        gModelMatrix = glm::rotate(gModelMatrix, earthRotateY, glm::vec3(0.0f, 1.0f, 0.0f));
-        gModelMatrix = glm::rotate(gModelMatrix, earthRotateZ, glm::vec3(0.0f, 0.0f, 1.0f));
-        gTransform -> setModelMatrix(gModelMatrix);
-    }
+
 
     //重新绘制地球
     void updateEarth() {
@@ -244,7 +244,7 @@ namespace OpenEarth {
     }
 
     //设置球体的各个参数
-    void setScale(JNIEnv *env, jobject instance, jfloat scale) {
+    void setScale(JNIEnv *env, jobject instance, jfloat scale){
         if(OpenEarth::Earth::setScale(scale))
             updateEarth();
         else
