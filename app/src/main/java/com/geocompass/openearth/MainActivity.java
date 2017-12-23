@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mEarth.lookDown();
                 return;
             case R.id.btn_set_center:
-                mEarth.setCenter(new LatLng(-40,116));
+                mEarth.setCenter(new LatLng(40,116));
                 return;
         }
     }
