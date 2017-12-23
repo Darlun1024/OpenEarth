@@ -6,7 +6,7 @@
 
 
 namespace OpenEarth {
-    namespace Shader {
+    namespace Shaders {
         const char *RasterShader::name = "raster_shader";
         //这是C++11支持的新的字符串初始化方法 R"()"
         const char *RasterShader::veterxShader = R"SHADER(

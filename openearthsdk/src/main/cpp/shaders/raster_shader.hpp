@@ -6,7 +6,7 @@
 #define OPENEARTH_RASTERSHADER_HPP
 
 namespace OpenEarth {
-    namespace Shader {
+    namespace Shaders {
         class RasterShader {
         public:
             static const char *name;

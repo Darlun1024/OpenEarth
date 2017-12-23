@@ -19,6 +19,7 @@
 #include "../util/util.hpp"
 #include "geometry/geometry_util.hpp"
 #include "../shaders/raster_shader.hpp"
+#include "../programs/program.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
 
@@ -245,41 +246,11 @@ namespace OpenEarth {
 //        sphere = std::make_unique<OpenEarth::Sphere>(1.0f);
         tile1 = new Tile(0, 0, 1);
         tile2 = new Tile(1, 0, 1);
-        GLuint glProgram;
-        GLuint vertexShader;
-        GLuint fragmentShader;
+
         //shader code
-        const char *shader_vertex = OpenEarth::Shader::RasterShader::veterxShader;
-        const char *shader_fragment = OpenEarth::Shader::RasterShader::fragmentShader;
-        glProgram = glCreateProgram();
-
-
-        if (glProgram == 0) {
-            return;
-        }
-
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
-        //vertexShader
-        vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &shader_vertex, NULL);
-
-        //fragmentShader
-        fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &shader_fragment, NULL);
-        glCompileShader(vertexShader);
-        glCompileShader(fragmentShader);
-
-        glAttachShader(glProgram, vertexShader);
-        glAttachShader(glProgram, fragmentShader);
-
-        glLinkProgram(glProgram);
-        int linkStatus;
-        glGetProgramiv(glProgram, GL_LINK_STATUS, &linkStatus);
-        if (linkStatus == 0) {
-            glDeleteProgram(glProgram);
-        }
-        d_glprogram = glProgram;
+        const char *shader_vertex   = OpenEarth::Shaders::RasterShader::veterxShader;
+        const char *shader_fragment = OpenEarth::Shaders::RasterShader::fragmentShader;
+        d_glprogram = OpenEarth::Programs::Program::createProgram(shader_vertex,shader_fragment);
     }
 
 
