@@ -49,15 +49,18 @@ namespace OpenEarth {
      void OpenEarth::Earth::rotate(float deltaLat, float deltaLon){
          center_latlng->lat  -= deltaLat;
          center_latlng->lon  -= deltaLon;
-         center_latlng->normalize();
          updateModelMatrix();
      }
 
     void OpenEarth::Earth::setCenterLatLng(LatLng *latLng) {
         center_latlng->lat = latLng->lat;
         center_latlng->lon = latLng->lon;
-        center_latlng->normalize();
         updateModelMatrix();
+    }
+
+    LatLng* OpenEarth::Earth::getCenterLatLng(){
+        center_latlng->normalize();
+        return center_latlng;
     }
 
 

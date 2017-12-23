@@ -51,6 +51,11 @@ add_library( # Sets the name of the library.
               src/main/cpp/util/jpeg_reader.c
               src/main/cpp/util/assets_file_reader.cpp
               src/main/cpp/util/util.cpp
+              src/main/cpp/gl/gl.cpp;
+              src/main/cpp/shaders/shader.cpp;
+              src/main/cpp/shaders/raster_shader.cpp;
+              src/main/cpp/programs/program.cpp;
+              src/main/cpp/texture/texture.cpp;
               src/main/cpp/earth/opengl_project.cpp
               src/main/cpp/earth/geometry/Ray.cpp
               src/main/cpp/earth/geometry/geometry_util.cpp

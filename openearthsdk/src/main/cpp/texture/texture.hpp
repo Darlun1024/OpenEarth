@@ -1,0 +1,10 @@
+
+
+#ifndef OPENEARTH_TEXTURE_HPP
+#define OPENEARTH_TEXTURE_HPP
+
+class Texture{
+	
+};
+
+#endif //OPENEARTH_TEXTURE_HPP

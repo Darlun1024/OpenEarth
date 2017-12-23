@@ -18,6 +18,7 @@
 #include "transform.hpp"
 #include "../util/util.hpp"
 #include "geometry/geometry_util.hpp"
+#include "../shaders/raster_shader.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
 
@@ -120,69 +121,6 @@ namespace OpenEarth {
         updateModelMatrix();
     }
 
-//    /**
-// * 自由旋转球体,围绕 两个屏幕触点与球体的相交的平面的法线 旋转
-// * 这种方法容易造成地图
-// * @param env
-// * @param instance
-// * @param screenPoint1
-// * @param screenPoint2
-// */
-//    void rotateEarth(JNIEnv *env, jobject instance, jfloatArray screenPoint1,jfloatArray screenPoint2){
-//        jboolean isCopy = true;
-//        glm::mat4 invereModelMatrix = glm::inverse(gModelMatrix);
-//        jfloat* array1 = env->GetFloatArrayElements(screenPoint1,&isCopy);
-//        jfloat* array2 = env->GetFloatArrayElements(screenPoint2,&isCopy);
-//        Ray* ray1 = gProject->screen2Ray(glm::vec2(array1[0],array1[1])); //先构建一条射线
-//        Ray* ray2 = gProject->screen2Ray(glm::vec2(array2[0],array2[1])); //先构建一条射线
-//        glm::vec3 earthCenter = OpenEarth::Earth::getCenter(); //获取球心
-//        glm::vec4 center = gModelMatrix * glm::vec4(earthCenter,1.0f);//通过模型矩阵将球心转换为世界坐标 这样球心和射线就处于同一套坐标系中
-//
-//        float distanceEarthCenterToRay1 = gTransform->distanceBetween(ray1,glm::vec3(center[0],center[1],center[2]));//球心到射线的距离
-//        float distanceEarthCenterToRay2 = gTransform->distanceBetween(ray2,glm::vec3(center[0],center[1],center[2]));//球心到射线的距离
-//        float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale(); //经过模型矩阵转换后地球的半径
-//
-//        if(R < distanceEarthCenterToRay1||R < distanceEarthCenterToRay2){ //不相交
-//            return;
-//        }else{
-//            float dist1 = sqrt(R*R - distanceEarthCenterToRay1*distanceEarthCenterToRay1);//
-//            float dist2 = sqrt(R*R - distanceEarthCenterToRay2*distanceEarthCenterToRay2);//
-//            float rayLength1  = glm::length(ray1->mVector); //求射线的长度
-//            float rayLength2  = glm::length(ray2->mVector); //求射线的长度
-//            //求圆心在向量上的投影
-//            glm::vec3 rayStartToCenter1 = glm::vec3(center[0]-ray1->mPoint[0],center[1]-ray1->mPoint[1],center[2]-ray1->mPoint[2]);
-//            glm::vec3 rayStartToCenter2 = glm::vec3(center[0]-ray2->mPoint[0],center[1]-ray2->mPoint[1],center[2]-ray2->mPoint[2]);
-//            float a1     = glm::dot(rayStartToCenter1,ray1->mVector)/rayLength1;
-//            float a2     = glm::dot(rayStartToCenter2,ray2->mVector)/rayLength2;
-//            glm::vec3 vectStartToFoootPoint1 = ray1->mPoint +  a1/rayLength1 * ray1->mVector;
-//            glm::vec3 vectStartToFoootPoint2 = ray2->mPoint +  a2/rayLength2 * ray2->mVector;
-//
-//            glm::vec3 p1 = vectStartToFoootPoint1 + dist1/rayLength1 * ray1->mVector; //远交点
-//            glm::vec3 p0 = vectStartToFoootPoint1 - dist1/rayLength1 * ray1->mVector; //近交点
-//            glm::vec4 pFar1  = invereModelMatrix * glm::vec4(p1,1.0f);
-//            glm::vec4 pNear1 = invereModelMatrix * glm::vec4(p0,1.0f);
-//
-//            glm::vec3 p4 = vectStartToFoootPoint2 + dist2/rayLength2 * ray2->mVector; //远交点
-//            glm::vec3 p3 = vectStartToFoootPoint2 - dist2/rayLength2 * ray2->mVector; //近交点
-//            glm::vec4 pFar2  = invereModelMatrix * glm::vec4(p4,1.0f);
-//            glm::vec4 pNear2 = invereModelMatrix * glm::vec4(p3,1.0f);
-//            //交点与球心的构成的向量
-//            glm::vec3 vectC1 = glm::vec3(pNear1);
-//            glm::vec3 vectC2 = glm::vec3(pNear2);
-//
-//            //三点构建一个平面
-//            glm::vec3 vect1 = glm::vec3(pNear1-pFar1);
-//            glm::vec3 vect2 = glm::vec3(pNear2-pFar1);
-//            glm::vec3 plane = glm::cross(vect1,vect2);//平面法向量
-//            glm::vec3 vp1 = OpenEarth::Geometry::GeometryUtil::projectToPlane(vectC1,plane); //向量投影到平面上
-//            glm::vec3 vp2 = OpenEarth::Geometry::GeometryUtil::projectToPlane(vectC2,plane);
-//            float rad = glm::dot(vp1,vp2)/(glm::length(vp1)*glm::length(vp2));  //向量之间的夹角
-//            rad = acos(rad);
-//            gModelMatrix = glm::rotate(gModelMatrix,rad,plane);
-//            gTransform->setModelMatrix(gModelMatrix);
-//        }
-//    }
-
 
     /**
      * 设置中心点坐标
@@ -220,7 +158,7 @@ namespace OpenEarth {
         tile2->reset();
     }
 
-    //设置球体的各个参数
+    //设置球体的缩放比例
     void setScale(JNIEnv *env, jobject instance, jfloat scale){
         if(OpenEarth::Earth::setScale(scale))
             updateEarth();
@@ -228,20 +166,22 @@ namespace OpenEarth {
             updateModelMatrix();
     }
 
+    /**获取球体的缩放比例(1.0 2.0)*/
     jfloat getScale(){
         return OpenEarth::Earth::getScale();
     }
 
 
-
+    //设置球体的显示级别,不同的级别会采用不用的纹理
     void setZoom(JNIEnv *env, jobject instance, jfloat zoom) {
         if(OpenEarth::Earth::setZoom(zoom))
             updateEarth();
     }
-
+    //获取球体的显示级别
     jint getZoom(){
         return OpenEarth::Earth::getZoom();
     }
+
     //修改摄像头瞄准的点
     void setTilt(JNIEnv *env, jobject instance, jfloat tilt) {
         //TODO 根据角度计算
@@ -254,6 +194,45 @@ namespace OpenEarth {
         gProject->setViewMatrix(gViewMatrix);
     }
 
+    jfloatArray screen2World(JNIEnv *env, jobject instance, jfloatArray point){
+        jboolean isCopy = true;
+        jfloat* array = env->GetFloatArrayElements(point,&isCopy);
+        glm::vec3 world = gProject->unProject(glm::vec2(array[0],array[1]),0);
+        jfloat array1[3] = {world[0],world[1],world[2]};
+        jfloatArray floatArray = env->NewFloatArray(3);
+        env->SetFloatArrayRegion(floatArray,0,3,array1);
+        return floatArray;
+    }
+
+    jfloatArray world2Screen(JNIEnv *env, jobject instance, jfloatArray point){
+        jboolean isCopy = true;
+        float* array = env->GetFloatArrayElements(point,&isCopy);
+        glm::vec2 screen = gProject->project(glm::vec3(array[0],array[1],array[2]));
+        jfloat array1[2] = {screen[0],screen[1]};
+        jfloatArray floatArray = env->NewFloatArray(2);
+        env->SetFloatArrayRegion(floatArray,0,2,array1);
+        return floatArray;
+    }
+
+    jfloatArray screen2LatLng(JNIEnv *env, jobject instance, jfloatArray point){
+        jboolean isCopy = true;
+        jfloat* array = env->GetFloatArrayElements(point,&isCopy);
+        glm::vec2 latlng = gTransform->screenPointToLatlng(glm::vec2(array[0],array[1]));
+        jfloat array1[2] = {latlng[0],latlng[1]};
+        jfloatArray floatArray = env->NewFloatArray(3);
+        env->SetFloatArrayRegion(floatArray,0,2,array1);
+        return floatArray;
+    }
+
+    jfloatArray latLng2Screen(JNIEnv *env, jobject instance, jfloatArray latlng){
+        jboolean isCopy = true;
+        float* array = env->GetFloatArrayElements(latlng,&isCopy);
+        glm::vec2 screen = gTransform->latLngToScreenPoint(new LatLng(array[0],array[1]));
+        jfloat array1[2] = {screen[0],screen[1]};
+        jfloatArray floatArray = env->NewFloatArray(2);
+        env->SetFloatArrayRegion(floatArray,0,2,array1);
+        return floatArray;
+    }
 
     void surfaceCreated(JNIEnv *env, jobject instance) {
         jclass objectClass = env->GetObjectClass(instance);
@@ -270,21 +249,8 @@ namespace OpenEarth {
         GLuint vertexShader;
         GLuint fragmentShader;
         //shader code
-        const char *shader_vertex =
-                "uniform mat4 u_MVPMatrix; \n"
-                        "attribute vec4 POSITION;\n"
-                        "attribute vec2 a_TextureCoordinates;\n"
-                        "varying vec2 v_TextureCoordinates;\n"
-                        "void main(){\n"
-                        "gl_Position = u_MVPMatrix*POSITION;\n"
-                        "v_TextureCoordinates = a_TextureCoordinates;\n"
-                        "}";
-        const char *shader_fragment = "precision mediump float;\n"
-                "uniform sampler2D u_TextureUnit;   \n"
-                "varying vec2 v_TextureCoordinates; \n"
-                "void main(){\n"
-                "   gl_FragColor = texture2D(u_TextureUnit, v_TextureCoordinates);\n"
-                "}";
+        const char *shader_vertex = OpenEarth::Shader::RasterShader::veterxShader;
+        const char *shader_fragment = OpenEarth::Shader::RasterShader::fragmentShader;
         glProgram = glCreateProgram();
 
 
@@ -360,45 +326,7 @@ namespace OpenEarth {
         tile2->draw(aPositionLocaiton, aTextureLocation, aAssetManager, "east.jpeg");
     }
 
-    jfloatArray screen2World(JNIEnv *env, jobject instance, jfloatArray point){
-        jboolean isCopy = true;
-        jfloat* array = env->GetFloatArrayElements(point,&isCopy);
-        glm::vec3 world = gProject->unProject(glm::vec2(array[0],array[1]),0);
-        jfloat array1[3] = {world[0],world[1],world[2]};
-        jfloatArray floatArray = env->NewFloatArray(3);
-         env->SetFloatArrayRegion(floatArray,0,3,array1);
-        return floatArray;
-    }
 
-    jfloatArray world2Screen(JNIEnv *env, jobject instance, jfloatArray point){
-        jboolean isCopy = true;
-        float* array = env->GetFloatArrayElements(point,&isCopy);
-        glm::vec2 screen = gProject->project(glm::vec3(array[0],array[1],array[2]));
-        jfloat array1[2] = {screen[0],screen[1]};
-        jfloatArray floatArray = env->NewFloatArray(2);
-        env->SetFloatArrayRegion(floatArray,0,2,array1);
-        return floatArray;
-    }
-
-    jfloatArray screen2LatLng(JNIEnv *env, jobject instance, jfloatArray point){
-        jboolean isCopy = true;
-        jfloat* array = env->GetFloatArrayElements(point,&isCopy);
-        glm::vec2 latlng = gTransform->screenPointToLatlng(glm::vec2(array[0],array[1]));
-        jfloat array1[2] = {latlng[0],latlng[1]};
-        jfloatArray floatArray = env->NewFloatArray(3);
-        env->SetFloatArrayRegion(floatArray,0,2,array1);
-        return floatArray;
-    }
-
-    jfloatArray latLng2Screen(JNIEnv *env, jobject instance, jfloatArray latlng){
-        jboolean isCopy = true;
-        float* array = env->GetFloatArrayElements(latlng,&isCopy);
-        glm::vec2 screen = gTransform->latLngToScreenPoint(new LatLng(array[0],array[1]));
-        jfloat array1[2] = {screen[0],screen[1]};
-        jfloatArray floatArray = env->NewFloatArray(2);
-        env->SetFloatArrayRegion(floatArray,0,2,array1);
-        return floatArray;
-    }
 
 
     static JNINativeMethod gMethods[] = {

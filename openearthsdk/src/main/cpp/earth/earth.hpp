@@ -60,7 +60,7 @@ namespace OpenEarth{
         static void   setCenterLatLng(LatLng* latLng);
 
         /*** 获取当前视图中心的经纬度*/
-        static LatLng getCenterLatLng();
+        static LatLng* getCenterLatLng();
 
 
     };
