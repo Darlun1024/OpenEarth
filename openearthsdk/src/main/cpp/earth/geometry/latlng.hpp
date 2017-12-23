@@ -18,8 +18,8 @@ public:
 
     LatLng(float lat, float lon);
     ~LatLng();
-
-
+    /** 标注化坐标 */
+    void normalize();
 
 
 };

@@ -112,16 +112,16 @@ namespace OpenEarth {
         glm::vec2 latlng2 = gTransform->screenPointToLatlng(glm::vec2(array2[0],array2[1]));
         if(!gTransform->isValidLatlng(latlng1) || ! gTransform->isValidLatlng(latlng2))
             return;
-
         float deltaLat = latlng2[0] - latlng1[0];
         float deltaLon = latlng2[1] - latlng1[1];
-        if(deltaLat * (array2[1]-array1[1]) > 0) deltaLat = -deltaLat;
+        if(deltaLat * (array2[1]-array1[1]) > 0) deltaLat = -deltaLat;  //在两级附近
+        //TODO 处理子午线上的情况
         OpenEarth::Earth::rotate(deltaLat,deltaLon);
         updateModelMatrix();
     }
 
 //    /**
-// * 自由旋转球体
+// * 自由旋转球体,围绕 两个屏幕触点与球体的相交的平面的法线 旋转
 // * 这种方法容易造成地图
 // * @param env
 // * @param instance
