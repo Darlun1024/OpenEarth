@@ -1,7 +1,6 @@
 package com.geocompass.openearth.sdk.earth;
 
 import android.content.Context;
-import android.graphics.PointF;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -9,7 +8,6 @@ import android.view.ScaleGestureDetector;
 import com.almeros.android.multitouch.MoveGestureDetector;
 import com.almeros.android.multitouch.RotateGestureDetector;
 import com.almeros.android.multitouch.ShoveGestureDetector;
-import com.geocompass.openearth.sdk.earth.geometry.LatLng;
 
 /**
  * Created by gxsn on 2017/12/8.
@@ -24,7 +22,7 @@ public class GestureDetector  implements MoveGestureDetector.OnMoveGestureListen
     private ShoveGestureDetector  mShoveGestureDetector;
     private ScaleGestureDetector  mScaleGestureDetector;
     private Earth mEarth;
-    float [] preXY;
+    private float [] preXY = {-1,-1};
     public GestureDetector(Context context,Earth earth){
         mEarth = earth;
         mMoveGestureDetector   = new MoveGestureDetector(context,this);
@@ -32,6 +30,7 @@ public class GestureDetector  implements MoveGestureDetector.OnMoveGestureListen
         mShoveGestureDetector  = new ShoveGestureDetector(context,this);
         mScaleGestureDetector  = new ScaleGestureDetector(context,this);
     }
+
     public boolean onTouchEvent(MotionEvent event){
 //        mMoveGestureDetector.onTouchEvent(event);
         mRotateGestureDetector.onTouchEvent(event);
@@ -41,12 +40,13 @@ public class GestureDetector  implements MoveGestureDetector.OnMoveGestureListen
         switch (action){
             case MotionEvent.ACTION_DOWN:
                 preXY = new float[]{event.getX(),event.getY()};
-                PointF screenPoint = new PointF(event.getX(),event.getY());
-                LatLng latLng = mEarth.screenToLatLng(screenPoint);
-                PointF newScreen = mEarth.latLngToScreen(latLng);
                 break;
             case MotionEvent.ACTION_MOVE:
                 if(mShoveGestureDetector.isInProgress()||mRotateGestureDetector.isInProgress()||mScaleGestureDetector.isInProgress()){
+                    preXY = new float[]{event.getX(),event.getY()};
+                    break;
+                }
+                if(preXY[0] < 0 ){
                     preXY = new float[]{event.getX(),event.getY()};
                     break;
                 }
@@ -57,7 +57,15 @@ public class GestureDetector  implements MoveGestureDetector.OnMoveGestureListen
                 mEarth.rotateEarth(preXY,xy);
                 preXY = xy;
                 break;
-            case MotionEvent.ACTION_UP:break;
+            case MotionEvent.ACTION_UP:
+                preXY = new float[]{-1,-1};
+                break;
+            case MotionEvent.ACTION_POINTER_UP:
+                //不管几个手指，先把prexy设置为（-1，-1）
+                preXY = new float[]{-1,-1};
+                break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                break;
         }
         return true;
     }

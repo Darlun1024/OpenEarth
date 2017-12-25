@@ -283,10 +283,10 @@ namespace OpenEarth {
         glDepthFunc(GL_LESS);
         glUseProgram(d_glprogram);
 
-        aPositionLocaiton = glGetAttribLocation(d_glprogram, "POSITION");
-        aTextureLocation = glGetAttribLocation(d_glprogram, "a_TextureCoordinates");
+        aPositionLocaiton    = glGetAttribLocation(d_glprogram, "POSITION");
+        aTextureLocation     = glGetAttribLocation(d_glprogram, "a_TextureCoordinates");
         uTextureUnitLocation = glGetUniformLocation(d_glprogram, "u_TextureUnit");
-        uProjectionLocation = glGetUniformLocation(d_glprogram, "u_MVPMatrix");
+        uProjectionLocation  = glGetUniformLocation(d_glprogram, "u_MVPMatrix");
 
         glUniform1i(uTextureUnitLocation, 0);
 
