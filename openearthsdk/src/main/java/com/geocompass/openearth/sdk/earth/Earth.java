@@ -29,19 +29,11 @@ public class Earth {
 
 
     public void zoomIn(){
-        zoom = mEarthRenderer.getZoom();
-        if(zoom+1 > MAX_ZOOM) return;
-        zoom = zoom+1;
-        this.mEarthRenderer.setZoom(zoom);
-//        this.mEarthRenderer.setScale(1.5f);
+        mEarthRenderer.zoomIn();
     }
 
     public void zoomOut(){
-        zoom = mEarthRenderer.getZoom();
-        if(zoom-1 < MIN_ZOOM)return;
-        zoom = zoom-1;
-        this.mEarthRenderer.setZoom(zoom);
-//        this.mEarthRenderer.setScale(0.75f);
+       mEarthRenderer.zoomOut();
     }
 
     public void setZoom(int zoom){
@@ -67,8 +59,12 @@ public class Earth {
         this.mEarthRenderer.setScale(scale);
     }
 
+    public void tilt(float tilt){
+        this.mEarthRenderer.tilt(tilt);
+    }
+
     public void rotateEarth(float[] point1,float[] point2){
-        this.mEarthRenderer.rotateEarth(point1,point2);
+        this.mEarthRenderer.rotate(point1,point2);
     }
 
     public LatLng screenToLatLng(PointF screenPoint){

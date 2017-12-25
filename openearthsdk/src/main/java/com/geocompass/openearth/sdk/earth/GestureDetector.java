@@ -74,13 +74,17 @@ public class GestureDetector  implements MoveGestureDetector.OnMoveGestureListen
     //shove
     @Override
     public boolean onShove(ShoveGestureDetector detector) {
-        return false;
+        Log.e(TAG,"shove delta:"+detector.getShovePixelsDelta());
+        float delta = detector.getShovePixelsDelta();
+        float tilt = delta * 0.005f;
+        mEarth.tilt(tilt);
+        return true;
     }
 
     @Override
     public boolean onShoveBegin(ShoveGestureDetector detector) {
 
-        return false;
+        return true;
     }
 
     @Override

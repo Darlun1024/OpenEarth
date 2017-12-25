@@ -53,13 +53,19 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      * @param point1
      * @param point2
      */
-    protected void rotateEarth(float[] point1,float[] point2){
-        nativeRotateEarth(point1,point2);
+    protected void rotate(float[] point1, float[] point2){
+        nativeRotateWithPoint(point1,point2);
+        glSurfaceView.requestRender();
+    }
+
+    protected void rotate(float deltaLat,float deltaLon){
+        nativeRotateWithLatLng(deltaLat,deltaLon);
         glSurfaceView.requestRender();
     }
 
 
     /**
+     * 在当前zoom 的基础之上缩放
      * 设置放大比例[1.0,2.0)
      * 用于处理在两个zoom之间的地球放大问题
      * @param scale
@@ -70,11 +76,30 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     }
 
     /**
+     * 在当前球体的基础之上缩放
+     * @param scale
+     */
+    protected void scale(float scale){
+        nativeScale(scale);
+        glSurfaceView.requestRender();
+    }
+
+    /**
      * 设置显示级别,级别越大，地球半径越大
      * @param zoom
      */
     protected void setZoom(float zoom){
         nativeSetZoom(zoom);
+        glSurfaceView.requestRender();
+    }
+
+    protected void zoomIn(){
+        nativeZoomIn();
+        glSurfaceView.requestRender();
+    }
+
+    protected void zoomOut(){
+        nativeZoomOut();
         glSurfaceView.requestRender();
     }
 
@@ -92,6 +117,15 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
      */
     protected void setTilt(float tilt){
         nativeSetTilt(tilt);
+        glSurfaceView.requestRender();
+    }
+
+    /**
+     * 倾斜
+     * @param tilt
+     */
+    protected void tilt(float tilt){
+        nativeTilt(tilt);
         glSurfaceView.requestRender();
     }
 
@@ -154,11 +188,16 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     private native void  nativeSurfaceCreated();
     private native void  nativeSurfaceChanged(int width,int height);
     private native void  nativeRender();
-    private native void  nativeRotateEarth(float[] screenPoint1,float[] screenPoint2);
+    private native void  nativeRotateWithPoint(float[] screenPoint1, float[] screenPoint2);
+    private native void  nativeRotateWithLatLng(float deltaLat,float deltaLon);
     private native void  nativeSetScale(float scale);
-    private native float   nativeGetScale();
+    private native void  nativeScale(float scale);
+    private native float nativeGetScale();
     private native void  nativeSetTilt(float radian);
+    private native void  nativeTilt(float radian);
     private native void  nativeSetZoom(float zoom);
+    private native void  nativeZoomIn();
+    private native void  nativeZoomOut();
     private native int   nativeGetZoom();
     private native void  nativeSetCenter(float[] latlng);
     private native void  nativeInitialize();

@@ -57,6 +57,8 @@ namespace OpenEarth {
     void drawEarth();
 
     float cameraTargetCenterY = 0.0f;
+    static const float const MAX_TARGET_CENTER_Y = 1.0f;
+    static const float const MIN_TARGET_CENTER_Y = 0.0f;
 
     //构造和析构函数
     OpenEarth::EarthRenderer::EarthRenderer() {
@@ -106,7 +108,7 @@ namespace OpenEarth {
      * @param screenPoint1
      * @param screenPoint2
      */
-    void rotateEarth(JNIEnv *env, jobject instance, jfloatArray screenPoint1,jfloatArray screenPoint2){
+    void rotateWithScreenPoint(JNIEnv *env, jobject instance, jfloatArray screenPoint1,jfloatArray screenPoint2){
         jboolean isCopy = true;
         jfloat* array1 = env->GetFloatArrayElements(screenPoint1,&isCopy);
         jfloat* array2 = env->GetFloatArrayElements(screenPoint2,&isCopy);
@@ -118,6 +120,12 @@ namespace OpenEarth {
         float deltaLon = latlng2[1] - latlng1[1];
         if(deltaLat * (array2[1]-array1[1]) > 0) deltaLat = -deltaLat;  //在两级附近
         //TODO 处理子午线上的情况
+        OpenEarth::Earth::rotate(deltaLat,deltaLon);
+        updateModelMatrix();
+    }
+
+
+    void rotateWithLatLng(JNIEnv *env, jobject instance, jfloat deltaLat,jfloat deltaLon){
         OpenEarth::Earth::rotate(deltaLat,deltaLon);
         updateModelMatrix();
     }
@@ -161,6 +169,14 @@ namespace OpenEarth {
 
     //设置球体的缩放比例
     void setScale(JNIEnv *env, jobject instance, jfloat scale){
+        //TODO 修改实现方法，这里的scale要限制在[1.0 2.0)之内
+        if(OpenEarth::Earth::setScale(scale))
+            updateEarth();
+        else
+            updateModelMatrix();
+    }
+
+    void scale(JNIEnv *env, jobject instance, jfloat scale){
         if(OpenEarth::Earth::setScale(scale))
             updateEarth();
         else
@@ -178,14 +194,27 @@ namespace OpenEarth {
         if(OpenEarth::Earth::setZoom(zoom))
             updateEarth();
     }
+
+    void zoomIn(JNIEnv *env, jobject instance){
+        int zoom = OpenEarth::Earth::getZoom();
+        if(OpenEarth::Earth::setZoom(zoom+1))
+            updateEarth();
+    }
+
+    void zoomOut(JNIEnv *env, jobject instance){
+        int zoom = OpenEarth::Earth::getZoom();
+        if(OpenEarth::Earth::setZoom(zoom-1))
+            updateEarth();
+    }
+
     //获取球体的显示级别
     jint getZoom(){
         return OpenEarth::Earth::getZoom();
     }
 
-    //修改摄像头瞄准的点
-    void setTilt(JNIEnv *env, jobject instance, jfloat tilt) {
-        //TODO 根据角度计算
+    void setCameraTargetCenterY(float tilt){
+        if(tilt > MAX_TARGET_CENTER_Y) tilt = MAX_TARGET_CENTER_Y;
+        if(tilt < MIN_TARGET_CENTER_Y) tilt = MIN_TARGET_CENTER_Y;
         cameraTargetCenterY = tilt;
         gViewMatrix = glm::lookAt(
                 glm::vec3(0.0f, 0.0f, DEFAULT_EYE_HEIGHT), //眼睛位置
@@ -194,6 +223,17 @@ namespace OpenEarth {
         );
         gProject->setViewMatrix(gViewMatrix);
     }
+
+
+    //修改摄像头瞄准的点
+    void setTilt(JNIEnv *env, jobject instance, jfloat tilt) {
+        setCameraTargetCenterY(tilt);
+    }
+
+    void tilt(JNIEnv *env, jobject instance, jfloat tilt) {
+        setCameraTargetCenterY(cameraTargetCenterY+tilt);
+    }
+
 
     jfloatArray screen2World(JNIEnv *env, jobject instance, jfloatArray point){
         jboolean isCopy = true;
@@ -304,12 +344,17 @@ namespace OpenEarth {
             {"nativeSurfaceCreated", "()V",   (void *) surfaceCreated},
             {"nativeSurfaceChanged", "(II)V", (void *) surfaceChanged},
             {"nativeRender",         "()V",   (void *) render},
-            {"nativeRotateEarth",    "([F[F)V", (void *) rotateEarth},
+            {"nativeRotateWithPoint",  "([F[F)V", (void *) rotateWithScreenPoint},
+            {"nativeRotateWithLatLng", "(FF)V", (void *) rotateWithLatLng},
             {"nativeInitialize",     "()V",   (void *) initialize},
             {"nativeSetScale",       "(F)V",  (void *) setScale},
+            {"nativeScale",         "(F)V",   (void *) scale},
             {"nativeGetScale",       "()F",   (jfloat*) getScale},
             {"nativeSetTilt",        "(F)V",  (void *) setTilt},
+            {"nativeTilt",           "(F)V",  (void *) tilt},
             {"nativeSetZoom",        "(F)V",  (void *) setZoom},
+            {"nativeZoomIn",        "()V",    (void *) zoomIn},
+            {"nativeZoomOut",        "()V",   (void *) zoomOut},
             {"nativeGetZoom",        "()I",   (jint *) getZoom},
             {"nativeSetCenter",     "([F)V",  (void *) setCenter},
             {"nativeScreen2World",  "([F)[F",  (jfloatArray *) screen2World},
