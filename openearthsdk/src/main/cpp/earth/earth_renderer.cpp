@@ -26,9 +26,6 @@
 namespace OpenEarth {
     static const char *const JavaClassName = "com/geocompass/openearth/sdk/earth/EarthRenderer";
     static const char *const TAG = "earth_renderer_cpp";
-    static const int const X_AXIS = 0;
-    static const int const Y_AXIS = 1;
-    static const int const Z_AXIS = 2;
     std::unique_ptr<OpenEarth::Sphere> sphere;
     std::shared_ptr<OpenEarth::OpenGLProject> gProject;
     std::unique_ptr<OpenEarth::Transform> gTransform;
@@ -49,16 +46,14 @@ namespace OpenEarth {
     glm::mat4x4 gMvpMatrix;
 
     float earthRotateX = 0.0f;
-    float earthRotateY = 0.0f;
-    float earthRotateZ = 0.0f;
 
 
     //函数声明
     void drawEarth();
 
     float cameraTargetCenterY = 0.0f;
-    static const float const MAX_TARGET_CENTER_Y = 1.0f;
-    static const float const MIN_TARGET_CENTER_Y = 0.0f;
+    static const float  MAX_TARGET_CENTER_Y = 1.0f;
+    static const float  MIN_TARGET_CENTER_Y = 0.0f;
 
     //构造和析构函数
     OpenEarth::EarthRenderer::EarthRenderer() {
@@ -152,9 +147,11 @@ namespace OpenEarth {
      * @return
      */
     jfloatArray getCenter(JNIEnv *env, jobject instance){
-        jfloat array1[2] = {-earthRotateX,-earthRotateY};
+        LatLng* latLng =  OpenEarth::Earth::getCenterLatLng();
+        float array1[] = {latLng->lat,latLng->lon};
         jfloatArray floatArray = env->NewFloatArray(2);
         env->SetFloatArrayRegion(floatArray,0,2,array1);
+        latLng = nullptr;
         return floatArray;
     }
 

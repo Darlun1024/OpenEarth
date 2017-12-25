@@ -2,6 +2,7 @@ package com.geocompass.openearth;
 
 import android.app.Application;
 
+import com.geocompass.openearth.sdk.OpenEarth;
 import com.squareup.leakcanary.LeakCanary;
 
 /**
@@ -13,6 +14,7 @@ public class TestApplication extends Application {
     public void onCreate() {
         super.onCreate();
         super.onCreate();
+        OpenEarth.init();
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.

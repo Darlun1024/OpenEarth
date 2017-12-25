@@ -56,6 +56,8 @@ add_library( # Sets the name of the library.
               src/main/cpp/shaders/raster_shader.cpp;
               src/main/cpp/programs/program.cpp;
               src/main/cpp/texture/texture.cpp;
+              src/main/cpp/source/data_source.cpp;
+              src/main/cpp/source/http_data_source.cpp;
               src/main/cpp/earth/opengl_project.cpp
               src/main/cpp/earth/geometry/Ray.cpp
               src/main/cpp/earth/geometry/geometry_util.cpp
@@ -69,7 +71,6 @@ add_library( # Sets the name of the library.
               src/main/cpp/main.cpp
               src/main/cpp/jni.cpp
               src/main/cpp/logging.hpp
-
              )
 
 

@@ -162,3 +162,5 @@ GLuint loadTexture(AAssetManager *amgr, const char *path) {
     return textureId;
 }
 
+
+

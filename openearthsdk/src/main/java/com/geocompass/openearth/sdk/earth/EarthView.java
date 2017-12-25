@@ -20,10 +20,6 @@ import com.geocompass.openearth.sdk.R;
 
 public class EarthView extends FrameLayout implements View.OnGenericMotionListener{
 
-    static {
-        System.loadLibrary("lib-earth");
-    }
-
     private GLSurfaceView mSurfaceView;
     private Earth mEarth;
 

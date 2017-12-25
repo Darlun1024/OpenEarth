@@ -5,6 +5,7 @@
 #include <cstddef>
 #include "native_earth_view.hpp"
 
+
 //Java 类名
 static const char* const JavaClassName="com/geocompass/openearth/sdk/earth/NativeEarthView";
 
@@ -18,7 +19,6 @@ OpenEarth::NativeEarthView::~NativeEarthView(){
 }
 
 void initializeEarth(JNIEnv *env,jobject instance,jobject obj) {
-
 }
 
 
