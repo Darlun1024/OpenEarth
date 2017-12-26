@@ -8,6 +8,7 @@
 #include <GLES2/gl2.h>
 #include <memory>
 #include <android/asset_manager.h>
+#include <string>
 
 namespace OpenEarth {
     class Tile {
@@ -19,6 +20,8 @@ namespace OpenEarth {
         void draw(GLuint aPostionLocaiton, GLuint aTextureLocation,AAssetManager *amgr,
         const char *path);
         void reset();
+        /**生成唯一标识符*/
+        static std::string genUniqueCode(std::string type,int zoom,int x,int y);
     private:
         double *bounds = new double[4];//left,top,right,bottom
         float step = 3.0f;
@@ -26,6 +29,7 @@ namespace OpenEarth {
         GLfloat *vertexArray;
         GLfloat **stripes;
         void genVertexArray();
+
 
     };
 }

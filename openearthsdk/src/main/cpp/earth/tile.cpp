@@ -7,6 +7,7 @@
 #include "../util/assets_file_reader.hpp"
 #include "earth.hpp"
 #include <GLES2/gl2.h>
+#include <sstream>
 
 extern "C" {
     #include "../util/png_reader.h"
@@ -160,6 +161,13 @@ GLuint loadTexture(AAssetManager *amgr, const char *path) {
     glBindTexture(GL_TEXTURE_2D, 0);
     release_raw_image_data(&data);
     return textureId;
+}
+
+
+std::string OpenEarth::Tile::genUniqueCode(std::string type,int zoom,int x,int y){
+    std::stringstream stringStream;
+    stringStream << type << "_" << zoom << "_" << x << "_" << y << std::endl;
+    return stringStream.str();
 }
 
 

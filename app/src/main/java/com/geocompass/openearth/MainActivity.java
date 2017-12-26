@@ -2,6 +2,7 @@ package com.geocompass.openearth;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
@@ -14,13 +15,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private EarthView mEarthView;
     private Earth mEarth;
-//    float x = 0;
-//    float x1;
-//    float y = 0;
-//    float y1;
-//
-//    float preX = 0;
-//    float preY = 0;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -36,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_look_down).setOnClickListener(this);
         findViewById(R.id.btn_set_center).setOnClickListener(this);
         HttpRequest request = new HttpRequest("http://t1.tianditu.com/DataServer?T=vec_w&x=1682&y=776&l=11");
+        Looper looper;
     }
 
 

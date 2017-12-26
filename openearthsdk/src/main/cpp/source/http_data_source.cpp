@@ -3,6 +3,7 @@
 //
 
 #include "http_data_source.hpp"
+#include <thread>
 
 namespace OpenEarth{
     namespace DataSource{

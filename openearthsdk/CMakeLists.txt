@@ -46,11 +46,13 @@ add_library( # Sets the name of the library.
 
 
              # util
-             src/main/cpp/util/image.c
+              src/main/cpp/util/image.c
               src/main/cpp/util/png_reader.c
               src/main/cpp/util/jpeg_reader.c
               src/main/cpp/util/assets_file_reader.cpp
               src/main/cpp/util/util.cpp
+              src/main/cpp/util/looper.cpp
+              src/main/cpp/util/thread_local.cpp
               src/main/cpp/gl/gl.cpp;
               src/main/cpp/shaders/shader.cpp;
               src/main/cpp/shaders/raster_shader.cpp;
@@ -67,6 +69,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/earth/transform.cpp
               src/main/cpp/earth/sphere.cpp
               src/main/cpp/earth/tile.cpp
+              src/main/cpp/earth/tile_management.cpp
               src/main/cpp/earth/earth_renderer.cpp
               src/main/cpp/main.cpp
               src/main/cpp/jni.cpp
