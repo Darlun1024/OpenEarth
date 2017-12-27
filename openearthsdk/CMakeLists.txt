@@ -70,6 +70,8 @@ add_library( # Sets the name of the library.
               src/main/cpp/earth/sphere.cpp
               src/main/cpp/earth/tile.cpp
               src/main/cpp/earth/tile_management.cpp
+              src/main/cpp/earth/layer/layer.cpp
+              src/main/cpp/earth/layer/raster_layer.cpp
               src/main/cpp/earth/earth_renderer.cpp
               src/main/cpp/main.cpp
               src/main/cpp/jni.cpp

@@ -20,6 +20,7 @@
 #include "geometry/geometry_util.hpp"
 #include "../shaders/raster_shader.hpp"
 #include "../programs/program.hpp"
+#include "../texture/texture.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
 
@@ -330,8 +331,15 @@ namespace OpenEarth {
         gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
 
-        tile1->draw(aPositionLocaiton, aTextureLocation, aAssetManager, "west.jpeg");
-        tile2->draw(aPositionLocaiton, aTextureLocation, aAssetManager, "east.jpeg");
+        GLuint  textureId = OpenEarth::Texture::loadTextureId(aAssetManager, "west.png");
+        tile1->draw(aPositionLocaiton, aTextureLocation,textureId);
+        textureId = OpenEarth::Texture::loadTextureId(aAssetManager, "east.png");
+        tile2->draw(aPositionLocaiton, aTextureLocation, textureId);
+    }
+
+
+    void loadTextureId(const char* path){
+
     }
 
 

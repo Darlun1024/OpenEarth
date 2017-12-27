@@ -30,8 +30,8 @@ namespace OpenEarth{
                 mTileMap.reset();
             }
 
-            Tile* getTile(string type,int zoom,int x,int y){
-                string key  = OpenEarth::Tile::genUniqueCode(type,zoom,x,y);
+            Tile* getTile(int zoom,int x,int y){
+                string key  = OpenEarth::Tile::genUniqueCode(zoom,x,y);
                 Tile* tile = mTileMap->at(key);
                 if(tile== nullptr)
                     tile = new Tile(zoom,x,y);
@@ -49,8 +49,8 @@ namespace OpenEarth{
 
         }
 
-        Tile* TileManagement::getTile(string type,int zoom,int x,int y){
-            return impl->getTile(type,zoom,x,y);
+        Tile* TileManagement::getTile(int zoom,int x,int y){
+            return impl->getTile(zoom,x,y);
         }
 
 
