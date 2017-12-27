@@ -46,11 +46,9 @@ namespace OpenEarth {
     glm::mat4x4 gProjectionMatrix;
     glm::mat4x4 gMvpMatrix;
 
-    float earthRotateX = 0.0f;
-
-
+    OpenEarth::Texture* textureManager;
     //函数声明
-    void drawEarth();
+    void drawEarth(JNIEnv* env);
 
     float cameraTargetCenterY = 0.0f;
     static const float  MAX_TARGET_CENTER_Y = 1.0f;
@@ -77,6 +75,7 @@ namespace OpenEarth {
     }
 
     void initialize() {
+        textureManager = new Texture();
         OpenEarth::Earth::initialize();
         gModelMatrix =  OpenEarth::Earth::getModelMatrix();
 
@@ -311,10 +310,10 @@ namespace OpenEarth {
 
 
     void render(JNIEnv *env, jobject instance){
-        drawEarth();
+        drawEarth(env);
     }
 
-    void drawEarth() {
+    void drawEarth(JNIEnv *env) {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
@@ -331,15 +330,12 @@ namespace OpenEarth {
         gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
 
-        GLuint  textureId = OpenEarth::Texture::loadTextureId(aAssetManager, "west.png");
+        textureManager->loadFromNet(env,"http://t3.tianditu.com/DataServer?T=vec_w&x=1682&y=775&l=11");
+
+        GLuint  textureId = textureManager->loadFromAssets(aAssetManager, "west.png");
         tile1->draw(aPositionLocaiton, aTextureLocation,textureId);
-        textureId = OpenEarth::Texture::loadTextureId(aAssetManager, "east.png");
+        textureId = textureManager->loadFromAssets(aAssetManager, "east.png");
         tile2->draw(aPositionLocaiton, aTextureLocation, textureId);
-    }
-
-
-    void loadTextureId(const char* path){
-
     }
 
 

@@ -1,15 +1,24 @@
 #include <string>
 #include "texture.hpp"
 #include "../util/assets_file_reader.hpp"
+#include "../source/http_data_source.hpp"
+#include "../logging.hpp"
 
 extern "C" {
-#include "../util/image.h"
-#include "../util/jpeg_reader.h"
-#include "../util/png_reader.h"
+    #include "../util/image.h"
+    #include "../util/jpeg_reader.h"
+    #include "../util/png_reader.h"
 }
 
 
-GLuint OpenEarth::Texture::loadTextureId(AAssetManager *amgr, const char *path) {
+OpenEarth::Texture::Texture(){
+    mHttpDataSource = new OpenEarth::DataSource::HttpDataSource();
+}
+OpenEarth::Texture::~Texture(){
+
+}
+
+GLuint OpenEarth::Texture::loadFromAssets(AAssetManager *amgr, const char *path) {
     FileData fileData = OpenEarth::util::AssetsFileReader::get_asset_data(path, amgr);
     RawImageData* data;
 
@@ -45,6 +54,23 @@ GLuint OpenEarth::Texture::loadTextureId(AAssetManager *amgr, const char *path) 
     return textureId;
 }
 
-GLuint OpenEarth::Texture::loadTextureId(const char *filePath) {
-//        RawImageData data = decompressJpegFromFile("/storage/emulated/0/west.jpeg");
+GLuint OpenEarth::Texture::loadFormFile(const char* filePath){
+    //RawImageData data = decompressJpegFromFile("/storage/emulated/0/west.jpeg");
+    return 0;
 }
+
+GLuint OpenEarth::Texture::loadFromNet(JNIEnv* env, const char* url){
+    OpenEarth::DataSource::HttpDataSource::request(env,url,this);
+    return 0;
+}
+
+ void OpenEarth::Texture::onResponse(HttpResponse response){
+     RawImageData dataPng = get_raw_image_data_from_png(response.byteArray, response.length);
+     LOGE("","hello");
+}
+ void OpenEarth::Texture::onFailure(int code,string message){
+
+}
+
+
+

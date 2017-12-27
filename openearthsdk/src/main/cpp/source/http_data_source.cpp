@@ -3,13 +3,67 @@
 //
 
 #include "http_data_source.hpp"
+#include "../jni.hpp"
 #include <thread>
+#include <cstdlib>
 
 namespace OpenEarth{
     namespace DataSource{
 
-        void onResponse(JNIEnv* env,jobject* obj,jint code,jbyteArray body){
+        void HttpDataSource::request(JNIEnv* env,string url,HttpDataSourceCallback* callback){
+            HttpDataSource* dataSource = new HttpDataSource();
+            dataSource->setCallback(callback);
+            jclass clazz;
+            clazz = env->FindClass(JavaClassName);
+            if(clazz == NULL) {
+                return;
+            }
+//            构造函数名称统一为<init>
+            jmethodID  initMethodId = env->GetMethodID(clazz,"<init>","(JLjava/lang/String;)V");
+            const char* chardata = url.c_str();
+            jstring jstr = jni::char2JString(env,chardata);
+            jobject  object = env->NewObject(clazz,initMethodId,dataSource,jstr);
+        }
 
+        HttpDataSource::HttpDataSource(){
+
+        }
+        HttpDataSource::~HttpDataSource(){
+
+        }
+
+
+        void HttpDataSource::setCallback(HttpDataSourceCallback* callback){
+            mCallBack = std::move(callback);
+        }
+
+
+
+        HttpDataSourceCallback* HttpDataSource::getCallback(){
+            return mCallBack;
+        }
+
+
+        void onResponse(JNIEnv* env,jobject obj,jstring jurl,jbyteArray body){
+            jclass clazz  = env->GetObjectClass(obj);
+            jfieldID fieldId = env->GetFieldID(clazz,"mNativePtr","J");
+            long nativePtr = env->GetLongField(obj,fieldId);
+            HttpDataSource* dataSource = (HttpDataSource*)nativePtr;
+            jboolean isCopy = true;
+            const char* url =  env->GetStringUTFChars(jurl,&isCopy);
+            jbyte * bytes = env->GetByteArrayElements(body,&isCopy);
+            jsize len  = env->GetArrayLength(body);
+
+            jbyte *jbarray = (jbyte *)malloc(len * sizeof(jbyte));
+            env->GetByteArrayRegion(body,0,len,jbarray);
+
+            char *data = (char *)jbarray;
+            HttpResponse response {
+                url,
+                data,
+                len
+            };
+            dataSource->getCallback()->onResponse(response);
         }
 
         void onFailure(JNIEnv* env,jobject* obj,jstring message){
@@ -19,7 +73,7 @@ namespace OpenEarth{
 
         static JNINativeMethod gMethods[] = {
                 {"nativeOnFailure", "(Ljava/lang/String;)V",   (void *) onFailure},
-                {"nativeOnResponse", "(I[B)V", (void *) onResponse}
+                {"nativeOnResponse", "(Ljava/lang/String;[B)V", (void *) onResponse}
 
         };
 

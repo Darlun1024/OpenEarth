@@ -30,7 +30,6 @@ namespace OpenEarth {
         GLfloat **stripes;
         void genVertexArray();
 
-
     };
 }
 
