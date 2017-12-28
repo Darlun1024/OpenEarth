@@ -40,7 +40,8 @@ public class HttpRequest implements Callback{
     public void onResponse(Call call, Response response) throws IOException {
         Log.e("tag","respone");
         String url = response.request().url().toString();
-        nativeOnResponse(url,response.body().bytes());
+        byte[] bytes = response.body().bytes();
+        nativeOnResponse(url,bytes);
     }
 
 

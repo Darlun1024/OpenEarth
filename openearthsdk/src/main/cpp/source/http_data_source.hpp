@@ -33,11 +33,8 @@ namespace OpenEarth {
             static void request(JNIEnv *env, string url, HttpDataSourceCallback *callback);
             HttpDataSource();
             ~HttpDataSource();
-        public:
             static void registerNative(JNIEnv *env);
-
             void setCallback(HttpDataSourceCallback *callback);
-
             HttpDataSourceCallback *getCallback();
         };
 

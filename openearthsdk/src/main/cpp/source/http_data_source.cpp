@@ -29,7 +29,7 @@ namespace OpenEarth{
 
         }
         HttpDataSource::~HttpDataSource(){
-
+            mCallBack = nullptr;
         }
 
 
@@ -51,9 +51,8 @@ namespace OpenEarth{
             HttpDataSource* dataSource = (HttpDataSource*)nativePtr;
             jboolean isCopy = true;
             const char* url =  env->GetStringUTFChars(jurl,&isCopy);
-            jbyte * bytes = env->GetByteArrayElements(body,&isCopy);
+//            拷贝一份数据
             jsize len  = env->GetArrayLength(body);
-
             jbyte *jbarray = (jbyte *)malloc(len * sizeof(jbyte));
             env->GetByteArrayRegion(body,0,len,jbarray);
 
@@ -74,7 +73,6 @@ namespace OpenEarth{
         static JNINativeMethod gMethods[] = {
                 {"nativeOnFailure", "(Ljava/lang/String;)V",   (void *) onFailure},
                 {"nativeOnResponse", "(Ljava/lang/String;[B)V", (void *) onResponse}
-
         };
 
 //注册native 方法

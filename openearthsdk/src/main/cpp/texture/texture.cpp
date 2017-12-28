@@ -1,8 +1,8 @@
 #include <string>
+#include <cstdlib>
 #include "texture.hpp"
 #include "../util/assets_file_reader.hpp"
 #include "../source/http_data_source.hpp"
-#include "../logging.hpp"
 
 extern "C" {
     #include "../util/image.h"
@@ -13,9 +13,28 @@ extern "C" {
 
 OpenEarth::Texture::Texture(){
     mHttpDataSource = new OpenEarth::DataSource::HttpDataSource();
+    mMap = std::make_unique<std::map<string,RawImageData>>();
 }
 OpenEarth::Texture::~Texture(){
 
+}
+
+GLuint  genTexture(RawImageData* data){
+    GLuint textureId;
+    glGenTextures(1, &textureId);
+    assert(textureId != 0);
+
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//超出图片范围，不重复
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(
+            GL_TEXTURE_2D, 0, data->gl_color_format, data->width, data->height, 0,
+            data->gl_color_format, GL_UNSIGNED_BYTE, data->data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    return textureId;
 }
 
 GLuint OpenEarth::Texture::loadFromAssets(AAssetManager *amgr, const char *path) {
@@ -34,22 +53,8 @@ GLuint OpenEarth::Texture::loadFromAssets(AAssetManager *amgr, const char *path)
     } else{
         return 0;
     }
-
     OpenEarth::util::AssetsFileReader::release_asset_data(&fileData);
-    GLuint textureId;
-    glGenTextures(1, &textureId);
-    assert(textureId != 0);
-
-    glBindTexture(GL_TEXTURE_2D, textureId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//超出图片范围，不重复
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(
-            GL_TEXTURE_2D, 0, data->gl_color_format, data->width, data->height, 0,
-            data->gl_color_format, GL_UNSIGNED_BYTE, data->data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    GLuint textureId = genTexture(data);
     release_raw_image_data(data);
     return textureId;
 }
@@ -60,13 +65,25 @@ GLuint OpenEarth::Texture::loadFormFile(const char* filePath){
 }
 
 GLuint OpenEarth::Texture::loadFromNet(JNIEnv* env, const char* url){
-    OpenEarth::DataSource::HttpDataSource::request(env,url,this);
-    return 0;
+    string surl = url;
+    std::map<string,RawImageData>::iterator it;
+    it = mMap->find(surl);
+    if(it!= mMap->end()){
+        RawImageData data = it->second;
+        return genTexture(&data);
+    }else{
+        OpenEarth::DataSource::HttpDataSource::request(env,url,this);
+        return 0;
+    }
 }
 
  void OpenEarth::Texture::onResponse(HttpResponse response){
      RawImageData dataPng = get_raw_image_data_from_png(response.byteArray, response.length);
-     LOGE("","hello");
+     mMap->insert(pair<string,RawImageData>(response.url,dataPng));
+     RawImageData data = mMap->at(response.url);
+     printf("hello");
+//     release_raw_image_data(&dataPng);
+//     free(response.byteArray);
 }
  void OpenEarth::Texture::onFailure(int code,string message){
 

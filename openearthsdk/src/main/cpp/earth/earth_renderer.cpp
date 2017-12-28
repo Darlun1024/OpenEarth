@@ -330,11 +330,11 @@ namespace OpenEarth {
         gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
 
-        textureManager->loadFromNet(env,"http://t3.tianditu.com/DataServer?T=vec_w&x=1682&y=775&l=11");
-
-        GLuint  textureId = textureManager->loadFromAssets(aAssetManager, "west.png");
+        GLuint  textureId =  textureManager->loadFromNet(env,"http://t3.tianditu.com/DataServer?T=vec_c&x=0&y=0&l=1");
+//        GLuint  textureId = textureManager->loadFromAssets(aAssetManager, "west.png");
         tile1->draw(aPositionLocaiton, aTextureLocation,textureId);
-        textureId = textureManager->loadFromAssets(aAssetManager, "east.png");
+//        textureId = textureManager->loadFromAssets(aAssetManager, "east.png");
+        textureId =  textureManager->loadFromNet(env,"http://t3.tianditu.com/DataServer?T=vec_c&x=1&y=0&l=1");
         tile2->draw(aPositionLocaiton, aTextureLocation, textureId);
     }
 
