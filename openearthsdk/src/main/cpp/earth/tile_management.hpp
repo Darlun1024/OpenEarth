@@ -24,7 +24,6 @@ namespace OpenEarth {
             TileManagement();
             ~TileManagement();
             Tile* getTile(int zoom,int x,int y);
-
         private:
             class Impl;
             Impl* impl;
