@@ -64,6 +64,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/earth/geometry/Ray.cpp
               src/main/cpp/earth/geometry/geometry_util.cpp
               src/main/cpp/earth/geometry/latlng.cpp
+              src/main/cpp/earth/geometry/bounds.cpp
               src/main/cpp/native_earth_view.cpp
               src/main/cpp/earth/earth.cpp
               src/main/cpp/earth/transform.cpp

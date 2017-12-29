@@ -28,6 +28,7 @@ namespace OpenEarth{
         HttpDataSource::HttpDataSource(){
 
         }
+
         HttpDataSource::~HttpDataSource(){
             mCallBack = nullptr;
         }

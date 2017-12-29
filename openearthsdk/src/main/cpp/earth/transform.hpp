@@ -23,6 +23,7 @@ namespace OpenEarth {
             Transform(glm::mat4 modelMatrix,std::shared_ptr<OpenEarth::OpenGLProject> glProject);
             ~Transform();
             void setModelMatrix(glm::mat4 modelMatrix);
+            void setProject(std::shared_ptr<OpenEarth::OpenGLProject> glProject);
             /**
              * 地图坐标转屏幕坐标
              * @param latLng
@@ -41,6 +42,8 @@ namespace OpenEarth {
 
             static bool isValidWorldCoordinate(glm::vec3 world);
             static bool isValidLatlng(glm::vec2 latlng);
+
+
 
         };
 }

@@ -8,6 +8,7 @@
 
 #include <glm/matrix.hpp>
 #include "geometry/latlng.hpp"
+#include "geometry/bounds.hpp"
 
 namespace OpenEarth{
     static int const  TILE_SIZE  = 256;
@@ -62,6 +63,8 @@ namespace OpenEarth{
         /*** 获取当前视图中心的经纬度*/
         static LatLng* getCenterLatLng();
 
+         /**获取可见的地图范围*/
+        static OpenEarth::Geometry::Bounds getViewMapBounds();
 
     };
 }

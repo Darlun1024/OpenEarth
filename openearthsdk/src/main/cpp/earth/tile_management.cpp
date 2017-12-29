@@ -3,9 +3,10 @@
 //
 
 #include "tile_management.hpp"
+#include "../logging.hpp"
 
 namespace OpenEarth{
-    namespace  Earth{
+        static const char* const TAG  = "TileManagement";
         class TileManagement::Impl{
             struct HashValue{
                 long accessTime;
@@ -21,6 +22,7 @@ namespace OpenEarth{
                 it = mTileMap->begin();
                 //TODO 清理数据
             }
+
 
         public:
             Impl(){
@@ -38,6 +40,12 @@ namespace OpenEarth{
                 mTileMap->insert(std::pair<string,Tile*>(key,tile));
                 return tile;
             }
+
+
+            void update(int zoom,OpenEarth::Geometry::Bounds bounds){
+                LOGE(TAG,"%f,%f,%f,%f",bounds.left,bounds.bottom,bounds.right,bounds.top);
+            }
+
         };
 
 
@@ -52,7 +60,8 @@ namespace OpenEarth{
         Tile* TileManagement::getTile(int zoom,int x,int y){
             return impl->getTile(zoom,x,y);
         }
+        void TileManagement::update(int zoom,OpenEarth::Geometry::Bounds bounds){
+            impl->update(zoom,bounds);
+        }
 
-
-    }
 }

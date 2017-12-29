@@ -26,6 +26,10 @@ void OpenEarth::Transform::setModelMatrix(glm::mat4 modelMatrix){
     this->mInverseModelMatrix  = glm::inverse(modelMatrix);
 }
 
+void OpenEarth::Transform::setProject(std::shared_ptr<OpenEarth::OpenGLProject> glProject){
+    this->mProject = glProject;
+}
+
 glm::vec2 OpenEarth::Transform::latLngToScreenPoint(LatLng* latLng){
     float R      = OpenEarth::Earth::getRadius();
 //    float scale  = OpenEarth::Earth::getScale(); //scale
@@ -84,6 +88,7 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
          }
          float latD = 180 * lat/M_PI;
          float lonD = 180 * lon/M_PI;
+                lonD -= 180;
          return glm::vec2(latD,lonD);
      }
 
@@ -147,6 +152,7 @@ glm::vec2 OpenEarth::Transform::worldToLatlng(glm::vec3 world){
     }
     float latD = 180 * lat/M_PI;
     float lonD = 180 * lon/M_PI;
+    if(lonD > 180) lonD -= 180;
     return glm::vec2(latD,lonD);
 }
 
@@ -155,7 +161,7 @@ bool OpenEarth::Transform::isValidWorldCoordinate(glm::vec3 world){
 }
 
 bool OpenEarth::Transform::isValidLatlng(glm::vec2 latlng){
-    return (-90<=latlng[0])&&(90>=latlng[0])&&(0<=latlng[1])&&(360>=latlng[1]);
+    return (-90<=latlng[0])&&(90>=latlng[0])&&(-189<=latlng[1])&&(180>=latlng[1]);
 }
 
 

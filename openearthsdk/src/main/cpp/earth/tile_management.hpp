@@ -12,10 +12,10 @@
 #include <map>
 #include <string>
 #include "tile.hpp"
+#include "geometry/bounds.hpp"
 
 using namespace std;
 namespace OpenEarth {
-    namespace Earth {
 
         class TileManagement {
         private:
@@ -24,12 +24,12 @@ namespace OpenEarth {
             TileManagement();
             ~TileManagement();
             Tile* getTile(int zoom,int x,int y);
+            void update(int zoom,OpenEarth::Geometry::Bounds bounds);
         private:
             class Impl;
             Impl* impl;
 
         };
 
-    }
 }
 #endif //OPENEARTH_TILEMANAGEMENT_HPP
