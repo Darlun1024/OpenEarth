@@ -10,7 +10,7 @@
 #include <string>
 
 namespace OpenEarth {
-    namespace DataSource {
+    namespace Storage {
         using namespace std;
         typedef struct {
             std::string url;
@@ -21,7 +21,7 @@ namespace OpenEarth {
         class HttpDataSourceCallback {
         public:
             virtual void onResponse(HttpResponse response)=0;
-            virtual void onFailure(int code, string message)=0;
+            virtual void onFailure(int code, string  url, string message)=0;
         };
 
         class HttpDataSource {

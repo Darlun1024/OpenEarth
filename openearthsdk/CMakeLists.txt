@@ -58,8 +58,8 @@ add_library( # Sets the name of the library.
               src/main/cpp/shaders/raster_shader.cpp;
               src/main/cpp/programs/program.cpp;
               src/main/cpp/texture/texture.cpp;
-              src/main/cpp/source/data_source.cpp;
-              src/main/cpp/source/http_data_source.cpp;
+              src/main/cpp/storage/data_source.cpp;
+              src/main/cpp/storage/http_data_source.cpp;
               src/main/cpp/earth/opengl_project.cpp
               src/main/cpp/earth/geometry/Ray.cpp
               src/main/cpp/earth/geometry/geometry_util.cpp
@@ -71,6 +71,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/earth/sphere.cpp
               src/main/cpp/earth/tile.cpp
               src/main/cpp/earth/tile_management.cpp
+              src/main/cpp/earth/source/source.cpp
               src/main/cpp/earth/layer/layer.cpp
               src/main/cpp/earth/layer/raster_layer.cpp
               src/main/cpp/earth/earth_renderer.cpp

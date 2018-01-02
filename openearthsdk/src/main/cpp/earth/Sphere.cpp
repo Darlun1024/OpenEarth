@@ -2,7 +2,7 @@
 // Created by GXSN-Pro on 2017/11/15.
 //
 
-#include "sphere.hpp"
+#include "Sphere.hpp"
 #include "../logging.hpp"
 #include <math.h>
 #include <android/log.h>

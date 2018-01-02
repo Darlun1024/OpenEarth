@@ -23,6 +23,7 @@
 #include "../texture/texture.hpp"
 #include "TileManager.hpp"
 #include "tile_management.hpp"
+#include "source/source.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
 
@@ -36,7 +37,7 @@ namespace OpenEarth {
     Tile *tile1;
     Tile *tile2;
     GLuint d_glprogram;
-    int aPositionLocaiton;
+    int aPositionLocation;
     int aTextureLocation;
     int uTextureUnitLocation;
     int uProjectionLocation;
@@ -351,7 +352,7 @@ namespace OpenEarth {
         glDepthFunc(GL_LESS);
         glUseProgram(d_glprogram);
 
-        aPositionLocaiton = glGetAttribLocation(d_glprogram, "POSITION");
+        aPositionLocation = glGetAttribLocation(d_glprogram, "POSITION");
         aTextureLocation = glGetAttribLocation(d_glprogram, "a_TextureCoordinates");
         uTextureUnitLocation = glGetUniformLocation(d_glprogram, "u_TextureUnit");
         uProjectionLocation = glGetUniformLocation(d_glprogram, "u_MVPMatrix");
@@ -361,14 +362,13 @@ namespace OpenEarth {
         gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
 
-        GLuint textureId = textureManager->loadFromNet(env,
-                                                       "http://t3.tianditu.com/DataServer?T=vec_c&x=0&y=0&l=1");
-//        GLuint  textureId = textureManager->loadFromAssets(aAssetManager, "west.png");
-        tile1->draw(aPositionLocaiton, aTextureLocation, textureId);
-//        textureId = textureManager->loadFromAssets(aAssetManager, "east.png");
-        textureId = textureManager->loadFromNet(env,
-                                                "http://t3.tianditu.com/DataServer?T=vec_c&x=1&y=0&l=1");
-        tile2->draw(aPositionLocaiton, aTextureLocation, textureId);
+        Source::Source* source = new Source::Source("http://t3.tianditu.com/DataServer?T=vec_c&x={x}&y={y}&l={z}");
+        tileManager->draw(env,aPositionLocation,aTextureLocation,source);
+//        GLuint textureId = textureManager->loadFromNet(env,source->getURLOfTile(tile1).c_str());
+//        tile1->draw(aPositionLocation, aTextureLocation, textureId);
+//        textureId = textureManager->loadFromNet(env,source->getURLOfTile(tile2).c_str());
+//        tile2->draw(aPositionLocation, aTextureLocation, textureId);
+//        delete source;
     }
 
 

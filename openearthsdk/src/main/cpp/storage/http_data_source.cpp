@@ -8,8 +8,7 @@
 #include <cstdlib>
 
 namespace OpenEarth{
-    namespace DataSource{
-
+    namespace Storage{
         void HttpDataSource::request(JNIEnv* env,string url,HttpDataSourceCallback* callback){
             HttpDataSource* dataSource = new HttpDataSource();
             dataSource->setCallback(callback);
@@ -23,6 +22,8 @@ namespace OpenEarth{
             const char* chardata = url.c_str();
             jstring jstr = jni::char2JString(env,chardata);
             jobject  object = env->NewObject(clazz,initMethodId,dataSource,jstr);
+            env->DeleteLocalRef(jstr); //http://blog.csdn.net/xyang81/article/details/44873769
+            env->DeleteLocalRef(object);
         }
 
         HttpDataSource::HttpDataSource(){
@@ -50,6 +51,8 @@ namespace OpenEarth{
             jfieldID fieldId = env->GetFieldID(clazz,"mNativePtr","J");
             long nativePtr = env->GetLongField(obj,fieldId);
             HttpDataSource* dataSource = (HttpDataSource*)nativePtr;
+            if(dataSource == nullptr)
+                return;
             jboolean isCopy = true;
             const char* url =  env->GetStringUTFChars(jurl,&isCopy);
 //            拷贝一份数据
@@ -64,15 +67,27 @@ namespace OpenEarth{
                 len
             };
             dataSource->getCallback()->onResponse(response);
+            env->ReleaseStringUTFChars(jurl,url);
         }
 
-        void onFailure(JNIEnv* env,jobject* obj,jstring message){
-
+        void onFailure(JNIEnv* env,jobject obj,jstring jurl,jstring jmessage){
+            jclass clazz  = env->GetObjectClass(obj);
+            jfieldID fieldId = env->GetFieldID(clazz,"mNativePtr","J");
+            long nativePtr = env->GetLongField(obj,fieldId);
+            HttpDataSource* dataSource = (HttpDataSource*)nativePtr;
+            if(dataSource== nullptr)
+                return;
+            jboolean isCopy = true;
+            const char* url =  env->GetStringUTFChars(jurl,&isCopy);
+            const char* message =  env->GetStringUTFChars(jmessage,&isCopy);
+            dataSource->getCallback()->onFailure(0,url,message);
+            env->ReleaseStringUTFChars(jmessage,message);
+            env->ReleaseStringUTFChars(jurl,url);
         }
 
 
         static JNINativeMethod gMethods[] = {
-                {"nativeOnFailure", "(Ljava/lang/String;)V",   (void *) onFailure},
+                {"nativeOnFailure", "(Ljava/lang/String;Ljava/lang/String;)V",   (void *) onFailure},
                 {"nativeOnResponse", "(Ljava/lang/String;[B)V", (void *) onResponse}
         };
 

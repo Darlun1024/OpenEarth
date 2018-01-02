@@ -11,8 +11,10 @@
 
 #include <map>
 #include <string>
+#include <jni.h>
 #include "tile.hpp"
 #include "geometry/bounds.hpp"
+#include "source/source.hpp"
 
 using namespace std;
 namespace OpenEarth {
@@ -23,8 +25,9 @@ namespace OpenEarth {
         public:
             TileManagement();
             ~TileManagement();
-            Tile* getTile(int zoom,int x,int y);
-            void update(int zoom,OpenEarth::Geometry::Bounds bounds);
+            Tile* getTile(int8_t  zoom,uint32_t x,uint32_t y);
+            void update(int8_t zoom,OpenEarth::Geometry::Bounds bounds);
+            void draw(JNIEnv* env,GLuint  aPositionLocation, GLuint aTextureLocation,Source::Source* source);
         private:
             class Impl;
             Impl* impl;

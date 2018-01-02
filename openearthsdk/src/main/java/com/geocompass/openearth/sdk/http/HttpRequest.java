@@ -18,13 +18,15 @@ import okhttp3.Response;
 public class HttpRequest implements Callback{
     protected Request mRequest;
     protected Call mCall;
-    protected OkHttpClient mClient;
+    protected  static OkHttpClient mClient;
     protected long mNativePtr;
+    static {
+        mClient = new OkHttpClient();
+    }
     public HttpRequest(long nativePtr,String url){
         mNativePtr = nativePtr;
         Request.Builder builder = new Request.Builder();
         builder.url(url).method("GET",null);
-        mClient = new OkHttpClient();
         mRequest = builder.build();
         mCall = mClient.newCall(mRequest);
         mCall.enqueue(this);
@@ -33,7 +35,7 @@ public class HttpRequest implements Callback{
     @Override
     public void onFailure(Call call, IOException e) {
         Log.e("tag","failure");
-        nativeOnFailure(e.getMessage());
+        nativeOnFailure(call.request().url().toString(),e.getMessage());
     }
 
     @Override
@@ -46,5 +48,5 @@ public class HttpRequest implements Callback{
 
 
     private native void nativeOnResponse(String url, byte[] body);
-    private native void nativeOnFailure(String message);
+    private native void nativeOnFailure(String url,String message);
 }
