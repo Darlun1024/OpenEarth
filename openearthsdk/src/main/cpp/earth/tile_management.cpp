@@ -6,6 +6,7 @@
 #include "tile_management.hpp"
 #include "../util/point.hpp"
 #include "../texture/texture.hpp"
+#include "../logging.hpp"
 #include <vector>
 #include <mutex>
 
@@ -13,7 +14,7 @@ namespace OpenEarth {
     static const char *const TAG = "TileManagement";
 
     class TileManagement::Impl {
-        struct HashValue {
+        struct TileCache {
             long accessTime;
             Tile *tile;
         };
@@ -23,11 +24,19 @@ namespace OpenEarth {
         unique_ptr<vector<shared_ptr<Tile>>> mTileArray;
         unique_ptr<Texture> mTextureManager;
         std::mutex mMutex;
-        void checkCapacity() {
+
+        void checkCapacity(int8_t zoom) {
             if (mTileMap->size() <= max_size)return;
             map<string, shared_ptr<Tile>>::iterator it;
             it = mTileMap->begin();
             //TODO 清理数据
+            while (it != mTileMap->end()) {
+                if (it->second->z != zoom) {
+                    LOGE(TAG, "erase tile %d_%d_%d", it->second->z, it->second->x, it->second->y);
+                    mTileMap->erase(it);
+                }
+                it++;
+            }
         }
 
 
@@ -71,43 +80,49 @@ namespace OpenEarth {
                     shared_ptr<Tile> tile;
                     string key = OpenEarth::Tile::genUniqueCode(zoom, x, y);
                     it = mTileMap->find(key);
-                    if(it == mTileMap->end()){
+                    if (it == mTileMap->end()) {
                         tile = std::make_shared<Tile>(x, y, zoom);
                         mTileMap->insert(std::pair<string, shared_ptr<Tile>>(key, tile));
-                    }else{
+                        LOGE(TAG, "from new");
+                    } else {
                         tile = it->second;
-                        if(tile == nullptr){
-                            tile = std::make_shared<Tile>(x, y, zoom);
-                            mTileMap->insert(std::pair<string, shared_ptr<Tile>>(key, tile));
-                        }
                     }
                     mTileArray->push_back(tile);
+                    LOGE(TAG, "tile count %d", tile.use_count());
                 }
             }
             mMutex.unlock();
+            checkCapacity(zoom);
         }
 
-        void draw(JNIEnv* env,GLuint  aPositionLocation, GLuint aTextureLocation,Source::Source* source){
-            int length = mTileArray->size();
-            vector<shared_ptr<Tile>>::iterator it = mTileArray->begin();
+        void draw(JNIEnv *env, GLuint aPositionLocation, GLuint aTextureLocation,
+                  Source::Source *source) {
             mMutex.lock();
-            while (it!=mTileArray->end()){
-                if(*it == nullptr)continue;
-                shared_ptr<Tile> tile = *it;
-                GLuint textureId = mTextureManager->loadFromNet(env,source->getURLOfTile(tile.get()).c_str());
-                tile->draw(aPositionLocation, aTextureLocation, textureId);
+            vector<shared_ptr<Tile>>::iterator it = mTileArray->begin();
+            while (it != mTileArray->end()) {
+                if (*it == nullptr)continue;
+                Tile* tile = it->get();
+                if (tile) {
+                    GLuint textureId = mTextureManager->loadFromNet(env, source->getURLOfTile(
+                            tile).c_str());
+                    if(textureId!=0)
+                     tile->draw(aPositionLocation, aTextureLocation, textureId);
+                }
                 it++;
             }
+
             mMutex.unlock();
         }
 
-        PointI latLng2TileXY(float lat, float lon, int zoom) {
-            int  max= std::pow(2,zoom);
+        PointI
+
+        latLng2TileXY(float lat, float lon, int zoom) {
+            int max = std::pow(2, zoom);
             float tileSpan = 360.0f / std::pow(2, zoom);
             int x = (lon + 180) / tileSpan;
             int y = (90 - lat) / tileSpan;
-            x = min(x,max-1);
-            y = min(y,max/2-1);
+            x = min(x, max - 1);
+            y = min(y, max / 2 - 1);
             return PointI{
                     x,
                     y
@@ -133,8 +148,9 @@ namespace OpenEarth {
         impl->update(zoom, bounds);
     }
 
-    void TileManagement::draw(JNIEnv* env,GLuint  aPositionLocation, GLuint aTextureLocation,Source::Source* source){
-        impl->draw(env,aPositionLocation,aTextureLocation,source);
+    void TileManagement::draw(JNIEnv *env, GLuint aPositionLocation, GLuint aTextureLocation,
+                              Source::Source *source) {
+        impl->draw(env, aPositionLocation, aTextureLocation, source);
     }
 
 

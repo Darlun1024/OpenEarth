@@ -4,7 +4,6 @@
 #include "texture.hpp"
 #include "../util/assets_file_reader.hpp"
 #include "../storage/http_data_source.hpp"
-#include "../logging.hpp"
 
 extern "C" {
 #include "../util/image.h"
@@ -17,11 +16,13 @@ OpenEarth::Texture::Texture() {
     mHttpDataSource = new OpenEarth::Storage::HttpDataSource();
     mMap = std::make_unique<std::map<string, RawImageData>>();
     mRequestQuene = std::make_unique<vector<string>>();
+    mWaitingRequestQuene=std::make_unique<vector<string>>();
 }
 
 OpenEarth::Texture::~Texture() {
     mMap.reset();
     mRequestQuene.reset();
+    mWaitingRequestQuene.reset();
 }
 
 GLuint genTexture(RawImageData *data) {
@@ -74,17 +75,16 @@ GLuint OpenEarth::Texture::loadFormFile(const char *filePath) {
 GLuint OpenEarth::Texture::loadFromNet(JNIEnv *env, const char *url) {
     string surl = url;
     std::map<string, RawImageData>::iterator it;
+    //首先从内存找，然后从本地文件系统缓存找，最后再从网上下载
     it = mMap->find(surl);
     if (it != mMap->end()) {
         RawImageData data = it->second;
-        LOGE("request", "cache:%s", url);
         return genTexture(&data);
     } else {
         vector<string>::iterator it = std::find(mRequestQuene->begin(), mRequestQuene->end(), url);
         if (it == mRequestQuene->end()) {
             OpenEarth::Storage::HttpDataSource::request(env, url, this);
             mRequestQuene->push_back(string(url));
-            LOGE("request", "request:%s", url);
         }
         return 0;
     }
@@ -95,6 +95,7 @@ void OpenEarth::Texture::onResponse(HttpResponse response) {
     mMap->insert(pair<string, RawImageData>(response.url, dataPng));
     vector<string>::iterator it = std::find(mRequestQuene->begin(), mRequestQuene->end(),
                                             response.url);
+
     if (it != mRequestQuene->end()) {
         mRequestQuene->erase(it);
     }

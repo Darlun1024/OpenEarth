@@ -9,6 +9,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <list>
 
 extern "C"{
 #include "../util/image.h"
@@ -22,8 +23,9 @@ namespace OpenEarth {
     class Texture : public HttpDataSourceCallback {
     private:
         GLuint loadFromCache();
-        std::unique_ptr<std::map<string,RawImageData>> mMap;
-        std::unique_ptr<std::vector<string>> mRequestQuene;
+        std::unique_ptr<std::map<string,RawImageData>> mMap; //缓存
+        std::unique_ptr<std::vector<string>> mRequestQuene; //正在请求的队列
+        std::unique_ptr<std::vector<string>> mWaitingRequestQuene; //等待队列
     public:
         Texture();
 

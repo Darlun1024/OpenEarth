@@ -19,7 +19,8 @@ char *jni::jString2Char(JNIEnv *env, jstring jstr) {
         memcpy(result, ba, arrayLength);
         result[arrayLength] = 0;
     }
-    env->ReleaseByteArrayElements(jbArr, ba, 0);
+//    env->ReleaseByteArrayElements(jbArr, ba, 0);
+    env->DeleteLocalRef(encoding);
     return result;
 }
 
@@ -31,5 +32,6 @@ jstring jni::char2JString(JNIEnv *env, const char *c) {
     jstring encoding = (env)->NewStringUTF("GB2312");
     jstring result = (jstring) (env)->NewObject(stringClass, constructId, bytes, encoding);
     env->DeleteLocalRef(encoding);
+    env->ReleaseByteArrayElements(bytes,(jbyte*) c,0);
     return result;
 }
