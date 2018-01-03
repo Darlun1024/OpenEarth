@@ -77,17 +77,19 @@ namespace OpenEarth {
             map<string, shared_ptr<Tile>>::iterator it;
             for (uint32_t x = minx; x <= maxx; x++) {
                 for (int y = miny; y <= maxy; y++) {
-                    shared_ptr<Tile> tile;
-                    string key = OpenEarth::Tile::genUniqueCode(zoom, x, y);
-                    it = mTileMap->find(key);
-                    if (it == mTileMap->end()) {
-                        tile = std::make_shared<Tile>(x, y, zoom);
-                        mTileMap->insert(std::pair<string, shared_ptr<Tile>>(key, tile));
-                        LOGE(TAG, "from new");
-                    } else {
-                        tile = it->second;
-                    }
+//                    shared_ptr<Tile> tile;
+//                    string key = OpenEarth::Tile::genUniqueCode(zoom, x, y);
+//                    it = mTileMap->find(key);
+//                    if (it == mTileMap->end()) {
+//                        tile = std::make_shared<Tile>(x, y, zoom);
+//                        mTileMap->insert(std::pair<string, shared_ptr<Tile>>(key, tile));
+//                        LOGE(TAG, "from new");
+//                    } else {
+//                        tile = it->second;
+//                    }
+                    shared_ptr<Tile> tile = std::make_shared<Tile>(x, y, zoom);
                     mTileArray->push_back(tile);
+
                     LOGE(TAG, "tile count %d", tile.use_count());
                 }
             }
