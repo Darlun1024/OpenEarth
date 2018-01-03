@@ -29,5 +29,7 @@ jstring jni::char2JString(JNIEnv *env, const char *c) {
     jbyteArray bytes = (env)->NewByteArray(strlen(c));
     (env)->SetByteArrayRegion(bytes, 0, strlen(c), (jbyte*) c);
     jstring encoding = (env)->NewStringUTF("GB2312");
-    return (jstring) (env)->NewObject(stringClass, constructId, bytes, encoding);
+    jstring result = (jstring) (env)->NewObject(stringClass, constructId, bytes, encoding);
+    env->DeleteLocalRef(encoding);
+    return result;
 }

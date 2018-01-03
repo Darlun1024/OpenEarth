@@ -79,8 +79,13 @@ static float dtor(float d) {
  */
 void OpenEarth::Tile::genVertexArray() {
     float R = OpenEarth::Earth::getRadius();
-    float width = bounds[2] - bounds[0];
+    float width  = bounds[2] - bounds[0];
     float height = bounds[1] - bounds[3];
+
+    if(std::fmod(width,step)>0){
+       step = width / 4;
+    }
+
 
     rows = height / step;
     cols = width / step + 1;
@@ -109,7 +114,6 @@ void OpenEarth::Tile::genVertexArray() {
         index = 0;
         float lon;
         for (lon = bounds[0]; lon <= bounds[2]; lon += step) {
-//            if(lon==bounds[2]) lon = lon - (lon/100000000);
             float lonR1 = dtor(lon);
             x1 = (float) (cosLat1 * sin(lonR1));
             z1 = (float) (cosLat1 * cos(lonR1));

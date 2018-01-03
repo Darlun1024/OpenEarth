@@ -39,6 +39,7 @@ namespace OpenEarth {
         }
 
         ~Impl() {
+            mTileMap->clear();
             mTileMap.reset();
             mTileArray->clear();
             mTileArray.reset();
@@ -80,7 +81,6 @@ namespace OpenEarth {
                             mTileMap->insert(std::pair<string, shared_ptr<Tile>>(key, tile));
                         }
                     }
-                    tile = std::make_shared<Tile>(x, y, zoom);
                     mTileArray->push_back(tile);
                 }
             }

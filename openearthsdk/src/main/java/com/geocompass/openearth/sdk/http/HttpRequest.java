@@ -46,6 +46,10 @@ public class HttpRequest implements Callback{
         nativeOnResponse(url,bytes);
     }
 
+    public void cancel(){
+        mCall.cancel();
+    }
+
 
     private native void nativeOnResponse(String url, byte[] body);
     private native void nativeOnFailure(String url,String message);
