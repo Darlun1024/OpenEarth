@@ -27,7 +27,7 @@ namespace OpenEarth {
             ~TileManagement();
             Tile* getTile(int8_t  zoom,uint32_t x,uint32_t y);
             void update(int8_t zoom,OpenEarth::Geometry::Bounds bounds);
-            void draw(JNIEnv* env,GLuint  aPositionLocation, GLuint aTextureLocation,Source::Source* source);
+            void draw(JNIEnv* env,GLuint  aPositionLocation, GLuint aTextureLocation,Source::Source* source,AAssetManager* mgr);
         private:
             class Impl;
             Impl* impl;

@@ -77,20 +77,16 @@ namespace OpenEarth {
             map<string, shared_ptr<Tile>>::iterator it;
             for (uint32_t x = minx; x <= maxx; x++) {
                 for (int y = miny; y <= maxy; y++) {
-//                    shared_ptr<Tile> tile;
-//                    string key = OpenEarth::Tile::genUniqueCode(zoom, x, y);
-//                    it = mTileMap->find(key);
-//                    if (it == mTileMap->end()) {
-//                        tile = std::make_shared<Tile>(x, y, zoom);
-//                        mTileMap->insert(std::pair<string, shared_ptr<Tile>>(key, tile));
-//                        LOGE(TAG, "from new");
-//                    } else {
-//                        tile = it->second;
-//                    }
-                    shared_ptr<Tile> tile = std::make_shared<Tile>(x, y, zoom);
-                    mTileArray->push_back(tile);
 
-                    LOGE(TAG, "tile count %d", tile.use_count());
+                    string key = OpenEarth::Tile::genUniqueCode(zoom, x, y);
+                    if (mTileMap->find(key) == mTileMap->end()) {
+                        mTileMap->insert(std::pair<string, shared_ptr<Tile>>(key, std::make_shared<Tile>(x, y, zoom)));
+                        LOGE(TAG, "from new");
+                    }
+//                    shared_ptr<Tile> tile = std::make_shared<Tile>(x, y, zoom);
+                    mTileArray->push_back(mTileMap->find(key)->second);
+
+//                    LOGE(TAG, "tile count %d", tile.use_count());
                 }
             }
             mMutex.unlock();
@@ -98,15 +94,16 @@ namespace OpenEarth {
         }
 
         void draw(JNIEnv *env, GLuint aPositionLocation, GLuint aTextureLocation,
-                  Source::Source *source) {
+                  Source::Source *source,AAssetManager* mgr) {
             mMutex.lock();
             vector<shared_ptr<Tile>>::iterator it = mTileArray->begin();
             while (it != mTileArray->end()) {
                 if (*it == nullptr)continue;
                 Tile* tile = it->get();
                 if (tile) {
-                    GLuint textureId = mTextureManager->loadFromNet(env, source->getURLOfTile(
-                            tile).c_str());
+//                    GLuint textureId = mTextureManager->loadFromNet(env, source->getURLOfTile(
+//                            tile).c_str());
+                    GLuint textureId = mTextureManager->loadFromAssets(mgr,"west.png");
                     if(textureId!=0)
                      tile->draw(aPositionLocation, aTextureLocation, textureId);
                 }
@@ -116,9 +113,7 @@ namespace OpenEarth {
             mMutex.unlock();
         }
 
-        PointI
-
-        latLng2TileXY(float lat, float lon, int zoom) {
+        PointI latLng2TileXY(float lat, float lon, int zoom) {
             int max = std::pow(2, zoom);
             float tileSpan = 360.0f / std::pow(2, zoom);
             int x = (lon + 180) / tileSpan;
@@ -151,8 +146,8 @@ namespace OpenEarth {
     }
 
     void TileManagement::draw(JNIEnv *env, GLuint aPositionLocation, GLuint aTextureLocation,
-                              Source::Source *source) {
-        impl->draw(env, aPositionLocation, aTextureLocation, source);
+                              Source::Source *source,AAssetManager* mgr) {
+        impl->draw(env, aPositionLocation, aTextureLocation, source,mgr);
     }
 
 
