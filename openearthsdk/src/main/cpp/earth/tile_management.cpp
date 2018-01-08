@@ -101,9 +101,9 @@ namespace OpenEarth {
                 if (*it == nullptr)continue;
                 Tile* tile = it->get();
                 if (tile) {
-//                    GLuint textureId = mTextureManager->loadFromNet(env, source->getURLOfTile(
-//                            tile).c_str());
-                    GLuint textureId = mTextureManager->loadFromAssets(mgr,"west.png");
+                    GLuint textureId = mTextureManager->loadFromNet(env, source->getURLOfTile(
+                            tile).c_str());
+//                    GLuint textureId = mTextureManager->loadFromAssets(mgr,"west.png");
                     if(textureId!=0)
                      tile->draw(aPositionLocation, aTextureLocation, textureId);
                 }
