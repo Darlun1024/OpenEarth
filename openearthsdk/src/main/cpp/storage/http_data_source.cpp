@@ -10,8 +10,6 @@
 namespace OpenEarth{
     namespace Storage{
         void HttpDataSource::request(JNIEnv* env,string url,HttpDataSourceCallback* callback){
-            HttpDataSource* dataSource = new HttpDataSource();
-            dataSource->setCallback(callback);
             jclass clazz;
             clazz = env->FindClass(JavaClassName);
             if(clazz == NULL) {
@@ -21,7 +19,7 @@ namespace OpenEarth{
             jmethodID  initMethodId = env->GetMethodID(clazz,"<init>","(JLjava/lang/String;)V");
             const char* chardata = url.c_str();
             jstring jstr = jni::char2JString(env,chardata);
-            jobject  object = env->NewObject(clazz,initMethodId,dataSource,jstr);
+            jobject  object = env->NewObject(clazz,initMethodId,callback,jstr);
             env->DeleteLocalRef(jstr); //http://blog.csdn.net/xyang81/article/details/44873769
             env->DeleteLocalRef(object);
         }
@@ -50,8 +48,8 @@ namespace OpenEarth{
             jclass clazz  = env->GetObjectClass(obj);
             jfieldID fieldId = env->GetFieldID(clazz,"mNativePtr","J");
             long nativePtr = env->GetLongField(obj,fieldId);
-            HttpDataSource* dataSource = (HttpDataSource*)nativePtr;
-            if(dataSource == nullptr)
+            HttpDataSourceCallback* callback = (HttpDataSourceCallback*)nativePtr;
+            if(callback == nullptr)
                 return;
             jboolean isCopy = true;
             const char* url =  env->GetStringUTFChars(jurl,&isCopy);
@@ -66,7 +64,7 @@ namespace OpenEarth{
                 data,
                 len
             };
-            dataSource->getCallback()->onResponse(response);
+            callback->onResponse(response);
             env->ReleaseStringUTFChars(jurl,url);
         }
 
@@ -74,13 +72,13 @@ namespace OpenEarth{
             jclass clazz  = env->GetObjectClass(obj);
             jfieldID fieldId = env->GetFieldID(clazz,"mNativePtr","J");
             long nativePtr = env->GetLongField(obj,fieldId);
-            HttpDataSource* dataSource = (HttpDataSource*)nativePtr;
-            if(dataSource== nullptr)
+            HttpDataSourceCallback* callback = (HttpDataSourceCallback*)nativePtr;
+            if(callback == nullptr)
                 return;
             jboolean isCopy = true;
             const char* url =  env->GetStringUTFChars(jurl,&isCopy);
             const char* message =  env->GetStringUTFChars(jmessage,&isCopy);
-            dataSource->getCallback()->onFailure(0,url,message);
+            callback->onFailure(0,url,message);
             env->ReleaseStringUTFChars(jmessage,message);
             env->ReleaseStringUTFChars(jurl,url);
         }

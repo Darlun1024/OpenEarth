@@ -1,7 +1,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "earth_renderer.hpp"
-#include "sphere.hpp"
+#include "Sphere.hpp"
 #include <memory>
 #include <GLES3/gl3.h>
 #include <glm/ext.hpp>
@@ -77,8 +77,6 @@ namespace OpenEarth {
 
         if (tile2)
             delete tile2;
-
-        delete aAssetManager;
     }
 
     void initialize() {

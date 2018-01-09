@@ -99,11 +99,11 @@ namespace OpenEarth {
             vector<shared_ptr<Tile>>::iterator it = mTileArray->begin();
             while (it != mTileArray->end()) {
                 if (*it == nullptr)continue;
+//                GLuint textureId = mTextureManager->loadFromAssets(mgr,"west.png");
                 Tile* tile = it->get();
                 if (tile) {
                     GLuint textureId = mTextureManager->loadFromNet(env, source->getURLOfTile(
                             tile).c_str());
-//                    GLuint textureId = mTextureManager->loadFromAssets(mgr,"west.png");
                     if(textureId!=0)
                      tile->draw(aPositionLocation, aTextureLocation, textureId);
                 }

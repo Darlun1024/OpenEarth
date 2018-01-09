@@ -72,6 +72,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/earth/tile.cpp
               src/main/cpp/earth/tile/tile_id.cpp
               src/main/cpp/earth/tile/tile_cache.cpp
+              src/main/cpp/earth/tile/tile_data.cpp
               src/main/cpp/earth/tile_management.cpp
               src/main/cpp/earth/source/source.cpp
               src/main/cpp/earth/layer/layer.cpp
