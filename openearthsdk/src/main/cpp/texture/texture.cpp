@@ -85,9 +85,11 @@ GLuint OpenEarth::Texture::loadFromNet(JNIEnv *env, const char *url) {
         if (it == mRequestQuene->end()) {
             if(mRequestQuene->size()>10){
                 //进入等待队列
+                mWaitingRequestQuene->push_back(string(url));
+            }else{
+                OpenEarth::Storage::HttpDataSource::request(env, url, this);
+                mRequestQuene->push_back(string(url));
             }
-            OpenEarth::Storage::HttpDataSource::request(env, url, this);
-            mRequestQuene->push_back(string(url));
         }
         return 0;
     }
