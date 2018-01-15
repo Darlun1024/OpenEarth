@@ -31,8 +31,10 @@ namespace OpenEarth {
             static constexpr const char * JavaClassName = "com/geocompass/openearth/sdk/http/HttpRequest";
             static constexpr const char * TAG = "HttpDataSource";
             HttpDataSourceCallback *mCallBack;
+            static jobject  localHttpObject;
+            static jmethodID requestMethodId;
         public:
-            static void request(JNIEnv *env, string url, HttpDataSourceCallback *callback);
+            static void request( JNIEnv *env, string url, HttpDataSourceCallback *callback);
             HttpDataSource();
             ~HttpDataSource();
             static void registerNative(JNIEnv *env);

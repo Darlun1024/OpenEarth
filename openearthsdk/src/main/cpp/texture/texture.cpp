@@ -4,6 +4,7 @@
 #include "texture.hpp"
 #include "../util/assets_file_reader.hpp"
 #include "../storage/http_data_source.hpp"
+#include "../logging.hpp"
 
 extern "C" {
 #include "../util/image.h"
@@ -11,18 +12,20 @@ extern "C" {
 #include "../util/png_reader.h"
 }
 
+namespace  OpenEarth{
 
+}
 OpenEarth::Texture::Texture() {
     mHttpDataSource = new OpenEarth::Storage::HttpDataSource();
     mMap = std::make_unique<std::map<string, RawImageData>>();
-    mRequestQuene = std::make_unique<vector<string>>();
-    mWaitingRequestQuene=std::make_unique<vector<string>>();
+    mRequestQueue = std::make_unique<vector<string>>();
+    mWaitingRequestQueue=std::make_unique<vector<string>>();
 }
 
 OpenEarth::Texture::~Texture() {
     mMap.reset();
-    mRequestQuene.reset();
-    mWaitingRequestQuene.reset();
+    mRequestQueue.reset();
+    mWaitingRequestQueue.reset();
 }
 
 GLuint genTexture(RawImageData *data) {
@@ -81,15 +84,16 @@ GLuint OpenEarth::Texture::loadFromNet(JNIEnv *env, const char *url) {
         RawImageData data = it->second;
         return genTexture(&data);
     } else {
-        vector<string>::iterator it = std::find(mRequestQuene->begin(), mRequestQuene->end(), url);
-        if (it == mRequestQuene->end()) {
-            if(mRequestQuene->size()>10){
-                //进入等待队列
-                mWaitingRequestQuene->push_back(string(url));
-            }else{
+        vector<string>::iterator it = std::find(mRequestQueue->begin(), mRequestQueue->end(), url);
+        if (it == mRequestQueue->end()) {
+//            if(mRequestQueue->size()>MAX_HTTP_REQUEST_SIZE){
+//                //进入等待队列
+//                mWaitingRequestQueue->push_back(string(url));
+//                LOGE("waiting","%s",url);
+//            }else{
                 OpenEarth::Storage::HttpDataSource::request(env, url, this);
-                mRequestQuene->push_back(string(url));
-            }
+                mRequestQueue->push_back(string(url));
+//            }
         }
         return 0;
     }
@@ -98,23 +102,48 @@ GLuint OpenEarth::Texture::loadFromNet(JNIEnv *env, const char *url) {
 void OpenEarth::Texture::onResponse(HttpResponse response) {
     RawImageData dataPng = get_raw_image_data_from_png(response.byteArray, response.length);
     mMap->insert(pair<string, RawImageData>(response.url, dataPng));
-    vector<string>::iterator it = std::find(mRequestQuene->begin(), mRequestQuene->end(),
+    vector<string>::iterator it = std::find(mRequestQueue->begin(), mRequestQueue->end(),
                                             response.url);
-
-    if (it != mRequestQuene->end()) {
-        mRequestQuene->erase(it);
+    LOGE("texture respone","%s",response.url.c_str());
+    if (it != mRequestQueue->end()) {
+        mRequestQueue->erase(it);
     }
-
+    next();
 //     release_raw_image_data(&dataPng);
 //     free(response.byteArray);
 }
 
 void OpenEarth::Texture::onFailure(int code, string url, string message) {
-    vector<string>::iterator it = std::find(mRequestQuene->begin(), mRequestQuene->end(), url);
-    if (it != mRequestQuene->end()) {
-        mRequestQuene->erase(it);
+    vector<string>::iterator it = std::find(mRequestQueue->begin(), mRequestQueue->end(), url);
+    if (it != mRequestQueue->end()) {
+        mRequestQueue->erase(it);
+    }
+    next();
+}
+
+/**
+ * 取消请求
+ * @param url
+ */
+void  OpenEarth::Texture::cancel(const char* url){
+    vector<string>::iterator it = std::find(mWaitingRequestQueue->begin(), mWaitingRequestQueue->end(), url);
+    if (it != mWaitingRequestQueue->end()) {
+        mWaitingRequestQueue->erase(it);
     }
 }
 
+void OpenEarth::Texture::next(){
+    if(mWaitingRequestQueue->size()>0){
+        vector<string>::iterator it = mWaitingRequestQueue->begin();
+        string url = *it;
+        OpenEarth::Storage::HttpDataSource::request(mEnv,url, this);
+        mRequestQueue->push_back(url);
+        mWaitingRequestQueue->erase(it);
+    }
+}
+
+void OpenEarth::Texture::setJEnv(JNIEnv* env){
+        mEnv = env;
+}
 
 

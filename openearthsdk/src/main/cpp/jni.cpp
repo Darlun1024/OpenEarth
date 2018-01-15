@@ -4,8 +4,11 @@
 
 #include <cstdlib>
 #include <string>
+#include <cstring>
 #include "jni.hpp"
 
+
+static JavaVM* globalJVM;
 char *jni::jString2Char(JNIEnv *env, jstring jstr) {
     char* result = NULL;
     jclass stringClass = env->FindClass("java/lang/String");
@@ -34,4 +37,12 @@ jstring jni::char2JString(JNIEnv *env, const char *c) {
     env->DeleteLocalRef(encoding);
     env->ReleaseByteArrayElements(bytes,(jbyte*) c,0);
     return result;
+}
+
+void jni::setJVM(JavaVM* jvm){
+    globalJVM = jvm;
+}
+
+JavaVM* jni::getJVM(){
+    return globalJVM;
 }

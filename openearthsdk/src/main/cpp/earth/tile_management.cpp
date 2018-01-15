@@ -70,10 +70,13 @@ namespace OpenEarth {
             mTileArray->clear();
             PointI nw = latLng2TileXY(bounds.top, bounds.left, zoom);
             PointI se = latLng2TileXY(bounds.bottom, bounds.right, zoom);
-            uint32_t minx = nw.x;
-            uint32_t maxx = se.x;
-            uint32_t miny = nw.y;
-            uint32_t maxy = se.y;
+            uint32_t MAX_X = std::pow(2,zoom)-1;
+            uint32_t MAX_Y = std::pow(2,zoom-1)-1;
+
+            uint32_t minx = nw.x > 0 ? nw.x:0;
+            uint32_t maxx = se.x < MAX_X ? se.x:MAX_X;
+            uint32_t miny = nw.y > 0 ? nw.y:0;
+            uint32_t maxy = se.y < MAX_Y ? se.y:MAX_Y;
             map<string, shared_ptr<Tile>>::iterator it;
             for (uint32_t x = minx; x <= maxx; x++) {
                 for (int y = miny; y <= maxy; y++) {
@@ -95,6 +98,7 @@ namespace OpenEarth {
 
         void draw(JNIEnv *env, GLuint aPositionLocation, GLuint aTextureLocation,
                   Source::Source *source,AAssetManager* mgr) {
+            mTextureManager->setJEnv(env);
             mMutex.lock();
             vector<shared_ptr<Tile>>::iterator it = mTileArray->begin();
             while (it != mTileArray->end()) {
@@ -102,8 +106,9 @@ namespace OpenEarth {
 //                GLuint textureId = mTextureManager->loadFromAssets(mgr,"west.png");
                 Tile* tile = it->get();
                 if (tile) {
-                    GLuint textureId = mTextureManager->loadFromNet(env, source->getURLOfTile(
-                            tile).c_str());
+//                    GLuint textureId = mTextureManager->loadFromNet(env, source->getURLOfTile(
+//                            tile).c_str());
+                    GLuint textureId = mTextureManager->loadFromAssets(mgr,"west.png");
                     if(textureId!=0)
                      tile->draw(aPositionLocation, aTextureLocation, textureId);
                 }
@@ -114,6 +119,7 @@ namespace OpenEarth {
         }
 
         PointI latLng2TileXY(float lat, float lon, int zoom) {
+            
             int max = std::pow(2, zoom);
             float tileSpan = 360.0f / std::pow(2, zoom);
             int x = (lon + 180) / tileSpan;

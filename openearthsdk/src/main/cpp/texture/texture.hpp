@@ -22,10 +22,13 @@ namespace OpenEarth {
 
     class Texture : public HttpDataSourceCallback {
     private:
+        static const int MAX_HTTP_REQUEST_SIZE = 10;
+        JNIEnv* mEnv;
         GLuint loadFromCache();
         std::unique_ptr<std::map<string,RawImageData>> mMap; //缓存
-        std::unique_ptr<std::vector<string>> mRequestQuene; //正在请求的队列
-        std::unique_ptr<std::vector<string>> mWaitingRequestQuene; //等待队列
+        std::unique_ptr<std::vector<string>> mRequestQueue; //正在请求的队列
+        std::unique_ptr<std::vector<string>> mWaitingRequestQueue; //等待队列
+        void next();
     public:
         Texture();
 
@@ -37,9 +40,13 @@ namespace OpenEarth {
 
         GLuint loadFromNet(JNIEnv *env, const char *url);
 
+        void setJEnv(JNIEnv* env);
+        void cancel(const char* url);
+
         void onResponse(HttpResponse response);
 
         void onFailure(int code,string url, string message);
+
 
     private:
         OpenEarth::Storage::HttpDataSource *mHttpDataSource;

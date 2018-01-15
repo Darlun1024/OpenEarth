@@ -16,6 +16,7 @@ import okhttp3.Response;
  */
 
 public class HttpRequest implements Callback{
+    private static final String TAG = "HttpRequest";
     protected Request mRequest;
     protected Call mCall;
     protected  static OkHttpClient mClient;
@@ -32,6 +33,10 @@ public class HttpRequest implements Callback{
         mCall.enqueue(this);
     }
 
+    public void request(long nativePtr,String url){
+
+    }
+
     @Override
     public void onFailure(Call call, IOException e) {
         Log.e("tag","failure");
@@ -40,7 +45,6 @@ public class HttpRequest implements Callback{
 
     @Override
     public void onResponse(Call call, Response response) throws IOException {
-        Log.e("tag","respone");
         String url = response.request().url().toString();
         byte[] bytes = response.body().bytes();
         nativeOnResponse(url,bytes);
