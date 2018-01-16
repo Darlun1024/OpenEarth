@@ -109,8 +109,8 @@ void OpenEarth::Texture::onResponse(HttpResponse response) {
         mRequestQueue->erase(it);
     }
     next();
-//     release_raw_image_data(&dataPng);
-//     free(response.byteArray);
+     release_raw_image_data(&dataPng);
+     free(response.byteArray);
 }
 
 void OpenEarth::Texture::onFailure(int code, string url, string message) {

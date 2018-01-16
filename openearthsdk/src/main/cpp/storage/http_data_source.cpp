@@ -6,25 +6,25 @@
 #include "../jni.hpp"
 #include <thread>
 #include <cstdlib>
+#include <jni.h>
 
 namespace OpenEarth{
     namespace Storage{
         void HttpDataSource::request( JNIEnv* env,string url,HttpDataSourceCallback* callback){
-            jclass clazz;
-            JNIEnv* newEnv;
-            jni::getJVM()->AttachCurrentThread(&newEnv, NULL);
-            clazz = newEnv->FindClass(JavaClassName);
+//            JNIEnv* newEnv;
+//            jni::getJVM()->AttachCurrentThread(&newEnv, NULL);
+            jclass  clazz = env->FindClass(JavaClassName);
             if(clazz == NULL) {
                 return;
             }
 //            构造函数名称统一为<init>
-            jmethodID  initMethodId = newEnv->GetMethodID(clazz,"<init>","(JLjava/lang/String;)V");
+            jmethodID  initMethodId = env->GetMethodID(clazz,"<init>","(JLjava/lang/String;)V");
             const char* chardata = url.c_str();
-            jstring jstr = jni::char2JString(newEnv,chardata);
-            jobject  object = newEnv->NewObject(clazz,initMethodId,callback,jstr);
-            newEnv->DeleteLocalRef(jstr); //http://blog.csdn.net/xyang81/article/details/44873769
-            newEnv->DeleteLocalRef(object);
-//            jni::getJVM()->DetachCurrentThread();
+            jstring jstr = env->NewStringUTF(chardata);
+            jobject  object = env->NewObject(clazz,initMethodId,callback,jstr);
+            env->DeleteLocalRef(jstr); //http://blog.csdn.net/xyang81/article/details/44873769
+            env->DeleteLocalRef(object);
+////            jni::getJVM()->DetachCurrentThread();
         }
 
         HttpDataSource::HttpDataSource(){
@@ -96,8 +96,7 @@ namespace OpenEarth{
 //注册native 方法
         static int registerNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *gMethods,
                                          int numMethods) {
-            jclass clazz;
-            clazz = env->FindClass(className);
+            jclass clazz = env->FindClass(className);
             if (clazz == NULL) {
                 return JNI_FALSE;
             }

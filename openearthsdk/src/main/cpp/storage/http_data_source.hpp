@@ -41,6 +41,7 @@ namespace OpenEarth {
             void setCallback(HttpDataSourceCallback *callback);
             HttpDataSourceCallback *getCallback();
         private:
+
 //            static unique_ptr<vector<unique_ptr<HttpDataSource>>> sourceVector; //请求对象
 //            static unique_ptr<vector<>>
         };
