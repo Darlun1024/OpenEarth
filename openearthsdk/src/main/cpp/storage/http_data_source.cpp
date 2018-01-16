@@ -11,19 +11,19 @@
 namespace OpenEarth{
     namespace Storage{
         void HttpDataSource::request( JNIEnv* env,string url,HttpDataSourceCallback* callback){
-//            JNIEnv* newEnv;
-//            jni::getJVM()->AttachCurrentThread(&newEnv, NULL);
-            jclass  clazz = env->FindClass(JavaClassName);
+            JNIEnv* newEnv;
+            jni::getJVM()->AttachCurrentThread(&newEnv, NULL);
+            jclass  clazz = newEnv->FindClass(JavaClassName);
             if(clazz == NULL) {
                 return;
             }
 //            构造函数名称统一为<init>
-            jmethodID  initMethodId = env->GetMethodID(clazz,"<init>","(JLjava/lang/String;)V");
+            jmethodID  initMethodId = newEnv->GetMethodID(clazz,"<init>","(JLjava/lang/String;)V");
             const char* chardata = url.c_str();
-            jstring jstr = env->NewStringUTF(chardata);
-            jobject  object = env->NewObject(clazz,initMethodId,callback,jstr);
-            env->DeleteLocalRef(jstr); //http://blog.csdn.net/xyang81/article/details/44873769
-            env->DeleteLocalRef(object);
+            jstring jstr = newEnv->NewStringUTF(chardata);
+            jobject  object = newEnv->NewObject(clazz,initMethodId,callback,jstr);
+            newEnv->DeleteLocalRef(jstr); //http://blog.csdn.net/xyang81/article/details/44873769
+            newEnv->DeleteLocalRef(object);
 ////            jni::getJVM()->DetachCurrentThread();
         }
 

@@ -27,6 +27,12 @@ char *jni::jString2Char(JNIEnv *env, jstring jstr) {
     return result;
 }
 
+/**
+ * 这个方法可能会导致内存报错，不能使用
+ * @param env
+ * @param c
+ * @return
+ */
 jstring jni::char2JString(JNIEnv *env, const char *c) {
     jclass stringClass = (env)->FindClass("java/lang/String");
     jmethodID constructId = (env)->GetMethodID(stringClass, "<init>", "([BLjava/lang/String;)V");
