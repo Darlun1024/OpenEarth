@@ -88,11 +88,15 @@ GLuint OpenEarth::Texture::loadFromNet(JNIEnv *env, const char *url) {
         if (it == mRequestQueue->end()) {
             if(mRequestQueue->size()>MAX_HTTP_REQUEST_SIZE){
                 //进入等待队列
-                mWaitingRequestQueue->push_back(string(url));
-                LOGE("waiting","%s",url);
+                vector<string>::iterator wit = std::find(mRequestQueue->begin(), mRequestQueue->end(),
+                                                        surl);
+                if(wit==mWaitingRequestQueue->end()){
+                     mWaitingRequestQueue->push_back(surl);
+                    LOGE("waiting","%s",url);
+                }
             }else{
                 OpenEarth::Storage::HttpDataSource::request(env, url, this);
-                mRequestQueue->push_back(string(url));
+                mRequestQueue->push_back(surl);
             }
         }
         return 0;
@@ -133,7 +137,7 @@ void  OpenEarth::Texture::cancel(const char* url){
 }
 
 void OpenEarth::Texture::next(){
-    if(mWaitingRequestQueue->size()>0){
+    if(mWaitingRequestQueue->size()>0 && mRequestQueue->size()<=MAX_HTTP_REQUEST_SIZE){
         vector<string>::iterator it = mWaitingRequestQueue->begin();
         string url = *it;
         OpenEarth::Storage::HttpDataSource::request(mEnv,url, this);

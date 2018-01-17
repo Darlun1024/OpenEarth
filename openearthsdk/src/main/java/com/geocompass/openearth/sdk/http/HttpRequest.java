@@ -50,22 +50,22 @@ public class HttpRequest implements Callback{
 
     @Override
     public void onResponse(Call call, final Response response) throws IOException {
-//       mCallbackThread.post(new Runnable() {
-//           @Override
-//           public void run() {
-//               String url = response.request().url().toString();
-//               byte[] bytes = new byte[0];
-//               try {
-//                   bytes = response.body().bytes();
-//               } catch (IOException e) {
-//                   e.printStackTrace();
-//               }
-//               nativeOnResponse(url,bytes);
-//           }
-//       });
-        String url = response.request().url().toString();
-        byte[] bytes = response.body().bytes();
-        nativeOnResponse(url,bytes);
+       mCallbackThread.post(new Runnable() {
+           @Override
+           public void run() {
+               String url = response.request().url().toString();
+               byte[] bytes = new byte[0];
+               try {
+                   bytes = response.body().bytes();
+               } catch (IOException e) {
+                   e.printStackTrace();
+               }
+               nativeOnResponse(url,bytes);
+           }
+       });
+//        String url = response.request().url().toString();
+//        byte[] bytes = response.body().bytes();
+//        nativeOnResponse(url,bytes);
     }
 
     public void cancel(){
