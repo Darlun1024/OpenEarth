@@ -12,5 +12,6 @@ typedef struct {
 }RawImageData;
 
 void release_raw_image_data(const RawImageData *data);
+RawImageData get_raw_image_data(const void* img_data, const int img_data_size);
 
 #endif

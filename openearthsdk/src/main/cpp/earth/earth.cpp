@@ -8,7 +8,7 @@
 #include <glm/ext.hpp>
 
 namespace OpenEarth {
-    static float  const  DEFAULT_RADIUS = 2.0f;
+    static float  const  DEFAULT_RADIUS = 1.0f;
     static float  const  DEFAULT_SCALE  = 1.0f;
     static  int   min_zoom  = 1;
     static  int   max_zoom  = 16;

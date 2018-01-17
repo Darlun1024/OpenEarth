@@ -360,7 +360,7 @@ namespace OpenEarth {
         gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
 
-        Source::Source* source = new Source::Source("http://t3.tianditu.com/DataServer?T=vec_c&x={x}&y={y}&l={z}");
+        Source::Source* source = new Source::Source("http://t3.tianditu.com/DataServer?T=img_c&x={x}&y={y}&l={z}");
         tileManager->draw(env,aPositionLocation,aTextureLocation,source,aAssetManager);
 //        GLuint textureId = textureManager->loadFromNet(env,source->getURLOfTile(tile1).c_str());
 //        tile1->draw(aPositionLocation, aTextureLocation, textureId);

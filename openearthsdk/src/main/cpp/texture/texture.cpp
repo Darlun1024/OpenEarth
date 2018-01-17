@@ -90,7 +90,7 @@ GLuint OpenEarth::Texture::loadFromNet(JNIEnv *env, const char *url) {
                 //进入等待队列
                 vector<string>::iterator wit = std::find(mRequestQueue->begin(), mRequestQueue->end(),
                                                         surl);
-                if(wit==mWaitingRequestQueue->end()){
+                if(wit == mWaitingRequestQueue->end()){
                      mWaitingRequestQueue->push_back(surl);
                     LOGE("waiting","%s",url);
                 }
@@ -104,7 +104,7 @@ GLuint OpenEarth::Texture::loadFromNet(JNIEnv *env, const char *url) {
 }
 
 void OpenEarth::Texture::onResponse(HttpResponse response) {
-    RawImageData dataPng = get_raw_image_data_from_png(response.byteArray, response.length);
+    RawImageData dataPng = get_raw_image_data(response.byteArray, response.length);
     mMap->insert(pair<string, RawImageData>(response.url, dataPng));
     vector<string>::iterator it = std::find(mRequestQueue->begin(), mRequestQueue->end(),
                                             response.url);
