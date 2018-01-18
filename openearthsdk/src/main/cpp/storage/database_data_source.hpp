@@ -5,7 +5,6 @@
 #ifndef OPENEARTH_DATABASE_DATA_SOURCE_HPP
 #define OPENEARTH_DATABASE_DATA_SOURCE_HPP
 
-#include <sqlite3>
 #include <memory>
 
 namespace OpenEarth {
@@ -14,19 +13,13 @@ namespace OpenEarth {
 
         class DatabaseDataSource {
         private:
-            static unique_ptr<DatabaseDataSource> singleDataBaseSource;
 
+        public:
             DatabaseDataSource();
-
             ~DatabaseDataSource();
 
         public:
-            static unique_ptr<DatabaseDataSource> singlePtr(){
-                if(singleDataBaseSource == nullptr){
-                    singleDataBaseSource = make_unique<DatabaseDataSource>();
-                }
-                return singleDataBaseSource;
-            }
+            static std::unique_ptr<DatabaseDataSource> newIntance();
         };
     }
 }

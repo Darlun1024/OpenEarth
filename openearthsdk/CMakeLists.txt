@@ -60,6 +60,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/texture/texture.cpp;
               src/main/cpp/storage/data_source.cpp;
               src/main/cpp/storage/http_data_source.cpp;
+              src/main/cpp/storage/database_data_source.cpp;
               src/main/cpp/earth/opengl_project.cpp
               src/main/cpp/earth/geometry/Ray.cpp
               src/main/cpp/earth/geometry/geometry_util.cpp
