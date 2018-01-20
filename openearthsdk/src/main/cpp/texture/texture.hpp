@@ -40,6 +40,9 @@ namespace OpenEarth {
 
         GLuint loadFromNet(JNIEnv *env, const char *url);
 
+        //离线数据库
+        GLuint loadFromDatabase(const char* dbPath);
+
         void setJEnv(JNIEnv* env);
         void cancel(const char* url);
 

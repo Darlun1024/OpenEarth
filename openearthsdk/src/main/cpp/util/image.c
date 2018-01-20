@@ -14,7 +14,7 @@ void release_raw_image_data(const RawImageData *data){
 }
 
 RawImageData get_raw_image_data(const void* img_data, const int img_data_size){
-    uint8_t* data = img_data;
+    uint8_t* data = (uint8_t*)img_data;
     //判断文件是png还是jpeg
     //png 文件 以 89 50 4E 47 开头
     //C 语言中 U标志无符号整形 L 表示Long  F 表示浮点型
@@ -31,4 +31,12 @@ RawImageData get_raw_image_data(const void* img_data, const int img_data_size){
             return get_raw_image_data_from_jpeg(data,img_data_size);
         }
     }
+
+    return (RawImageData){
+            0,
+            0,
+            0,
+            0,
+            NULL
+    };
 }

@@ -17,8 +17,10 @@ cmake_minimum_required(VERSION 3.4.1)
 INCLUDE_DIRECTORIES (src/main/cpp/deps/)
 
 add_library(libjpeg SHARED IMPORTED)
+add_library(libsqlite SHARED IMPORTED)
 #这里千万要注意路径的写法
 set_target_properties(libjpeg PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libjpeg.so)
+set_target_properties(libsqlite PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/src/main/jniLibs/${ANDROID_ABI}/libsqliteX.so)
 
 add_library( # Sets the name of the library.
              lib-earth
@@ -53,6 +55,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/util/util.cpp
               src/main/cpp/util/looper.cpp
               src/main/cpp/util/thread_local.cpp
+              src/main/cpp/util/thread_local.cpp
               src/main/cpp/gl/gl.cpp;
               src/main/cpp/shaders/shader.cpp;
               src/main/cpp/shaders/raster_shader.cpp;
@@ -61,6 +64,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/storage/data_source.cpp;
               src/main/cpp/storage/http_data_source.cpp;
               src/main/cpp/storage/database_data_source.cpp;
+              src/main/cpp/storage/mbtile_data_source.cpp;
               src/main/cpp/earth/opengl_project.cpp
               src/main/cpp/earth/geometry/Ray.cpp
               src/main/cpp/earth/geometry/geometry_util.cpp
@@ -106,6 +110,7 @@ find_library( # Sets the name of the path variable.
 target_link_libraries( # Specifies the target library.
                        lib-earth
                        libjpeg
+                       libsqlite
                        EGL    #必须要添加这两行，否则会报link错误，找不到glXXXX方法
                        GLESv2 #
                        GLESv3 #

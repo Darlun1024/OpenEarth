@@ -21,7 +21,7 @@ namespace OpenEarth {
         }
 
         bool TileID::isChildOf(const TileID &rhs) const {
-
+            return false;
         }
 
     }

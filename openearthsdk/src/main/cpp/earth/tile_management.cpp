@@ -7,6 +7,7 @@
 #include "../util/point.hpp"
 #include "../texture/texture.hpp"
 #include "../logging.hpp"
+#include "../storage/mbtile_data_source.hpp"
 #include <vector>
 #include <mutex>
 #include <assert.h>
@@ -46,6 +47,8 @@ namespace OpenEarth {
             mTileMap = make_unique<std::map<string, shared_ptr<Tile>>>();
             mTileArray = make_unique<vector<shared_ptr<Tile>>>();
             mTextureManager = make_unique<Texture>();
+
+            unique_ptr<OpenEarth::Storage::MBTileDataSource> db = std::make_unique<OpenEarth::Storage::MBTileDataSource>("/storage/emulated/0/1.db");
         }
 
         ~Impl() {

@@ -1,25 +1,34 @@
 //
 // Created by GXSN-Pro on 2018/1/18.
+// 网络缓存的数据
 //
 
 #ifndef OPENEARTH_DATABASE_DATA_SOURCE_HPP
 #define OPENEARTH_DATABASE_DATA_SOURCE_HPP
 
 #include <memory>
+#include "../earth/tile.hpp"
+#include "../sqlite/sqlite3pp.h"
 
 namespace OpenEarth {
     namespace Storage {
         using namespace std;
 
         class DatabaseDataSource {
-        private:
-
+        protected:
+            string mDBPath;
+            void initDatabase();
         public:
-            DatabaseDataSource();
+            DatabaseDataSource& operator= (const DatabaseDataSource&);
+            DatabaseDataSource(string path);
             ~DatabaseDataSource();
-
-        public:
-            static std::unique_ptr<DatabaseDataSource> newIntance();
+            static std::shared_ptr<DatabaseDataSource> newInstance(string path);
+            /**
+             * 从缓存数据库加载数据
+             * @param url
+             * @return
+             */
+            char* find(string url);
         };
     }
 }

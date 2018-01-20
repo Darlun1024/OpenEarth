@@ -6,8 +6,9 @@
 
 namespace OpenEarth {
     namespace Storage {
+        shared_ptr<DatabaseDataSource> singleDbPtr;
 
-        DatabaseDataSource::DatabaseDataSource() {
+        DatabaseDataSource::DatabaseDataSource(string path):mDBPath(path) {
 
         }
 
@@ -15,9 +16,16 @@ namespace OpenEarth {
 
         }
 
-        unique_ptr<DatabaseDataSource> DatabaseDataSource::newIntance(){
-            unique_ptr<DatabaseDataSource> ptr = make_unique<DatabaseDataSource>();
-            return ptr;
+
+        shared_ptr<DatabaseDataSource> DatabaseDataSource::newInstance(string path){
+            if(singleDbPtr== nullptr){
+               singleDbPtr = make_shared<DatabaseDataSource>(path);
+            }
+            return singleDbPtr;
+        }
+
+        void DatabaseDataSource::initDatabase(){
+
         }
     }
 }
