@@ -2,32 +2,47 @@
 // Created by GXSN-Pro on 2018/1/20.
 //
 
+#include <map>
 #include "mbtile_data_source.hpp"
 #include "../sqlite/sqlite3pp.h"
+#include <boost/algorithm/string/split.hpp>
 
 namespace OpenEarth{
     namespace Storage{
         using namespace std;
         using namespace sqlite3pp;
+
+
+        const char *protocol = "mbtile://";
+        const uint8_t protocolLength = 9;
+
         unique_ptr<database> db;
+        unique_ptr<map<string,shared_ptr<database>>> databaseMap;
+
        // /storage/emulated/0/
-        MBTileDataSource::MBTileDataSource(const std::string path){
-            db = make_unique<database>(path.c_str());
-           initDataBase();
+        MBTileDataSource::MBTileDataSource(){
+           databaseMap = make_unique<map<string,shared_ptr<database>>>();
         }
 
         MBTileDataSource::~MBTileDataSource(){
-
+            databaseMap.reset();
         }
 
-        std::unique_ptr<MBTileDataSource> MBTileDataSource::newInstance(const  std::string path){
-            std::unique_ptr<MBTileDataSource> mbDataSource = std::make_unique<MBTileDataSource>(path);
+        std::unique_ptr<MBTileDataSource> MBTileDataSource::newInstance(){
+            std::unique_ptr<MBTileDataSource> mbDataSource = std::make_unique<MBTileDataSource>();
             return mbDataSource;
         }
 
-        void MBTileDataSource::initDataBase(){
-            const char* sql  = "create table tab_test(ID TEXT,Name TEXT)";
-            db->execute(sql);
+        Response request(std::string url){
+            //TODO
+            string dbPath = "";
+//            shared_ptr<database> db = ;
         }
+
+        bool MBTileDataSource::isValidUrl(const std::string &url) {
+            return url.compare(0, protocolLength, protocol) == 0;
+        }
+
+
     }
 }

@@ -7,7 +7,7 @@
 
 #include <string>
 #include <memory>
-
+#include "Respone.hpp"
 
 namespace OpenEarth{
     namespace Storage{
@@ -15,9 +15,11 @@ namespace OpenEarth{
         private:
             void initDataBase();
         public:
-            MBTileDataSource(std::string path);
+            MBTileDataSource();
             ~MBTileDataSource();
-            std::unique_ptr<MBTileDataSource> newInstance(std::string path);
+            std::unique_ptr<MBTileDataSource> newInstance();
+            Response request(std::string url);
+            bool isValidUrl(const std::string &url);
 
         };
     }
