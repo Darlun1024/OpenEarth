@@ -270,7 +270,7 @@ namespace sqlite3pp
       int column_bytes(int idx) const;
 
       template <class T> T get(int idx) const {
-        return get(idx, T());
+        return    get(idx, T());
       }
 
       template <class... Ts>

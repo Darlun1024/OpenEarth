@@ -56,6 +56,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/util/looper.cpp
               src/main/cpp/util/thread_local.cpp
               src/main/cpp/util/thread_local.cpp
+              src/main/cpp/util/url.cpp
               src/main/cpp/gl/gl.cpp;
               src/main/cpp/shaders/shader.cpp;
               src/main/cpp/shaders/raster_shader.cpp;
@@ -63,6 +64,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/texture/texture.cpp;
               src/main/cpp/storage/data_source.cpp;
               src/main/cpp/storage/http_data_source.cpp;
+              src/main/cpp/storage/mbtile_info.cpp;
               src/main/cpp/storage/database_data_source.cpp;
               src/main/cpp/storage/mbtile_data_source.cpp;
               src/main/cpp/earth/opengl_project.cpp
