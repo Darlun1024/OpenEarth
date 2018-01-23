@@ -17,8 +17,8 @@ namespace OpenEarth{
         public:
             MBTileDataSource();
             ~MBTileDataSource();
-            std::unique_ptr<MBTileDataSource> newInstance();
-            Response request(std::string url);
+            static std::unique_ptr<MBTileDataSource> newInstance();
+            Response* request(std::string url);
             bool isValidUrl(const std::string &url);
 
         };

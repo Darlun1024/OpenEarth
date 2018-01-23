@@ -26,6 +26,7 @@ namespace OpenEarth{
        // /storage/emulated/0/
         MBTileDataSource::MBTileDataSource(){
            databaseMap = make_unique<map<string,shared_ptr<database>>>();
+           tileInfoMap = make_unique<map<string,shared_ptr<MBTileInfo>>>();
         }
 
         MBTileDataSource::~MBTileDataSource(){
@@ -37,7 +38,7 @@ namespace OpenEarth{
             return mbDataSource;
         }
 
-        Response request(std::string url){
+        Response* MBTileDataSource::request(std::string url){
             //TODO
             string dbPath = "";
 //            shared_ptr<database> db = ;
@@ -54,7 +55,7 @@ namespace OpenEarth{
                     x = atoi(kv[1].c_str());
                 }else if(kv[0].compare("y")==0){
                     y = atoi(kv[1].c_str());
-                } else if(kv[0].compare("z")==0){
+                } else if(kv[0].compare("l")==0){
                     z = atoi(kv[1].c_str());
                 }else if(kv[0].compare("path")==0){
                     dbPath = kv[1];
@@ -72,31 +73,33 @@ namespace OpenEarth{
                 db = it->second;
                 tileInfo = itInfo->second;
             }else{
-                db =  std::make_shared<database>(dbPath.c_str());
+                db =  std::make_shared<database>(dbPath.c_str(),SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE);
                 databaseMap->insert(pair<string,shared_ptr<database>>(dbPath,db));
                 tileInfo = std::make_shared<MBTileInfo>(db);
                 tileInfoMap->insert(pair<string,shared_ptr<MBTileInfo>>(dbPath,tileInfo));
             }
 
-            Response response;
-            response.url = url;
+            Response* response = new Response();
+            response->url=url;
             if(!tileInfo->isExists(z,x,y)){
-                return Response{
-                        url,
-                        nullptr,
-                        0
-                };
+                response->length = 0;
             }else{
                 sqlite3pp::query query(*db.get(),"SELECT tile_data FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?");
                 query.bind(1,z);
                 query.bind(2,x);
                 query.bind(3,y);
-                for(sqlite3pp::query::iterator it = query.begin();it!=query.end();++it){
-                   response.length =  (*it).column_bytes(0);
-                   response.byteArray = const_cast<char*>((*it).get<const char *>(0));
+                sqlite3pp::query::iterator it = query.begin();
+                if(it!=query.end()){
+                    const char* bytes = (*it).get<const char *>(0);
+                    int length = (*it).column_bytes(0);
+                    char* newBytes = new char[length];
+                    memcpy(newBytes, bytes, length);
+                    response->length = length;
+                    response->byteArray = newBytes;
+
                 }
-                return  response;
             }
+            return  response;
 
         }
 

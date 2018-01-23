@@ -96,7 +96,6 @@ namespace OpenEarth {
 
         void draw(JNIEnv *env, GLuint aPositionLocation, GLuint aTextureLocation,
                   Source::Source *source,AAssetManager* mgr) {
-            mTextureManager->setJEnv(env);
             mMutex.lock();
             vector<shared_ptr<Tile>>::iterator it = mTileArray->begin();
             while (it != mTileArray->end()) {
@@ -104,8 +103,8 @@ namespace OpenEarth {
 //                GLuint textureId = mTextureManager->loadFromAssets(mgr,"west.png");
                 Tile* tile = it->get();
                 if (tile) {
-                    GLuint textureId = mTextureManager->loadFromNet(env, source->getURLOfTile(
-                            tile).c_str());
+                    GLuint textureId = mTextureManager->loadFromDatabase(source->getURLOfTile(
+                            tile));
                     if(textureId!=0)
                      tile->draw(aPositionLocation, aTextureLocation, textureId);
                 }

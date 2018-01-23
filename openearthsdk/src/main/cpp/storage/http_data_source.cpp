@@ -13,6 +13,7 @@ namespace OpenEarth{
         void HttpDataSource::request( JNIEnv* env,string url,HttpDataSourceCallback* callback){
             JNIEnv* newEnv;
             jni::getJVM()->AttachCurrentThread(&newEnv, NULL);
+
             jclass  clazz = newEnv->FindClass(JavaClassName);
             if(clazz == NULL) {
                 return;

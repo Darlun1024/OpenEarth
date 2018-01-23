@@ -13,11 +13,17 @@ namespace  OpenEarth{
         }
 
         MBTileInfo::MBTileInfo (shared_ptr<sqlite3pp::database> db)  {
-            sqlite3pp::query qry(*db.get(), "SELECT minLevel, maxLevel FROM metadata");
+            sqlite3pp::query qry(*db.get(), "SELECT key,value FROM metadata");
             int colCount = qry.column_count();
+            string key;
             for (sqlite3pp::query::iterator it = qry.begin(); it != qry.end(); ++it) {
-                    minLevel = (*it).get<int>(0);
+                    key = (*it).get<string>(0);
+                if(key.compare("minLevel")==0){
                     minLevel = (*it).get<int>(1);
+                }
+                if(key.compare("maxLevel")==0){
+                    maxLevel = (*it).get<int>(1);
+                }
             }
 //
 
