@@ -59,6 +59,9 @@ add_library( # Sets the name of the library.
               src/main/cpp/util/url.cpp
               src/main/cpp/gl/gl.cpp;
               src/main/cpp/shaders/shader.cpp;
+              src/main/cpp/shaders/point_shader.cpp;
+              src/main/cpp/shaders/line_shader.cpp;
+              src/main/cpp/shaders/fill_shader.cpp;
               src/main/cpp/shaders/raster_shader.cpp;
               src/main/cpp/programs/program.cpp;
               src/main/cpp/texture/texture.cpp;
