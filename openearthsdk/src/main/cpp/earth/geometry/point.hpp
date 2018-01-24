@@ -5,9 +5,11 @@
 #ifndef OPENEARTH_POINT_HPP
 #define OPENEARTH_POINT_HPP
 
+#include "geometry.hpp"
+
 namespace OpenEarth {
     namespace Geometry {
-        class Point {
+        class Point:Geometry {
 
         };
     }

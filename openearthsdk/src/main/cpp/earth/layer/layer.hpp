@@ -7,13 +7,17 @@
 
 
 #include <string>
+namespace  OpenEarth{
+    namespace  Layer{
+        class Layer {
+        public:
+            std::string name;
+            std::string id;
 
-class Layer {
-public:
-    std::string name;
-    std::string id;
+        };
+    }
+}
 
-};
 
 
 #endif //OPENEARTH_LAYER_HPP

@@ -5,10 +5,16 @@
 #ifndef OPENEARTH_RASTERLAYER_HPP
 #define OPENEARTH_RASTERLAYER_HPP
 
+#include "layer.hpp"
 
-class raster_layer {
+namespace OpenEarth{
+namespace Layer{
+    class RasterLayer:Layer {
 
-};
+    };
+}
+}
+
 
 
 #endif //OPENEARTH_RASTERLAYER_HPP

@@ -6,9 +6,11 @@
 #define OPENEARTH_POLYGON_FEATURE_HPP
 
 
+#include "feature.hpp"
+
 namespace OpenEarth{
     namespace Feature{
-        class PolygonFeature {
+        class PolygonFeature:Feature {
 
         };
     }

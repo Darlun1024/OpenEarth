@@ -5,9 +5,11 @@
 #ifndef OPENEARTH_POINT_FEATURE_HPP
 #define OPENEARTH_POINT_FEATURE_HPP
 
+#include "feature.hpp"
+
 namespace OpenEarth{
     namespace Feature{
-        class PointFeature {
+        class PointFeature:Feature {
 
         };
     }

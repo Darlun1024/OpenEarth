@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <libjpeg/jpeglib.h>
+#include <stdio.h>
 
 
 RawImageData get_raw_image_data_from_jpeg(const void *data, size_t len) {

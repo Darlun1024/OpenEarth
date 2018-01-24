@@ -5,9 +5,11 @@
 #ifndef OPENEARTH_LINE_HPP
 #define OPENEARTH_LINE_HPP
 
+#include "geometry.hpp"
+
 namespace OpenEarth {
     namespace Geometry {
-        class Line {
+        class Line:Geometry {
 
         };
     }

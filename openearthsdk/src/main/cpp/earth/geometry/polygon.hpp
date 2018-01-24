@@ -5,9 +5,11 @@
 #ifndef OPENEARTH_POLYGON_HPP
 #define OPENEARTH_POLYGON_HPP
 
+#include "geometry.hpp"
+
 namespace OpenEarth {
     namespace Geometry {
-        class Polygon {
+        class Polygon:Geometry {
 
         };
     }

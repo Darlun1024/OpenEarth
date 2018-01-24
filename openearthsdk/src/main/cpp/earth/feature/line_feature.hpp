@@ -6,9 +6,11 @@
 #define OPENEARTH_LINE_FEATURE_HPP
 
 
+#include "feature.hpp"
+
 namespace OpenEarth{
     namespace Feature{
-        class LineFeature {
+        class LineFeature:Feature {
 
         };
     }

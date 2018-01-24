@@ -24,6 +24,7 @@
 #include "../../gil_all.hpp"
 #include "io_error.hpp"
 #include <png.h>
+#include <stdio.h>
 
 namespace boost { namespace gil {
 
