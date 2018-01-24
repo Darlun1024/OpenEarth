@@ -75,6 +75,14 @@ add_library( # Sets the name of the library.
               src/main/cpp/earth/geometry/geometry_util.cpp
               src/main/cpp/earth/geometry/latlng.cpp
               src/main/cpp/earth/geometry/bounds.cpp
+              src/main/cpp/earth/geometry/geometry.cpp
+              src/main/cpp/earth/geometry/point.cpp
+              src/main/cpp/earth/geometry/line.cpp
+              src/main/cpp/earth/geometry/polygon.cpp
+              src/main/cpp/earth/feature/point_feature.cpp
+              src/main/cpp/earth/feature/line_feature.cpp
+              src/main/cpp/earth/feature/polygon_feature.cpp
+              src/main/cpp/earth/feature/feature.cpp
               src/main/cpp/native_earth_view.cpp
               src/main/cpp/earth/earth.cpp
               src/main/cpp/earth/transform.cpp
