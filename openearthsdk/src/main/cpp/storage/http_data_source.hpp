@@ -8,6 +8,8 @@
 
 #include <jni.h>
 #include <string>
+#include <memory>
+#include <vector>
 
 namespace OpenEarth {
     namespace Storage {
@@ -26,16 +28,22 @@ namespace OpenEarth {
 
         class HttpDataSource {
         private:
-            static constexpr char *const JavaClassName = "com/geocompass/openearth/sdk/http/HttpRequest";
-            static constexpr char *const TAG = "HttpDataSource";
+            static constexpr const char * JavaClassName = "com/geocompass/openearth/sdk/http/HttpRequest";
+            static constexpr const char * TAG = "HttpDataSource";
             HttpDataSourceCallback *mCallBack;
+            static jobject  localHttpObject;
+            static jmethodID requestMethodId;
         public:
-            static void request(JNIEnv *env, string url, HttpDataSourceCallback *callback);
+            static void request( JNIEnv *env, string url, HttpDataSourceCallback *callback);
             HttpDataSource();
             ~HttpDataSource();
             static void registerNative(JNIEnv *env);
             void setCallback(HttpDataSourceCallback *callback);
             HttpDataSourceCallback *getCallback();
+        private:
+
+//            static unique_ptr<vector<unique_ptr<HttpDataSource>>> sourceVector; //请求对象
+//            static unique_ptr<vector<>>
         };
 
 

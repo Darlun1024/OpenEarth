@@ -9,6 +9,7 @@
 #include "../logging.hpp"
 #include <vector>
 #include <mutex>
+#include <assert.h>
 
 namespace OpenEarth {
     static const char *const TAG = "TileManagement";
@@ -70,22 +71,22 @@ namespace OpenEarth {
             mTileArray->clear();
             PointI nw = latLng2TileXY(bounds.top, bounds.left, zoom);
             PointI se = latLng2TileXY(bounds.bottom, bounds.right, zoom);
-            uint32_t minx = nw.x;
-            uint32_t maxx = se.x;
-            uint32_t miny = nw.y;
-            uint32_t maxy = se.y;
+            uint32_t MAX_X = std::pow(2,zoom)-1;
+            uint32_t MAX_Y = std::pow(2,zoom-1)-1;
+
+            uint32_t minx = nw.x > 0 ? nw.x:0;
+            uint32_t maxx = se.x < MAX_X ? se.x:MAX_X;
+            uint32_t miny = nw.y > 0 ? nw.y:0;
+            uint32_t maxy = se.y < MAX_Y ? se.y:MAX_Y;
             map<string, shared_ptr<Tile>>::iterator it;
             for (uint32_t x = minx; x <= maxx; x++) {
                 for (int y = miny; y <= maxy; y++) {
-
                     string key = OpenEarth::Tile::genUniqueCode(zoom, x, y);
                     if (mTileMap->find(key) == mTileMap->end()) {
                         mTileMap->insert(std::pair<string, shared_ptr<Tile>>(key, std::make_shared<Tile>(x, y, zoom)));
-                        LOGE(TAG, "from new");
                     }
 //                    shared_ptr<Tile> tile = std::make_shared<Tile>(x, y, zoom);
                     mTileArray->push_back(mTileMap->find(key)->second);
-
 //                    LOGE(TAG, "tile count %d", tile.use_count());
                 }
             }
@@ -99,11 +100,11 @@ namespace OpenEarth {
             vector<shared_ptr<Tile>>::iterator it = mTileArray->begin();
             while (it != mTileArray->end()) {
                 if (*it == nullptr)continue;
+//                GLuint textureId = mTextureManager->loadFromAssets(mgr,"west.png");
                 Tile* tile = it->get();
                 if (tile) {
-//                    GLuint textureId = mTextureManager->loadFromNet(env, source->getURLOfTile(
-//                            tile).c_str());
-                    GLuint textureId = mTextureManager->loadFromAssets(mgr,"west.png");
+                    GLuint textureId = mTextureManager->loadFromNet(env,source->getURLOfTile(
+                            tile));
                     if(textureId!=0)
                      tile->draw(aPositionLocation, aTextureLocation, textureId);
                 }
@@ -114,6 +115,9 @@ namespace OpenEarth {
         }
 
         PointI latLng2TileXY(float lat, float lon, int zoom) {
+            assert(-180<=lon && lon<=180);
+            assert(-90 <=lat && lat<= 90 );
+            assert(zoom >= 0 );
             int max = std::pow(2, zoom);
             float tileSpan = 360.0f / std::pow(2, zoom);
             int x = (lon + 180) / tileSpan;
@@ -125,7 +129,6 @@ namespace OpenEarth {
                     y
             };
         }
-
     };
 
 

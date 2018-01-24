@@ -7,11 +7,15 @@
 
 
 #include <jni.h>
+#include <memory>
+#include <jni.h>
 
 class jni {
 public:
     static char* jString2Char(JNIEnv* env,jstring string);
     static jstring  char2JString(JNIEnv* env,const char * c);
+    static void setJVM(JavaVM* jvm);
+    static JavaVM* getJVM();
 };
 
 

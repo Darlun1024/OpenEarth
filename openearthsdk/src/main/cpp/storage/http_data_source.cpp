@@ -6,24 +6,26 @@
 #include "../jni.hpp"
 #include <thread>
 #include <cstdlib>
+#include <jni.h>
 
 namespace OpenEarth{
     namespace Storage{
-        void HttpDataSource::request(JNIEnv* env,string url,HttpDataSourceCallback* callback){
-            HttpDataSource* dataSource = new HttpDataSource();
-            dataSource->setCallback(callback);
-            jclass clazz;
-            clazz = env->FindClass(JavaClassName);
+        void HttpDataSource::request( JNIEnv* env,string url,HttpDataSourceCallback* callback){
+            JNIEnv* newEnv;
+            jni::getJVM()->AttachCurrentThread(&newEnv, NULL);
+
+            jclass  clazz = newEnv->FindClass(JavaClassName);
             if(clazz == NULL) {
                 return;
             }
 //            构造函数名称统一为<init>
-            jmethodID  initMethodId = env->GetMethodID(clazz,"<init>","(JLjava/lang/String;)V");
+            jmethodID  initMethodId = newEnv->GetMethodID(clazz,"<init>","(JLjava/lang/String;)V");
             const char* chardata = url.c_str();
-            jstring jstr = jni::char2JString(env,chardata);
-            jobject  object = env->NewObject(clazz,initMethodId,dataSource,jstr);
-            env->DeleteLocalRef(jstr); //http://blog.csdn.net/xyang81/article/details/44873769
-            env->DeleteLocalRef(object);
+            jstring jstr = newEnv->NewStringUTF(chardata);
+            jobject  object = newEnv->NewObject(clazz,initMethodId,callback,jstr);
+            newEnv->DeleteLocalRef(jstr); //http://blog.csdn.net/xyang81/article/details/44873769
+            newEnv->DeleteLocalRef(object);
+////            jni::getJVM()->DetachCurrentThread();
         }
 
         HttpDataSource::HttpDataSource(){
@@ -50,8 +52,8 @@ namespace OpenEarth{
             jclass clazz  = env->GetObjectClass(obj);
             jfieldID fieldId = env->GetFieldID(clazz,"mNativePtr","J");
             long nativePtr = env->GetLongField(obj,fieldId);
-            HttpDataSource* dataSource = (HttpDataSource*)nativePtr;
-            if(dataSource == nullptr)
+            HttpDataSourceCallback* callback = (HttpDataSourceCallback*)nativePtr;
+            if(callback == nullptr)
                 return;
             jboolean isCopy = true;
             const char* url =  env->GetStringUTFChars(jurl,&isCopy);
@@ -66,21 +68,22 @@ namespace OpenEarth{
                 data,
                 len
             };
-            dataSource->getCallback()->onResponse(response);
+            callback->onResponse(response);
             env->ReleaseStringUTFChars(jurl,url);
+            env->ReleaseByteArrayElements(body,jbarray,JNI_COMMIT);
         }
 
         void onFailure(JNIEnv* env,jobject obj,jstring jurl,jstring jmessage){
             jclass clazz  = env->GetObjectClass(obj);
             jfieldID fieldId = env->GetFieldID(clazz,"mNativePtr","J");
             long nativePtr = env->GetLongField(obj,fieldId);
-            HttpDataSource* dataSource = (HttpDataSource*)nativePtr;
-            if(dataSource== nullptr)
+            HttpDataSourceCallback* callback = (HttpDataSourceCallback*)nativePtr;
+            if(callback == nullptr)
                 return;
             jboolean isCopy = true;
             const char* url =  env->GetStringUTFChars(jurl,&isCopy);
             const char* message =  env->GetStringUTFChars(jmessage,&isCopy);
-            dataSource->getCallback()->onFailure(0,url,message);
+            callback->onFailure(0,url,message);
             env->ReleaseStringUTFChars(jmessage,message);
             env->ReleaseStringUTFChars(jurl,url);
         }
@@ -94,8 +97,7 @@ namespace OpenEarth{
 //注册native 方法
         static int registerNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *gMethods,
                                          int numMethods) {
-            jclass clazz;
-            clazz = env->FindClass(className);
+            jclass clazz = env->FindClass(className);
             if (clazz == NULL) {
                 return JNI_FALSE;
             }

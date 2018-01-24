@@ -4,8 +4,11 @@
 
 #include <cstdlib>
 #include <string>
+#include <cstring>
 #include "jni.hpp"
 
+
+static JavaVM* globalJVM;
 char *jni::jString2Char(JNIEnv *env, jstring jstr) {
     char* result = NULL;
     jclass stringClass = env->FindClass("java/lang/String");
@@ -24,6 +27,12 @@ char *jni::jString2Char(JNIEnv *env, jstring jstr) {
     return result;
 }
 
+/**
+ * 这个方法可能会导致内存报错，不能使用
+ * @param env
+ * @param c
+ * @return
+ */
 jstring jni::char2JString(JNIEnv *env, const char *c) {
     jclass stringClass = (env)->FindClass("java/lang/String");
     jmethodID constructId = (env)->GetMethodID(stringClass, "<init>", "([BLjava/lang/String;)V");
@@ -34,4 +43,12 @@ jstring jni::char2JString(JNIEnv *env, const char *c) {
     env->DeleteLocalRef(encoding);
     env->ReleaseByteArrayElements(bytes,(jbyte*) c,0);
     return result;
+}
+
+void jni::setJVM(JavaVM* jvm){
+    globalJVM = jvm;
+}
+
+JavaVM* jni::getJVM(){
+    return globalJVM;
 }

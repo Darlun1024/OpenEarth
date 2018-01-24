@@ -1,7 +1,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include "earth_renderer.hpp"
-#include "sphere.hpp"
+#include "Sphere.hpp"
 #include <memory>
 #include <GLES3/gl3.h>
 #include <glm/ext.hpp>
@@ -77,8 +77,6 @@ namespace OpenEarth {
 
         if (tile2)
             delete tile2;
-
-        delete aAssetManager;
     }
 
     void initialize() {
@@ -361,8 +359,9 @@ namespace OpenEarth {
 
         gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
-
-        Source::Source* source = new Source::Source("http://t3.tianditu.com/DataServer?T=vec_c&x={x}&y={y}&l={z}");
+//        file:///storage/emulated/0/
+        Source::Source* source = new Source::Source("http://t3.tianditu.com/DataServer?T=img_c&x={x}&y={y}&l={z}");
+//        Source::Source* source = new Source::Source("mbtile://path=/storage/emulated/0/img_beijing.db&x={x}&y={y}&l={z}");
         tileManager->draw(env,aPositionLocation,aTextureLocation,source,aAssetManager);
 //        GLuint textureId = textureManager->loadFromNet(env,source->getURLOfTile(tile1).c_str());
 //        tile1->draw(aPositionLocation, aTextureLocation, textureId);

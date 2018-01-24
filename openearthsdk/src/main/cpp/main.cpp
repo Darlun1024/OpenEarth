@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "jni.hpp"
 #include "native_earth_view.hpp"
 #include "earth/earth_renderer.hpp"
 #include "storage/http_data_source.hpp"
@@ -24,6 +25,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     OpenEarth::Storage::HttpDataSource::registerNative(env);
 
     result = JNI_VERSION_1_6;
+    jni::setJVM(vm);
     return result;
 }
 
