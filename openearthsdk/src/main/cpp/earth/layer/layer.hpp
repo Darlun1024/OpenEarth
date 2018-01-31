@@ -7,14 +7,18 @@
 
 
 #include <string>
+#include "../feature/feature.hpp"
+
 namespace  OpenEarth{
-    namespace  Layer{
+    namespace Layer{
         class Layer {
         public:
-            Layer(std::string layerId,std::string sourceId);
-            std::string name;
+            const  std::string name;
             std::string id;
+            std::string sourceId;
+            Layer(const std::string &layerId,const  std::string &name,const std::string &sourceId);
 
+            void draw();
         };
     }
 }

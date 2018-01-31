@@ -10,7 +10,10 @@
 namespace OpenEarth{
     namespace Layer{
         class VectorLayer:Layer {
-
+        public:
+            VectorLayer(const std::string &layerId,const std::string &name, const std::string &sourceId);
+            void addFeature(const Feature::Feature *feature);
+            void draw();
         };
     }
 }

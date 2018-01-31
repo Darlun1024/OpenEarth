@@ -3,3 +3,12 @@
 //
 
 #include "layer.hpp"
+
+namespace OpenEarth {
+    namespace Layer {
+        Layer::Layer(const std::string &layerId,const  std::string &name,const std::string &sourceId):
+        id(layerId),name(name),sourceId(sourceId) {
+
+        }
+    }
+}
