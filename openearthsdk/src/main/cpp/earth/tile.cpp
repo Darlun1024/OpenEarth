@@ -50,7 +50,7 @@ void OpenEarth::Tile::reset() {
 
 void OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation,GLuint textureId){
     glBindTexture(GL_TEXTURE_2D, 0);
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0);//
     glBindTexture(GL_TEXTURE_2D, textureId);
     for (int i = 0; i < rows; i++) {
         GLfloat *vertexArray = stripes[i];

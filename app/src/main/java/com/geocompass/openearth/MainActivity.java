@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mEarthView = findViewById(R.id.earth_view);
 
         mEarth = mEarthView.getEarth();
+
         findViewById(R.id.btn_zoom_in).setOnClickListener(this);
         findViewById(R.id.btn_zoom_out).setOnClickListener(this);
         findViewById(R.id.btn_look_up).setOnClickListener(this);

@@ -20,12 +20,22 @@ public class Earth {
     private float[] preXY;
     private GestureDetector mGestureDetector;
 
+    private EarthOptions mEarthOptions;
+
     protected Earth(GLSurfaceView glSurfaceView){
         this.mGLSurfaceView = glSurfaceView;
         mEarthRenderer = new EarthRenderer(mGLSurfaceView);
         mGestureDetector = new GestureDetector(glSurfaceView.getContext(),this);
     }
 
+    protected Earth(GLSurfaceView glSurfaceView,EarthOptions options){
+        this(glSurfaceView);
+        setOptions(options);
+    }
+
+    public  void setOptions(EarthOptions options){
+        this.mEarthOptions = options;
+    }
 
 
     public void zoomIn(){
@@ -81,4 +91,11 @@ public class Earth {
     protected boolean handleTouchEvent(MotionEvent event){
         return  mGestureDetector.onTouchEvent(event);
     }
+
+    public  native void nativeSetMinZoom(int minZoom);
+    public  native void nativeSetMaxZoom(int maxZoom);
+    public  native void nativeSetZoom(int maxZoom,boolean animated);
+    public  native void nativeSetScale(float scale,boolean animated);
+    public  native void nativeSetTilt(float tilt,boolean animated);
+    public  native void nativeRotate(float[] point1,float[] point2,boolean animated);
 }

@@ -8,22 +8,21 @@ namespace OpenEarth {
     namespace Shaders {
         const char *LineShader::name = "line_shader";
         const char *LineShader::veterxShader = R"SHADER(
-                uniform mat4 u_MVPMatrix;
+                 uniform mat4 u_MVPMatrix;
                  attribute vec4 POSITION;
-                 attribute vec2 a_TextureCoordinates;
-                 varying vec2 v_TextureCoordinates;
+                 uniform vec4 u_LineColor;
+                 varying vec4 v_LineColor;
                  void main(){
-                 gl_Position = u_MVPMatrix*POSITION;
-                 v_TextureCoordinates = a_TextureCoordinates;
+                    gl_Position = u_MVPMatrix*POSITION;
+                    v_LineColor = u_LineColor;
                  }
         )SHADER";
 
         const char *LineShader::fragmentShader = R"SHADER(
-                precision mediump float;
-                 uniform sampler2D u_TextureUnit;
-                 varying vec2 v_TextureCoordinates;
+                 precision mediump float;
+                varying vec4 v_LineColor;
                  void main(){
-                    gl_FragColor = texture2D(u_TextureUnit, v_TextureCoordinates);
+                    gl_FragColor = v_LineColor;
                  }
         )SHADER";
     }

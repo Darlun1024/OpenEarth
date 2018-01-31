@@ -8,6 +8,7 @@
 namespace OpenEarth {
     namespace Shaders {
         class LineShader {
+        public:
             static const char *name;
             static const char *veterxShader;
             static const char *fragmentShader;

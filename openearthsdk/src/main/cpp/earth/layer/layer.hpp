@@ -11,6 +11,7 @@ namespace  OpenEarth{
     namespace  Layer{
         class Layer {
         public:
+            Layer(std::string layerId,std::string sourceId);
             std::string name;
             std::string id;
 

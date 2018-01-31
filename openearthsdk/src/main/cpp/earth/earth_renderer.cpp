@@ -24,6 +24,7 @@
 #include "TileManager.hpp"
 #include "tile_management.hpp"
 #include "source/source.hpp"
+#include "../shaders/line_shader.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
 
@@ -37,6 +38,7 @@ namespace OpenEarth {
     Tile *tile1;
     Tile *tile2;
     GLuint d_glprogram;
+    GLuint line_program;
     int aPositionLocation;
     int aTextureLocation;
     int uTextureUnitLocation;
@@ -317,6 +319,11 @@ namespace OpenEarth {
         const char *shader_vertex = OpenEarth::Shaders::RasterShader::veterxShader;
         const char *shader_fragment = OpenEarth::Shaders::RasterShader::fragmentShader;
         d_glprogram = OpenEarth::Programs::Program::createProgram(shader_vertex, shader_fragment);
+
+        //line shader
+        const char *line_shader_vertex = OpenEarth::Shaders::LineShader::veterxShader;
+        const char *line_shader_fragment = OpenEarth::Shaders::LineShader::fragmentShader;
+        line_program = OpenEarth::Programs::Program::createProgram(line_shader_vertex, line_shader_fragment);
     }
 
 
@@ -338,9 +345,26 @@ namespace OpenEarth {
         gTransform->setProject(gProject);
     }
 
+//TODO refactor
+    void testDrawLine(){
+        glUseProgram(line_program);
+        aPositionLocation    = glGetAttribLocation(line_program, "POSITION");
+        uProjectionLocation  = glGetUniformLocation(line_program,"u_MVPMatrix");
+        int  colorPosition   = glGetUniformLocation(line_program,"u_LineColor");
+        glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
+        glm::vec4 color = glm::vec4(0.0f,1.0f,1.0f,0.6f);
+
+        glUniform4fv(colorPosition,1,glm::value_ptr(color));
+        float points[] = {0.0f,0.0f,-2.0f,1.0f,1.0f,-2.0f};
+        glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
+                              points);
+        glEnableVertexAttribArray(aPositionLocation);
+        glDrawArrays(GL_LINE_STRIP,0,2);
+    }
 
     void render(JNIEnv *env, jobject instance) {
         drawEarth(env);
+        testDrawLine();
     }
 
     void drawEarth(JNIEnv *env) {
@@ -350,12 +374,13 @@ namespace OpenEarth {
         glDepthFunc(GL_LESS);
         glUseProgram(d_glprogram);
 
-        aPositionLocation = glGetAttribLocation(d_glprogram, "POSITION");
-        aTextureLocation = glGetAttribLocation(d_glprogram, "a_TextureCoordinates");
+        aPositionLocation    = glGetAttribLocation(d_glprogram, "POSITION");
+        aTextureLocation     = glGetAttribLocation(d_glprogram, "a_TextureCoordinates");
         uTextureUnitLocation = glGetUniformLocation(d_glprogram, "u_TextureUnit");
-        uProjectionLocation = glGetUniformLocation(d_glprogram, "u_MVPMatrix");
+        uProjectionLocation  = glGetUniformLocation(d_glprogram, "u_MVPMatrix");
+//        glActiveTexture()
 
-        glUniform1i(uTextureUnitLocation, 0);
+        glUniform1i(uTextureUnitLocation, 0);  //这里的数字是设备纹理单元的编号，0 对应的是GL_TEXTURE0
 
         gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix;
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
@@ -363,12 +388,9 @@ namespace OpenEarth {
         Source::Source* source = new Source::Source("http://t3.tianditu.com/DataServer?T=img_c&x={x}&y={y}&l={z}");
 //        Source::Source* source = new Source::Source("mbtile://path=/storage/emulated/0/img_beijing.db&x={x}&y={y}&l={z}");
         tileManager->draw(env,aPositionLocation,aTextureLocation,source,aAssetManager);
-//        GLuint textureId = textureManager->loadFromNet(env,source->getURLOfTile(tile1).c_str());
-//        tile1->draw(aPositionLocation, aTextureLocation, textureId);
-//        textureId = textureManager->loadFromNet(env,source->getURLOfTile(tile2).c_str());
-//        tile2->draw(aPositionLocation, aTextureLocation, textureId);
-//        delete source;
+        testDrawLine();
     }
+
 
 
     static JNINativeMethod gMethods[] = {
