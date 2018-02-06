@@ -93,6 +93,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/earth/tile/tile_data.cpp
               src/main/cpp/earth/tile_management.cpp
               src/main/cpp/earth/source/source.cpp
+              src/main/cpp/earth/feature/feature.cpp
               src/main/cpp/earth/layer/layer.cpp
               src/main/cpp/earth/layer/vector_layer.cpp
               src/main/cpp/earth/layer/raster_layer.cpp

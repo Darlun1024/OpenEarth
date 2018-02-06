@@ -7,10 +7,13 @@
 
 
 #include "feature.hpp"
+#include "../geometry/line.hpp"
 
 namespace OpenEarth{
-    namespace Feature{
+    namespace Features{
         class LineFeature:Feature {
+        private:
+
 
         };
     }

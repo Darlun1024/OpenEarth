@@ -6,13 +6,14 @@
 #define OPENEARTH_VECTOR_LAYER_H
 
 #include "layer.hpp"
+#include "../feature/feature.hpp"
 
 namespace OpenEarth{
-    namespace Layer{
+    namespace Layers{
         class VectorLayer:Layer {
         public:
             VectorLayer(const std::string &layerId,const std::string &name, const std::string &sourceId);
-            void addFeature(const Feature::Feature *feature);
+            void addFeature(const OpenEarth::Features::Feature *feature);
             void draw();
         };
     }

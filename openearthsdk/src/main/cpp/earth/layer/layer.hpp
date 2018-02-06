@@ -7,10 +7,9 @@
 
 
 #include <string>
-#include "../feature/feature.hpp"
 
 namespace  OpenEarth{
-    namespace Layer{
+    namespace Layers{
         class Layer {
         public:
             const  std::string name;

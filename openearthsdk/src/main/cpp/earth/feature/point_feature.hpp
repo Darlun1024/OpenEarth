@@ -8,7 +8,7 @@
 #include "feature.hpp"
 
 namespace OpenEarth{
-    namespace Feature{
+    namespace Features{
         class PointFeature:Feature {
 
         };

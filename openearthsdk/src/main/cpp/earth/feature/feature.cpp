@@ -3,3 +3,15 @@
 //
 
 #include "feature.hpp"
+
+namespace  OpenEarth{
+    namespace Features{
+        Feature::Feature(){
+
+        }
+
+        Feature::~Feature(){
+
+        }
+    }
+}

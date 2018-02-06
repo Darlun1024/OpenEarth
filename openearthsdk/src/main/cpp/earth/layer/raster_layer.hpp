@@ -8,7 +8,7 @@
 #include "layer.hpp"
 
 namespace OpenEarth{
-namespace Layer{
+namespace Layers{
     class RasterLayer:Layer {
 
     };
