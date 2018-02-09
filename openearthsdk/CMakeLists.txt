@@ -5,6 +5,27 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+# CACHE
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    set(C_LAUNCHER   "${CCACHE_PROGRAM}")
+    set(CXX_LAUNCHER "${CCACHE_PROGRAM}")
+        # Support Unix Makefiles and Ninja
+        configure_file(scripts/launch-c.in   launch-c   @ONLY)
+        configure_file(scripts/launch-cxx.in launch-cxx @ONLY)
+
+        set(CMAKE_C_COMPILER_LAUNCHER        "${CMAKE_BINARY_DIR}/launch-c")
+        set(CMAKE_CXX_COMPILER_LAUNCHER      "${CMAKE_BINARY_DIR}/launch-cxx")
+
+    execute_process(COMMAND chmod a+rx "${CMAKE_BINARY_DIR}/launch-c" "${CMAKE_BINARY_DIR}/launch-cxx")
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments -fcolor-diagnostics")
+    endif()
+else()
+    message(STATUS "Can't find ccache — consider installing ccache to improve recompilation performance")
+endif()
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -57,6 +78,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/util/thread_local.cpp
               src/main/cpp/util/thread_local.cpp
               src/main/cpp/util/url.cpp
+              # gl
               src/main/cpp/gl/gl.cpp;
               src/main/cpp/shaders/shader.cpp;
               src/main/cpp/shaders/point_shader.cpp;
@@ -65,12 +87,15 @@ add_library( # Sets the name of the library.
               src/main/cpp/shaders/raster_shader.cpp;
               src/main/cpp/programs/program.cpp;
               src/main/cpp/texture/texture.cpp;
+              # data source
               src/main/cpp/storage/data_source.cpp;
               src/main/cpp/storage/http_data_source.cpp;
               src/main/cpp/storage/mbtile_info.cpp;
               src/main/cpp/storage/database_data_source.cpp;
               src/main/cpp/storage/mbtile_data_source.cpp;
+
               src/main/cpp/earth/opengl_project.cpp
+              # geometry
               src/main/cpp/earth/geometry/Ray.cpp
               src/main/cpp/earth/geometry/geometry_util.cpp
               src/main/cpp/earth/geometry/latlng.cpp
@@ -79,25 +104,42 @@ add_library( # Sets the name of the library.
               src/main/cpp/earth/geometry/point.cpp
               src/main/cpp/earth/geometry/line.cpp
               src/main/cpp/earth/geometry/polygon.cpp
-              src/main/cpp/earth/feature/point_feature.cpp
-              src/main/cpp/earth/feature/line_feature.cpp
-              src/main/cpp/earth/feature/polygon_feature.cpp
-              src/main/cpp/earth/feature/feature.cpp
+
+              # style
+              src/main/cpp/earth/style/style.cpp
+              src/main/cpp/earth/style/line_style.cpp
+              src/main/cpp/earth/style/point_style.cpp
+              src/main/cpp/earth/style/polygon_style.cpp
+
+              # earth
               src/main/cpp/native_earth_view.cpp
               src/main/cpp/earth/earth.cpp
               src/main/cpp/earth/transform.cpp
               src/main/cpp/earth/sphere.cpp
+
+              # tile
               src/main/cpp/earth/tile.cpp
               src/main/cpp/earth/tile/tile_id.cpp
               src/main/cpp/earth/tile/tile_cache.cpp
               src/main/cpp/earth/tile/tile_data.cpp
               src/main/cpp/earth/tile_management.cpp
               src/main/cpp/earth/source/source.cpp
+
+              # feature
               src/main/cpp/earth/feature/feature.cpp
+              src/main/cpp/earth/feature/point_feature.cpp
+              src/main/cpp/earth/feature/line_feature.cpp
+              src/main/cpp/earth/feature/polygon_feature.cpp
+
+              # layer
               src/main/cpp/earth/layer/layer.cpp
               src/main/cpp/earth/layer/vector_layer.cpp
+              src/main/cpp/earth/layer/point_layer.cpp
+              src/main/cpp/earth/layer/line_layer.cpp
+              src/main/cpp/earth/layer/polygon_layer.cpp
               src/main/cpp/earth/layer/raster_layer.cpp
               src/main/cpp/earth/earth_renderer.cpp
+
               src/main/cpp/main.cpp
               src/main/cpp/jni.cpp
               src/main/cpp/logging.hpp

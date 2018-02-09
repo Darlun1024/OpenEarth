@@ -16,7 +16,7 @@ namespace OpenEarth {
 
         }
 
-        VectorLayer::addFeature(const OpenEarth::Features::Feature *feature) {
+        void VectorLayer::addFeature(const OpenEarth::Features::Feature *feature) {
 
         }
     }
