@@ -19,5 +19,4 @@ namespace OpenEarth{
 }
 
 
-
 #endif //OPENEARTH_LINE_LAYER_HPP

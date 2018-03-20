@@ -14,7 +14,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * copy from mapbox
+ *
+ * 多个线程获取数据，单线程返回给Native层
  * Created by gxsn on 2017/12/25.
  */
 

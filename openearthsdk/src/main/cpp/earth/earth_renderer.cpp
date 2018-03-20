@@ -324,6 +324,8 @@ namespace OpenEarth {
         const char *line_shader_vertex = OpenEarth::Shaders::LineShader::veterxShader;
         const char *line_shader_fragment = OpenEarth::Shaders::LineShader::fragmentShader;
         line_program = OpenEarth::Programs::Program::createProgram(line_shader_vertex, line_shader_fragment);
+
+
     }
 
 
@@ -389,6 +391,8 @@ namespace OpenEarth {
 //        Source::Source* source = new Source::Source("mbtile://path=/storage/emulated/0/img_beijing.db&x={x}&y={y}&l={z}");
         tileManager->draw(env,aPositionLocation,aTextureLocation,source,aAssetManager);
         testDrawLine();
+
+        
     }
 
 
