@@ -85,6 +85,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/shaders/line_shader.cpp;
               src/main/cpp/shaders/fill_shader.cpp;
               src/main/cpp/shaders/raster_shader.cpp;
+              src/main/cpp/shaders/light_raster_shader.cpp;
               src/main/cpp/programs/program.cpp;
               src/main/cpp/texture/texture.cpp;
               # data source

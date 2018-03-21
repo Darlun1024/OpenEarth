@@ -25,6 +25,7 @@
 #include "tile_management.hpp"
 #include "source/source.hpp"
 #include "../shaders/line_shader.hpp"
+#include "../shaders/light_raster_shader.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
 
@@ -39,10 +40,14 @@ namespace OpenEarth {
     Tile *tile2;
     GLuint d_glprogram;
     GLuint line_program;
+
     int aPositionLocation;
     int aTextureLocation;
     int uTextureUnitLocation;
     int uProjectionLocation;
+    int uMvMatrixLocation;
+    int uLightPosition;
+    int aNormalPosition;
 
 
 
@@ -53,6 +58,9 @@ namespace OpenEarth {
     glm::mat4x4 gViewMatrix;
     glm::mat4x4 gProjectionMatrix;
     glm::mat4x4 gMvpMatrix;
+    glm::mat4x4 gMvMatrix;
+    glm::vec3 gLightPosition; //光照位置
+    glm::vec3 gNormal; //
 
     OpenEarth::Texture *textureManager;
 
@@ -86,21 +94,36 @@ namespace OpenEarth {
         OpenEarth::Earth::initialize();
         gModelMatrix = OpenEarth::Earth::getModelMatrix();
 
+        //设置镜头位置
         gViewMatrix = glm::lookAt(
                 glm::vec3(0.0f, 0.0f, 1.0f), //眼睛位置
                 glm::vec3(0.0f, cameraTargetCenterY, 0.0f), //瞄准的点
                 glm::vec3(0.0f, 1.0f, 0.0f)  //头顶方向的法向量
         );
+
+        //投影
         gProjectionMatrix = glm::mat4(1.0f);
+
+
         screenSize = glm::vec2(0, 0);
+
+        //投影工具
         gProject = std::make_shared<OpenEarth::OpenGLProject>(gViewMatrix, gProjectionMatrix,
                                                               screenSize);
+        //坐标转换工具
         gTransform = std::make_unique<OpenEarth::Transform>(gModelMatrix, gProject);
 
+        //纹理管理工具
         tileManager = std::make_unique<OpenEarth::TileManagement>();
+
+        //光源位置
+        gLightPosition = glm::vec3(0.0f,0.0f,2.0f); //镜头后方
+
+        //法向量
+        gNormal = glm::vec3(0.0f,0.0f,1.0f);
     }
 
-
+    //可见的地球的坐标范围
     OpenEarth::Geometry::Bounds getViewMapBounds() {
         //考虑到旋转的情况，四个角的坐标都要求
         glm::vec2 nw = gTransform->screenPointToLatlng(glm::vec2(0, 0));
@@ -118,6 +141,11 @@ namespace OpenEarth {
 
     }
 
+    /**
+     *  更新模型矩阵
+     *  模型矩阵更新后，坐标转换工具和纹理管理都有对应的更新
+     * @return
+     */
     void updateModelMatrix() {
         OpenEarth::Earth::updateModelMatrix();
         gModelMatrix = OpenEarth::Earth::getModelMatrix();
@@ -203,6 +231,13 @@ namespace OpenEarth {
             updateModelMatrix();
     }
 
+    /**
+     * 缩放地球
+     * 如果缩放的比例累积大于2.0或者小于0.5，需要修改Zoom,更新模型矩阵
+     * @param env
+     * @param instance
+     * @param scale 缩放比例
+     */
     void scale(JNIEnv *env, jobject instance, jfloat scale) {
         if (OpenEarth::Earth::setScale(scale))
             updateEarth();
@@ -252,7 +287,7 @@ namespace OpenEarth {
     }
 
 
-    //修改摄像头瞄准的点
+    //修改摄像头瞄准的点，实现地图倾斜效果
     void setTilt(JNIEnv *env, jobject instance, jfloat tilt) {
         setCameraTargetCenterY(tilt);
     }
@@ -262,6 +297,14 @@ namespace OpenEarth {
     }
 
 
+    /**
+     * 屏幕坐标转世界坐标
+     * 这里转换的世界坐标是在 z=0 时的坐标
+     * @param env
+     * @param instance
+     * @param point
+     * @return
+     */
     jfloatArray screen2World(JNIEnv *env, jobject instance, jfloatArray point) {
         jboolean isCopy = true;
         jfloat *array = env->GetFloatArrayElements(point, &isCopy);
@@ -272,6 +315,13 @@ namespace OpenEarth {
         return floatArray;
     }
 
+    /**
+     * 世界坐标转屏幕坐标
+     * @param env
+     * @param instance
+     * @param point
+     * @return
+     */
     jfloatArray world2Screen(JNIEnv *env, jobject instance, jfloatArray point) {
         jboolean isCopy = true;
         float *array = env->GetFloatArrayElements(point, &isCopy);
@@ -282,6 +332,10 @@ namespace OpenEarth {
         return floatArray;
     }
 
+    /**
+     * 屏幕坐标转经纬度
+     * 返回球面可见部门与屏幕交点的坐标
+     */
     jfloatArray screen2LatLng(JNIEnv *env, jobject instance, jfloatArray point) {
         jboolean isCopy = true;
         jfloat *array = env->GetFloatArrayElements(point, &isCopy);
@@ -292,6 +346,13 @@ namespace OpenEarth {
         return floatArray;
     }
 
+    /**
+     * 经纬度转屏幕坐标
+     * @param env
+     * @param instance
+     * @param latlng
+     * @return
+     */
     jfloatArray latLng2Screen(JNIEnv *env, jobject instance, jfloatArray latlng) {
         jboolean isCopy = true;
         float *array = env->GetFloatArrayElements(latlng, &isCopy);
@@ -380,11 +441,21 @@ namespace OpenEarth {
         aTextureLocation     = glGetAttribLocation(d_glprogram, "a_TextureCoordinates");
         uTextureUnitLocation = glGetUniformLocation(d_glprogram, "u_TextureUnit");
         uProjectionLocation  = glGetUniformLocation(d_glprogram, "u_MVPMatrix");
+
+        //试验漫反射光照
+//        uLightPosition       = glGetUniformLocation(d_glprogram,"u_LightPos");
+//        uMvMatrixLocation    = glGetUniformLocation(d_glprogram,"u_MVMatrix");
+//        aNormalPosition      = glGetAttribLocation(d_glprogram,"a_Normal");
+//
+//        gMvMatrix = gViewMatrix * gModelMatrix;
+//        glUniformMatrix4fv(uMvMatrixLocation, 1, GL_FALSE, glm::value_ptr(gMvMatrix));
+//        glUniform3fv(uLightPosition,1,glm::value_ptr(gLightPosition));
+
 //        glActiveTexture()
 
         glUniform1i(uTextureUnitLocation, 0);  //这里的数字是设备纹理单元的编号，0 对应的是GL_TEXTURE0
 
-        gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix;
+        gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix; //投影x视图x模型矩阵
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
 //        file:///storage/emulated/0/
         Source::Source* source = new Source::Source("http://t3.tianditu.com/DataServer?T=img_c&x={x}&y={y}&l={z}");
@@ -392,7 +463,7 @@ namespace OpenEarth {
         tileManager->draw(env,aPositionLocation,aTextureLocation,source,aAssetManager);
         testDrawLine();
 
-        
+
     }
 
 

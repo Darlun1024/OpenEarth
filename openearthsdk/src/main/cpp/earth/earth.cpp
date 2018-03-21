@@ -85,6 +85,11 @@ namespace OpenEarth {
         return earth_zoom;
     }
 
+    /**
+     * 设置缩放级别
+     * @param scale
+     * @return
+     */
     bool OpenEarth::Earth::setScale(float scale) {
         assert(scale>0.0f);
         float newScale = earth_scale * scale;
