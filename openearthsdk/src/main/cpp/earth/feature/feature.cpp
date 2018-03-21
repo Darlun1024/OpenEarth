@@ -13,5 +13,13 @@ namespace  OpenEarth{
         Feature::~Feature(){
 
         }
+
+        void Feature::setAttribute(string key, string value) {
+
+        }
+
+        void Feature::setGeometry(shared_ptr<Geometry::Geometry> geo) {
+            mGeometry = std::move(geo);
+        }
     }
 }

@@ -18,15 +18,16 @@ namespace OpenEarth{
 
         class Feature{
         protected:
-            unique_ptr<Geometry::Geometry> mGeometry;
-            unique_ptr<unordered_map<string,string>> mAttributes;
+            shared_ptr<Geometry::Geometry> mGeometry;
+            shared_ptr<unordered_map<string,string>> mAttributes;
 //            weak_ptr<VectorLayer> mLayer;
         public:
             Feature();
             ~Feature();
-            void draw(JNIEnv* jniEnv);
-            void setGeometry(unique_ptr<Geometry::Geometry> geo);
             void setAttribute(string key,string value);
+
+            void setGeometry(shared_ptr<Geometry::Geometry> geo);
+
 
         };
     }

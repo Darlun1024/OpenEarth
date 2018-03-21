@@ -7,14 +7,20 @@
 
 #include "layer.hpp"
 #include "../feature/feature.hpp"
+#include <list>
+
 
 namespace OpenEarth{
     namespace Layers{
+        using namespace std;
         class VectorLayer:Layer {
+        protected:
+            shared_ptr<list<const Features::Feature*>> mFeatures;
         public:
             VectorLayer(const std::string &layerId,const std::string &name, const std::string &sourceId);
             void addFeature(const OpenEarth::Features::Feature *feature);
-            void draw();
+            virtual void draw();
+            void removeFeature(const OpenEarth::Features::Feature *feature);
         };
     }
 }

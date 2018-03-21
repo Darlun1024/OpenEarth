@@ -3,3 +3,11 @@
 //
 
 #include "line_feature.hpp"
+
+namespace OpenEarth {
+    namespace Features {
+        void LineFeature::draw(int aColorLocation, int aPosotionLocation) {
+
+        }
+    }
+}

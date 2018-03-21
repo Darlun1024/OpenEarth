@@ -6,17 +6,23 @@
 
 namespace OpenEarth {
     namespace Layers {
+        using namespace Features;
         VectorLayer::VectorLayer(const std::string &layerId, const std::string &name,
                                  const std::string &sourceId)
                 : Layer(layerId, name, sourceId) {
-
+            mFeatures = make_shared<list<const Feature*>>();
         }
 
         void VectorLayer::draw() {
 
         }
 
-        void VectorLayer::addFeature(const OpenEarth::Features::Feature *feature) {
+        void VectorLayer::addFeature(const Feature* feature) {
+            mFeatures->push_back(feature);
+
+        }
+
+        void VectorLayer::removeFeature(const Feature* feature) {
 
         }
     }

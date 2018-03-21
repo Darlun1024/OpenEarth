@@ -13,7 +13,9 @@ namespace OpenEarth{
     namespace Features{
         class LineFeature:Feature {
         private:
+        protected:
 
+            void draw(int aColorLocation,int aPostionLocation);
 
         };
     }
