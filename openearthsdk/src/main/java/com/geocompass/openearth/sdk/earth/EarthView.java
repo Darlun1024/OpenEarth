@@ -40,8 +40,8 @@ public class EarthView extends FrameLayout implements View.OnGenericMotionListen
         setClickable(true);
         setLongClickable(true);
         setFocusable(true);
-        setFocusableInTouchMode(true);
-        requestDisallowInterceptTouchEvent(true);
+        setFocusableInTouchMode(true); //触碰时获取焦点
+        requestDisallowInterceptTouchEvent(true); //不允许parent拦截touch事件
     }
 
 

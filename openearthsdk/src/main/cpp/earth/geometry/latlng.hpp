@@ -9,20 +9,18 @@
 
 #include <cmath>
 
+        class LatLng {
 
-class LatLng {
+        public:
+            float lat;
+            float lon;
 
-public:
-    float lat;
-    float lon;
+            LatLng(float lat, float lon);
 
-    LatLng(float lat, float lon);
-    ~LatLng();
-    /** 标注化坐标 */
-    void normalize();
+            ~LatLng();
 
-
-};
-
+            /** 标注化坐标 */
+            void normalize();
+        };
 
 #endif //OPENEARTH_LATLNG_HPP

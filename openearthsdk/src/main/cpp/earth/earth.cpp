@@ -7,6 +7,7 @@
 #include "../util/util.hpp"
 #include <glm/ext.hpp>
 
+using namespace OpenEarth::Geometry;
 namespace OpenEarth {
     static float  const  DEFAULT_RADIUS = 1.0f;
     static float  const  DEFAULT_SCALE  = 1.0f;

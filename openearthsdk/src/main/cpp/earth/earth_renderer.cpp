@@ -458,11 +458,11 @@ namespace OpenEarth {
         gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix; //投影x视图x模型矩阵
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
 //        file:///storage/emulated/0/
+//        Source::Source* source = new Source::Source("http://web2.geo-compass.com/wmts/wmts?layer=dzdt_mkt&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/png&TileMatrix=17&TileCol=104023&TileRow=54198");
         Source::Source* source = new Source::Source("http://t3.tianditu.com/DataServer?T=img_c&x={x}&y={y}&l={z}");
 //        Source::Source* source = new Source::Source("mbtile://path=/storage/emulated/0/img_beijing.db&x={x}&y={y}&l={z}");
         tileManager->draw(env,aPositionLocation,aTextureLocation,source,aAssetManager);
         testDrawLine();
-
 
     }
 

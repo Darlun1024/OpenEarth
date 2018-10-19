@@ -10,7 +10,9 @@
 namespace OpenEarth {
     namespace Geometry {
         class Point:Geometry {
-
+        public:
+            double lat;
+            double lon;
         };
     }
 }

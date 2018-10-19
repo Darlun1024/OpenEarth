@@ -96,6 +96,7 @@ add_library( # Sets the name of the library.
               src/main/cpp/storage/mbtile_data_source.cpp;
 
               src/main/cpp/earth/opengl_project.cpp
+
               # geometry
               src/main/cpp/earth/geometry/Ray.cpp
               src/main/cpp/earth/geometry/geometry_util.cpp
@@ -105,6 +106,9 @@ add_library( # Sets the name of the library.
               src/main/cpp/earth/geometry/point.cpp
               src/main/cpp/earth/geometry/line.cpp
               src/main/cpp/earth/geometry/polygon.cpp
+
+              # geometry::turf
+              src/main/cpp/earth/geometry/turf/turf.cpp
 
               # style
               src/main/cpp/earth/style/style.cpp
