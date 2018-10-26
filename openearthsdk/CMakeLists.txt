@@ -109,7 +109,7 @@ add_library( # Sets the name of the library.
 
               # geometry::turf
               src/main/cpp/earth/geometry/turf/turf.cpp
-
+                src/main/cpp/earth/geometry/turf/envelope.cpp
               # style
               src/main/cpp/earth/style/style.cpp
               src/main/cpp/earth/style/line_style.cpp

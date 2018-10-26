@@ -7,6 +7,10 @@
 #include <boost/range/size_type.hpp>
 
 #define earth_radius  6371008.8
+
+#define MAX_COORDINATE_VALUE 1000000
+#define MIN_COORDINATE_VALUE -1000000
+
 using namespace OpenEarth::Geometry;
 
   double Turf::degreesToRadians(double degree){
@@ -73,5 +77,24 @@ double Turf::bearing(Point* start,Point* end){
     double a = sin(lon2 - lon1) * cos(lat2);
     double b = cos(lat1) * sin(lat2) -
             sin(lat1) * cos(lat2) * cos(lon2 - lon1);
-    return radiansToDegrees(Math.atan2(a, b));
+    return radiansToDegrees(atan2(a, b));
+}
+
+Envelope* Turf::envelope(std::vector<Point*>* points){
+    if(points == nullptr) {
+        return new Envelope(0,0,0,0);
+    }
+    double minLon = MAX_COORDINATE_VALUE;
+    double minLat = MAX_COORDINATE_VALUE;
+    double maxLon = MIN_COORDINATE_VALUE;
+    double maxLat = MIN_COORDINATE_VALUE;
+    u_long length = points->size();
+    for(u_long i = 0; i < length; i++){
+        Point* point = points->at(i);
+        minLon = fmin(minLon,point->lon);
+        minLat = fmin(minLat,point->lat);
+        maxLon = fmax(maxLon,point->lon);
+        maxLat = fmax(maxLat,point->lat);
+    }
+    return new Envelope(minLon,minLat,maxLon,maxLat);
 }

@@ -9,6 +9,7 @@
 
 #include "../point.hpp"
 #include "../latlng.hpp"
+#include "envelope.hpp"
 #import <vector>
 
 using namespace OpenEarth::Geometry;
@@ -26,8 +27,8 @@ namespace OpenEarth{
             static  double radiansToDegrees(double rad);
             /**计算方位角*/
             static  double bearing(Point* start,Point* end);
-
-            static double
+            /**最小包围矩形*/
+            static Envelope* envelope(std::vector<Point*>* points);
         };
     }
 }
