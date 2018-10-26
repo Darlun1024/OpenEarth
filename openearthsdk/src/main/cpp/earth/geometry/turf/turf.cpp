@@ -4,6 +4,8 @@
 
 #include "turf.hpp"
 #include <cmath>
+#include <boost/range/size_type.hpp>
+
 #define earth_radius  6371008.8
 using namespace OpenEarth::Geometry;
 
@@ -36,7 +38,7 @@ using namespace OpenEarth::Geometry;
  * @param from
  * @param to
  * */
-double Turf::distance(LatLng* from,LatLng* to){
+double Turf::distance(Point* from,Point* to){
     double dLat = degreesToRadians(to->lat - from->lat);
     double dLon = degreesToRadians(to->lon - from->lon);
     double lat1 = degreesToRadians(from->lat);
@@ -46,24 +48,30 @@ double Turf::distance(LatLng* from,LatLng* to){
     return rad * earth_radius;
 }
 
-//var ring = this;  // so we can work with a clone if needed
-//if(projection) {
-//var gg = new OpenLayers.Projection("EPSG:4326");
-//if(!gg.equals(projection)) {
-//ring = this.clone().transform(projection, gg);
-//}
-//}
-//var area = 0.0;
-//var len = ring.components && ring.components.length;
-//if(len > 2) {
-//var p1, p2;
-//for(var i=0; i<len-1; i++) {
-//p1 = ring.components[i];
-//p2 = ring.components[i+1];
-//area += OpenLayers.Util.rad(p2.x - p1.x) *
-//(2 + Math.sin(OpenLayers.Util.rad(p1.y)) +
-//Math.sin(OpenLayers.Util.rad(p2.y)));
-//}
-//area = area * 6378137.0 * 6378137.0 / 2.0;
-//}
-//return area;
+/**
+ * 算法来自OpenLayers
+ * */
+double Turf::area(std::vector<Point*>* points){
+    if(points == nullptr)return 0.0;
+    if(points->size() < 3) return  0.0;
+    double area = 0.0;
+    unsigned long length = points->size();
+    for(unsigned long i = 0; i < length-1; i++){
+        Point* point1 = points->at(i);
+        Point* point2 = points->at(i+1);
+        area += degreesToRadians(point2->lon - point1->lon) * (2 + sin(degreesToRadians(point1->lat))+sin(degreesToRadians(point2->lat)));
+    }
+    area = area * earth_radius * earth_radius / 2.0;
+    return area;
+}
+
+double Turf::bearing(Point* start,Point* end){
+    double lon1 = degreesToRadians(start->lon);
+    double lon2 = degreesToRadians(end->lon);
+    double lat1 = degreesToRadians(start->lat);
+    double lat2 = degreesToRadians(end->lat);
+    double a = sin(lon2 - lon1) * cos(lat2);
+    double b = cos(lat1) * sin(lat2) -
+            sin(lat1) * cos(lat2) * cos(lon2 - lon1);
+    return radiansToDegrees(Math.atan2(a, b));
+}
