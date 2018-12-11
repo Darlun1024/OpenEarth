@@ -127,15 +127,15 @@ namespace OpenEarth {
     //可见的地球的坐标范围
     OpenEarth::Geometry::Bounds getViewMapBounds() {
         //考虑到旋转的情况，四个角的坐标都要求
-        glm::vec2 nw = gTransform->screenPointToLatlng(glm::vec2(0, 0));
-        glm::vec2 se = gTransform->screenPointToLatlng(screenSize);
-        glm::vec2 ne = gTransform->screenPointToLatlng(glm::vec2(screenSize[0], 0));
-        glm::vec2 sw = gTransform->screenPointToLatlng(glm::vec2(0, screenSize[1]));
+        LatLng* nw = gTransform->screenPointToLatlng(glm::vec2(0, 0));
+        LatLng* se = gTransform->screenPointToLatlng(screenSize);
+        LatLng* ne = gTransform->screenPointToLatlng(glm::vec2(screenSize[0], 0));
+        LatLng* sw = gTransform->screenPointToLatlng(glm::vec2(0, screenSize[1]));
         using namespace std;
-        double left = fmax(fmin(fmin(fmin(nw[1], se[1]), ne[1]), sw[1]), -180);
-        double right = fmin(fmax(fmax(fmax(nw[1], se[1]), ne[1]), sw[1]), 180);
-        double bottom = fmax(fmin(fmin(fmin(nw[0], se[0]), ne[0]), sw[0]), -90);
-        double top = fmin(fmax(fmax(fmax(nw[0], se[0]), ne[0]), sw[0]), 90);
+        double left = fmax(fmin(fmin(fmin(nw->lon, se->lon), ne->lon), sw->lon), -180);
+        double right = fmin(fmax(fmax(fmax(nw->lon, se->lon), ne->lon), sw->lon), 180);
+        double bottom = fmax(fmin(fmin(fmin(nw->lat, se->lat), ne->lat), sw->lat), -90);
+        double top = fmin(fmax(fmax(fmax(nw->lat, se->lat), ne->lat), sw->lat), 90);
         if(left > 180 ) left = -180;
         if(bottom > 90) bottom = -90;
         return OpenEarth::Geometry::Bounds(left,bottom,right,top);
@@ -167,12 +167,12 @@ namespace OpenEarth {
         jboolean isCopy = true;
         jfloat *array1 = env->GetFloatArrayElements(screenPoint1, &isCopy);
         jfloat *array2 = env->GetFloatArrayElements(screenPoint2, &isCopy);
-        glm::vec2 latlng1 = gTransform->screenPointToLatlng(glm::vec2(array1[0], array1[1]));
-        glm::vec2 latlng2 = gTransform->screenPointToLatlng(glm::vec2(array2[0], array2[1]));
+        LatLng* latlng1 = gTransform->screenPointToLatlng(glm::vec2(array1[0], array1[1]));
+        LatLng* latlng2 = gTransform->screenPointToLatlng(glm::vec2(array2[0], array2[1]));
         if (!gTransform->isValidLatlng(latlng1) || !gTransform->isValidLatlng(latlng2))
             return;
-        float deltaLat = latlng2[0] - latlng1[0];
-        float deltaLon = latlng2[1] - latlng1[1];
+        double deltaLat = latlng2->lat - latlng1->lat;
+        double deltaLon = latlng2->lon - latlng1->lon;
         if (deltaLat * (array2[1] - array1[1]) > 0) deltaLat = -deltaLat;  //在两级附近
         //TODO 处理子午线上的情况
         OpenEarth::Earth::rotate(deltaLat, deltaLon);
@@ -208,7 +208,7 @@ namespace OpenEarth {
      */
     jfloatArray getCenter(JNIEnv *env, jobject instance) {
         LatLng *latLng = OpenEarth::Earth::getCenterLatLng();
-        float array1[] = {latLng->lat, latLng->lon};
+        float array1[] = {(float)latLng->lat, (float)latLng->lon};
         jfloatArray floatArray = env->NewFloatArray(2);
         env->SetFloatArrayRegion(floatArray, 0, 2, array1);
         latLng = nullptr;
@@ -340,8 +340,8 @@ namespace OpenEarth {
     jfloatArray screen2LatLng(JNIEnv *env, jobject instance, jfloatArray point) {
         jboolean isCopy = true;
         jfloat *array = env->GetFloatArrayElements(point, &isCopy);
-        glm::vec2 latlng = gTransform->screenPointToLatlng(glm::vec2(array[0], array[1]));
-        jfloat array1[2] = {latlng[0], latlng[1]};
+        LatLng*  latlng = gTransform->screenPointToLatlng(glm::vec2(array[0], array[1]));
+        jfloat array1[2] = {(float)latlng->lat, (float)latlng->lon};
         jfloatArray floatArray = env->NewFloatArray(3);
         env->SetFloatArrayRegion(floatArray, 0, 2, array1);
         return floatArray;
@@ -424,16 +424,16 @@ namespace OpenEarth {
         glm::vec3 p1 = gTransform->latLngToWorld(latLng1);
         glm::vec3 p2 = gTransform->latLngToWorld(latLng2);
         glm::vec3 p3 = gTransform->latLngToWorld(latLng3);
-        float points[] = {p1.x,p1.y,p1.z+0.001f,p2.x,p2.y,p2.z+0.001f,p3.x,p3.y,p3.z+0.001f};
+        float points[] = {p1.x,p1.y,p1.z,p2.x,p2.y,p2.z,p3.x,p3.y,p3.z};
         glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
                               points);
         glEnableVertexAttribArray(aPositionLocation);
         glDrawArrays(GL_LINE_STRIP,0,3);
-        float points1[] = {0,-1,1+0.001,0,0,1+0.001,0,1,1+0.001};
-        glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
-                              points1);
-        glEnableVertexAttribArray(aPositionLocation);
-        glDrawArrays(GL_LINE_STRIP,0,3);
+//        float points1[] = {0,-1,1+0.001,0,0,1+0.001,0,1,1+0.001};
+//        glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
+//                              points1);
+//        glEnableVertexAttribArray(aPositionLocation);
+//        glDrawArrays(GL_LINE_STRIP,0,3);
     }
 
     void render(JNIEnv *env, jobject instance) {

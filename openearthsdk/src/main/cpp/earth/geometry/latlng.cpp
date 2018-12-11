@@ -4,7 +4,7 @@
 
 #include "latlng.hpp"
 
-LatLng::LatLng(float lat, float lon) {
+LatLng::LatLng(double lat, double lon) {
     this->lat = lat;
     this->lon = lon;
 }

@@ -12,10 +12,10 @@
         class LatLng {
 
         public:
-            float lat;
-            float lon;
+            double lat;
+            double lon;
 
-            LatLng(float lat, float lon);
+            LatLng(double lat, double lon);
 
             ~LatLng();
 

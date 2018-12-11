@@ -32,18 +32,18 @@ namespace OpenEarth {
              glm::vec2 latLngToScreenPoint(LatLng* latLng);
 
             //屏幕坐标转地图坐标
-            glm::vec2 screenPointToLatlng(glm::vec2 point);
+            LatLng*  screenPointToLatlng(glm::vec2 point);
             //屏幕坐标转到球面上的世界坐标
             glm::vec3 screenPointToWorld(glm::vec2 point);
             //球面上的世界坐标转为经纬度
-            glm::vec2 worldToLatlng(glm::vec3 world);
+            LatLng* worldToLatlng(glm::vec3 world);
             //经纬度转世界坐标
             glm::vec3 latLngToWorld(LatLng* latLng);
 
             float distanceBetween(Ray* ray,glm::vec3 point);
 
             static bool isValidWorldCoordinate(glm::vec3 world);
-            static bool isValidLatlng(glm::vec2 latlng);
+            static bool isValidLatlng(LatLng* latlng);
 
 
 

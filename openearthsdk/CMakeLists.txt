@@ -107,9 +107,11 @@ add_library( # Sets the name of the library.
               src/main/cpp/earth/geometry/line.cpp
               src/main/cpp/earth/geometry/polygon.cpp
 
-              # geometry::turf
-              src/main/cpp/earth/geometry/turf/turf.cpp
-                src/main/cpp/earth/geometry/turf/envelope.cpp
+              # geometry::util
+              src/main/cpp/earth/geometry/util/math_util.cpp
+              src/main/cpp/earth/geometry/util/sphere_util.cpp
+              src/main/cpp/earth/geometry/util/envelope.cpp
+
               # style
               src/main/cpp/earth/style/style.cpp
               src/main/cpp/earth/style/line_style.cpp
