@@ -73,22 +73,20 @@ glm::vec2 OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
 
          glm::vec3 p1 = vectStartToFoootPoint + dist/rayLength * ray->mVector; //远交点
          glm::vec3 p0 = vectStartToFoootPoint - dist/rayLength * ray->mVector; //近交点
-         //反转模型矩阵，求出原始的球体坐标0是较近的一点
+         //反转模型矩阵，求出原始的球体较近的一点
          glm::vec4 pFar  = mInverseModelMatrix * glm::vec4(p1,1.0f);
          glm::vec4 pNear = mInverseModelMatrix * glm::vec4(p0,1.0f);
          //转为经纬度
-         float lat    = asinf(pNear[1]/r); //lat [-pi/2, pi/2]
+         float lat    = asin(pNear[1]/r); //lat [-pi/2, pi/2]  为什么是r不是R呢，因为上一步已经把碰撞点逆转换为原始的坐标了
          float cosLat = r*cos(lat);     //cos(lat)>=0;
          float lon    = asin(pNear[0]/cosLat); //lon
          if(lon >= 0){
              if(pNear[2] < 0) lon = M_PI - lon;
          }else if(lon < 0){
-             if(pNear[2] < 0) lon = M_PI - lon;
-             if(pNear[2] > 0) lon = M_PI*2 + lon;
+             if(pNear[2] < 0) lon = -M_PI - lon;
          }
          float latD = 180 * lat/M_PI;
          float lonD = 180 * lon/M_PI;
-                lonD -= 180;
          return glm::vec2(latD,lonD);
      }
 
@@ -154,6 +152,16 @@ glm::vec2 OpenEarth::Transform::worldToLatlng(glm::vec3 world){
     float lonD = 180 * lon/M_PI;
     if(lonD > 180) lonD -= 180;
     return glm::vec2(latD,lonD);
+}
+
+glm::vec3 OpenEarth::Transform::latLngToWorld(LatLng* latLng){
+    float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale();
+    double latR = latLng->lat * M_PI / 180.0;
+    double lonR = latLng->lon * M_PI / 180.0;
+    double x = R * cos(latR) * sin(lonR);
+    double y = R * sin(latR);
+    double z = R * cos(latR)*cos(lonR);
+    return glm::vec3(x,y,z);
 }
 
 bool OpenEarth::Transform::isValidWorldCoordinate(glm::vec3 world){

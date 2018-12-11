@@ -37,7 +37,7 @@ namespace OpenEarth {
         model_matrix = glm::translate(model_matrix, glm::vec3(0, 0, -earth_radius * earth_scale - 1));
         model_matrix = glm::scale(model_matrix,glm::vec3(earth_scale,earth_scale,earth_scale));
         float earthRotateX =   center_latlng->lat * M_PI/180;  //anit-clockwise +
-        float earthRotateY =   -(center_latlng->lon+180) * M_PI/180;
+        float earthRotateY =   -center_latlng->lon * M_PI/180; //，
         model_matrix = glm::rotate(model_matrix,earthRotateX,glm::vec3(1,0,0));
         model_matrix = glm::rotate(model_matrix,earthRotateY,glm::vec3(0,1,0));
     }

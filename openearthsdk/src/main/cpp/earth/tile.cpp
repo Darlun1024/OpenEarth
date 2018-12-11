@@ -23,7 +23,7 @@ OpenEarth::Tile::Tile(uint32_t x, uint32_t y, uint32_t z) {
     this->z = z;
 
     double degreeOfEachTile = 360 / pow(2, z);
-    double left = x * degreeOfEachTile;
+    double left = -180+x * degreeOfEachTile;
     double right = left + degreeOfEachTile;
     double top = 90 - (y * degreeOfEachTile);
     double bottom = top - degreeOfEachTile;
@@ -75,18 +75,22 @@ static float dtor(float d) {
 }
 
 /**
- *用绘制球体的方法，绘制瓦片是不行的，在右边界的点会左边界的点连接起来
+ *  使用中心点+四个角点的方法，在边界上会有空隙
+ *  使用三角形条带绘制
+ *     (1)       (3)     (5)
+ *       ︳    /  ︳    /  ︳
+ *       ︳  /    ︳  /    ︳
+ *       ︳/      ︳/      ︳
+ *     (2)       (4)      (6)
  */
 void OpenEarth::Tile::genVertexArray() {
     float R = OpenEarth::Earth::getRadius();
-    float width  = bounds[2] - bounds[0];
-    float height = bounds[1] - bounds[3];
+    double width  = bounds[2] - bounds[0];
+    double height = bounds[1] - bounds[3];
 
     if(std::fmod(width,step)>0){
        step = width / 4;
     }
-
-
     rows = height / step;
     cols = width / step + 1;
 

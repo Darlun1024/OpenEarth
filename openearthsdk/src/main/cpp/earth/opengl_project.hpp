@@ -19,7 +19,7 @@ namespace OpenEarth {
         glm::mat4 mViewMatrix;
         glm::mat4 mProjectMatrix;
         glm::mat4 mVPMatrix;
-        glm::mat4 mInserseVPMatrix;
+        glm::mat4 mInverseVPMatrix;
         glm::vec4 mViewPort;
     public:
         OpenGLProject(glm::mat4 viewMat,glm::mat4 projMat,glm::vec2 screenSize);

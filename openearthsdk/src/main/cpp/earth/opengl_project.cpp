@@ -12,8 +12,7 @@ OpenEarth::OpenGLProject::OpenGLProject(glm::mat4 viewMat, glm::mat4 projMat,
     this->mProjectMatrix   = projMat;
     this->mScreenSize      = screenSize;
     this->mVPMatrix        = mProjectMatrix * mViewMatrix;
-    this->mInserseVPMatrix = glm::inverse(mVPMatrix);
-    this->mScreenSize      = screenSize;
+    this->mInverseVPMatrix = glm::inverse(mVPMatrix);
     this->mViewPort        = glm::vec4(0, 0, screenSize);
 }
 
@@ -26,13 +25,13 @@ void OpenEarth::OpenGLProject::setScreenSize(glm::vec2 size) {
 void OpenEarth::OpenGLProject::setProjectMatrix(glm::mat4 projMat){
     this->mProjectMatrix = projMat;
     this->mVPMatrix        = mProjectMatrix * mViewMatrix;
-    this->mInserseVPMatrix = glm::inverse(mVPMatrix);
+    this->mInverseVPMatrix = glm::inverse(mVPMatrix);
 }
 
 void OpenEarth::OpenGLProject::setViewMatrix(glm::mat4 viewMat){
     this->mViewMatrix      = viewMat;
     this->mVPMatrix        = mProjectMatrix * mViewMatrix;
-    this->mInserseVPMatrix = glm::inverse(mVPMatrix);
+    this->mInverseVPMatrix = glm::inverse(mVPMatrix);
 }
 
 glm::vec2 OpenEarth::OpenGLProject::getScreenSize() {

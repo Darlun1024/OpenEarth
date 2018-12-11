@@ -178,6 +178,11 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
         nativeSetCenter(latlng);
         glSurfaceView.requestRender();
     }
+    
+    protected float[] getCenter(){
+        return  nativeGetCenter();
+        
+    }
 
 
     public AssetManager getAssetManager(){
@@ -200,6 +205,7 @@ public class EarthRenderer implements GLSurfaceView.Renderer  {
     private native void  nativeZoomOut();
     private native int   nativeGetZoom();
     private native void  nativeSetCenter(float[] latlng);
+    private native float[]  nativeGetCenter();
     private native void  nativeInitialize();
     private native float[] nativeScreen2World(float[] point);
     private native float[] nativeWorld2Screen(float[] point);

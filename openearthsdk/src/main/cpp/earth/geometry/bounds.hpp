@@ -10,11 +10,11 @@ namespace OpenEarth{
     namespace Geometry{
         class Bounds {
         public:
-            float  left;
-            float  right;
-            float  bottom;
-            float  top;
-            Bounds(float l, float b, float r, float t){
+            double  left;
+            double  right;
+            double  bottom;
+            double  top;
+            Bounds(double l, double b, double r, double t){
                 this->left   = l;
                 this->bottom = b;
                 this->right  = r;

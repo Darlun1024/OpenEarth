@@ -46,4 +46,13 @@
         android:layout_height="@dimen/btn_size"
         android:layout_below="@id/btn_look_down"
         android:text="中心" />
+
+    <Button
+        android:id="@+id/btn_coordinate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:text="坐标转换测试" />
 </RelativeLayout>

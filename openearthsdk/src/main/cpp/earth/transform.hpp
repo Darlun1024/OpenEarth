@@ -37,6 +37,8 @@ namespace OpenEarth {
             glm::vec3 screenPointToWorld(glm::vec2 point);
             //球面上的世界坐标转为经纬度
             glm::vec2 worldToLatlng(glm::vec3 world);
+            //经纬度转世界坐标
+            glm::vec3 latLngToWorld(LatLng* latLng);
 
             float distanceBetween(Ray* ray,glm::vec3 point);
 

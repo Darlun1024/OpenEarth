@@ -26,6 +26,7 @@
 #include "source/source.hpp"
 #include "../shaders/line_shader.hpp"
 #include "../shaders/light_raster_shader.hpp"
+#include "../logging.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
 
@@ -131,10 +132,10 @@ namespace OpenEarth {
         glm::vec2 ne = gTransform->screenPointToLatlng(glm::vec2(screenSize[0], 0));
         glm::vec2 sw = gTransform->screenPointToLatlng(glm::vec2(0, screenSize[1]));
         using namespace std;
-        float left = fmax(fmin(fmin(fmin(nw[1], se[1]), ne[1]), sw[1]), -180);
-        float right = fmin(fmax(fmax(fmax(nw[1], se[1]), ne[1]), sw[1]), 180);
-        float bottom = fmax(fmin(fmin(fmin(nw[0], se[0]), ne[0]), sw[0]), -90);
-        float top = fmin(fmax(fmax(fmax(nw[0], se[0]), ne[0]), sw[0]), 90);
+        double left = fmax(fmin(fmin(fmin(nw[1], se[1]), ne[1]), sw[1]), -180);
+        double right = fmin(fmax(fmax(fmax(nw[1], se[1]), ne[1]), sw[1]), 180);
+        double bottom = fmax(fmin(fmin(fmin(nw[0], se[0]), ne[0]), sw[0]), -90);
+        double top = fmin(fmax(fmax(fmax(nw[0], se[0]), ne[0]), sw[0]), 90);
         if(left > 180 ) left = -180;
         if(bottom > 90) bottom = -90;
         return OpenEarth::Geometry::Bounds(left,bottom,right,top);
@@ -376,16 +377,15 @@ namespace OpenEarth {
         tile1 = new Tile(0, 0, 1);
         tile2 = new Tile(1, 0, 1);
 
-        //shader code
+        //shader code 瓦片渲染程序
         const char *shader_vertex = OpenEarth::Shaders::RasterShader::veterxShader;
         const char *shader_fragment = OpenEarth::Shaders::RasterShader::fragmentShader;
         d_glprogram = OpenEarth::Programs::Program::createProgram(shader_vertex, shader_fragment);
 
-        //line shader
+        //line shader  线渲染程序
         const char *line_shader_vertex = OpenEarth::Shaders::LineShader::veterxShader;
         const char *line_shader_fragment = OpenEarth::Shaders::LineShader::fragmentShader;
         line_program = OpenEarth::Programs::Program::createProgram(line_shader_vertex, line_shader_fragment);
-
 
     }
 
@@ -418,11 +418,22 @@ namespace OpenEarth {
         glm::vec4 color = glm::vec4(0.0f,1.0f,1.0f,0.6f);
 
         glUniform4fv(colorPosition,1,glm::value_ptr(color));
-        float points[] = {0.0f,0.0f,-2.0f,1.0f,1.0f,-2.0f};
+        LatLng* latLng1 = new LatLng(0,-180);
+        LatLng* latLng2 = new LatLng(10,-180);
+        LatLng* latLng3 = new LatLng(20,-180);
+        glm::vec3 p1 = gTransform->latLngToWorld(latLng1);
+        glm::vec3 p2 = gTransform->latLngToWorld(latLng2);
+        glm::vec3 p3 = gTransform->latLngToWorld(latLng3);
+        float points[] = {p1.x,p1.y,p1.z+0.001f,p2.x,p2.y,p2.z+0.001f,p3.x,p3.y,p3.z+0.001f};
         glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
                               points);
         glEnableVertexAttribArray(aPositionLocation);
-        glDrawArrays(GL_LINE_STRIP,0,2);
+        glDrawArrays(GL_LINE_STRIP,0,3);
+        float points1[] = {0,-1,1+0.001,0,0,1+0.001,0,1,1+0.001};
+        glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
+                              points1);
+        glEnableVertexAttribArray(aPositionLocation);
+        glDrawArrays(GL_LINE_STRIP,0,3);
     }
 
     void render(JNIEnv *env, jobject instance) {
@@ -441,7 +452,6 @@ namespace OpenEarth {
         aTextureLocation     = glGetAttribLocation(d_glprogram, "a_TextureCoordinates");
         uTextureUnitLocation = glGetUniformLocation(d_glprogram, "u_TextureUnit");
         uProjectionLocation  = glGetUniformLocation(d_glprogram, "u_MVPMatrix");
-
         //试验漫反射光照
 //        uLightPosition       = glGetUniformLocation(d_glprogram,"u_LightPos");
 //        uMvMatrixLocation    = glGetUniformLocation(d_glprogram,"u_MVMatrix");
@@ -485,6 +495,7 @@ namespace OpenEarth {
             {"nativeZoomOut",          "()V",     (void *) zoomOut},
             {"nativeGetZoom",          "()I",     (jint *) getZoom},
             {"nativeSetCenter",        "([F)V",   (void *) setCenter},
+            {"nativeGetCenter",        "()[F",    (jfloatArray *) getCenter},
             {"nativeScreen2World",     "([F)[F",  (jfloatArray *) screen2World},
             {"nativeWorld2Screen",     "([F)[F",  (jfloatArray *) world2Screen},
             {"nativeLatLng2Screen",    "([F)[F",  (jfloatArray *) latLng2Screen},

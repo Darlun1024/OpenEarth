@@ -64,6 +64,11 @@ public class Earth {
     public void setCenter(LatLng latLng){
         this.mEarthRenderer.setCenter(new float[]{latLng.lat,latLng.lon});
     }
+    
+    public LatLng getCenter(){
+        float[] point = mEarthRenderer.getCenter();
+        return new LatLng(point[0],point[1]);
+    }
 
     public void scale(float scale){
         this.mEarthRenderer.setScale(scale);
@@ -92,10 +97,5 @@ public class Earth {
         return  mGestureDetector.onTouchEvent(event);
     }
 
-    public  native void nativeSetMinZoom(int minZoom);
-    public  native void nativeSetMaxZoom(int maxZoom);
-    public  native void nativeSetZoom(int maxZoom,boolean animated);
-    public  native void nativeSetScale(float scale,boolean animated);
-    public  native void nativeSetTilt(float tilt,boolean animated);
-    public  native void nativeRotate(float[] point1,float[] point2,boolean animated);
+ 
 }
