@@ -27,7 +27,7 @@ double SphereUtil::radiansToDegrees(double rad) {
  * @param from
  * @param to
  * */
-double SphereUtil::distance(LatLng *from, LatLng *to) {
+double SphereUtil::distance(const LatLng &from,const LatLng &to) {
     //先计算两点之间的大圆夹角
     double rad = computeAngleBetween(from,to);
     return rad * earth_radius;
@@ -61,20 +61,20 @@ double SphereUtil::polarTriangleArea(double tan1, double lng1, double tan2, doub
     return 2 * atan2(t * sin(deltaLng), 1 + t * cos(deltaLng));
 }
 
-double SphereUtil::bearing(LatLng *start, LatLng *end) {
-    double lon1 = degreesToRadians(start->lon);
-    double lon2 = degreesToRadians(end->lon);
-    double lat1 = degreesToRadians(start->lat);
-    double lat2 = degreesToRadians(end->lat);
+double SphereUtil::bearing(const LatLng &start,const  LatLng &end) {
+    double lon1 = degreesToRadians(start.lon);
+    double lon2 = degreesToRadians(end.lon);
+    double lat1 = degreesToRadians(start.lat);
+    double lat2 = degreesToRadians(end.lat);
     double a = sin(lon2 - lon1) * cos(lat2);
     double b = cos(lat1) * sin(lat2) -
                sin(lat1) * cos(lat2) * cos(lon2 - lon1);
     return radiansToDegrees(atan2(a, b));
 }
 
-Envelope *SphereUtil::envelope(std::vector<LatLng *> *points) {
+Envelope  SphereUtil::envelope(std::vector<LatLng *> *points) {
     if (points == nullptr) {
-        return new Envelope(0, 0, 0, 0);
+        return  Envelope(0, 0, 0, 0);
     }
     double minLon = MAX_COORDINATE_VALUE;
     double minLat = MAX_COORDINATE_VALUE;
@@ -88,14 +88,14 @@ Envelope *SphereUtil::envelope(std::vector<LatLng *> *points) {
         maxLon = fmax(maxLon, point->lon);
         maxLat = fmax(maxLat, point->lat);
     }
-    return new Envelope(minLon, minLat, maxLon, maxLat);
+    return  Envelope(minLon, minLat, maxLon, maxLat);
 }
 
-LatLng *SphereUtil::interpolate(LatLng *from, LatLng *to, double fraction) {
-    double fromLat = degreesToRadians(from->lat);
-    double fromLng = degreesToRadians(from->lon);
-    double toLat = degreesToRadians(to->lat);
-    double toLng = degreesToRadians(to->lon);
+LatLng SphereUtil::interpolate(const LatLng &from, const LatLng &to, double fraction) {
+    double fromLat = degreesToRadians(from.lat);
+    double fromLng = degreesToRadians(from.lon);
+    double toLat = degreesToRadians(to.lat);
+    double toLng = degreesToRadians(to.lon);
     double cosFromLat = cos(fromLat);
     double cosToLat = cos(toLat);
 
@@ -103,9 +103,10 @@ LatLng *SphereUtil::interpolate(LatLng *from, LatLng *to, double fraction) {
     double angle = computeAngleBetween(from, to);
     double sinAngle = sin(angle);
     if (sinAngle < 1E-6) {
-        return new LatLng(
-                from->lat + fraction * (to->lat - from->lat),
-                from->lon + fraction * (to->lon - from->lon));
+         LatLng latlng =  LatLng(
+                from.lat + fraction * (to.lat - from.lat),
+                from.lon + fraction * (to.lon - from.lon));;
+        return latlng;
     }
     double a = sin((1 - fraction) * angle) / sinAngle;
     double b = sin(fraction * angle) / sinAngle;
@@ -118,12 +119,12 @@ LatLng *SphereUtil::interpolate(LatLng *from, LatLng *to, double fraction) {
     // Converts interpolated vector back to polar.
     double lat = atan2(z, sqrt(x * x + y * y));
     double lng = atan2(y, x);
-    return new LatLng(radiansToDegrees(lat), radiansToDegrees(lng));
+    return  LatLng(radiansToDegrees(lat), radiansToDegrees(lng));
 }
 
-double SphereUtil::computeAngleBetween(LatLng *from, LatLng *to) {
-    return distanceRadians(degreesToRadians(from->lat), degreesToRadians(from->lon),
-                           degreesToRadians(to->lat), degreesToRadians(to ->lon));
+double SphereUtil::computeAngleBetween(const LatLng &from, const LatLng &to) {
+    return distanceRadians(degreesToRadians(from.lat), degreesToRadians(from.lon),
+                           degreesToRadians(to.lat), degreesToRadians(to.lon));
 }
 
 double SphereUtil::distanceRadians(double lat1, double lng1, double lat2, double lng2) {

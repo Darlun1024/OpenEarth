@@ -42,7 +42,6 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
      *
      * @see android.opengl.EGL14.EGL_CONFORMANT;
      */
-    @SuppressWarnings("JavadocReference")
     private static final int EGL_CONFORMANT = 0x3042;
 
     /**
@@ -50,7 +49,6 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
      *
      * @see android.opengl.EGL14.EGL_OPENGL_ES2_BIT;
      */
-    @SuppressWarnings("JavadocReference")
     private static final int EGL_OPENGL_ES2_BIT = 0x0004;
 
     @Override

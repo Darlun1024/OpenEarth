@@ -17,7 +17,7 @@ namespace OpenEarth{
         class SphereUtil {
         public:
             /**计算两点之间的距离*/
-            static  double distance(LatLng* from,LatLng* to);
+            static  double distance(const LatLng &from,const LatLng &to);
             /**计算给定点串构成的多边形的面积*/
             static  double area(std::vector<LatLng*>* points);
             /**角度转弧度*/
@@ -25,9 +25,9 @@ namespace OpenEarth{
             /**弧度转角度*/
             static  double radiansToDegrees(double rad);
             /**计算方位角*/
-            static  double bearing(LatLng* start,LatLng* end);
+            static  double bearing(const LatLng &start,const  LatLng &end);
             /**最小包围矩形*/
-            static Envelope* envelope(std::vector<LatLng*>* points);
+            static Envelope envelope(std::vector<LatLng*>* points);
 
             /***
              * 在两点之间的球面上做插值，
@@ -36,7 +36,7 @@ namespace OpenEarth{
              * @param fraction 系数
              * @return
              */
-            LatLng*  interpolate(LatLng* from,LatLng* to,double fraction);
+            LatLng  interpolate(const LatLng &from, const LatLng &to, double fraction);
 
             /***
              * 计算两点之间的大圆夹角
@@ -44,7 +44,7 @@ namespace OpenEarth{
              * @param to
              * @return
              */
-            static double computeAngleBetween(LatLng* from, LatLng* to);
+            static double computeAngleBetween(const LatLng &from, const LatLng &to);
 
         private:
             static double distanceRadians(double lat1, double lng1, double lat2, double lng2);

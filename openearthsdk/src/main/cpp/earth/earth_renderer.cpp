@@ -21,7 +21,6 @@
 #include "../shaders/raster_shader.hpp"
 #include "../programs/program.hpp"
 #include "../texture/texture.hpp"
-#include "TileManager.hpp"
 #include "tile_management.hpp"
 #include "source/source.hpp"
 #include "../shaders/line_shader.hpp"
@@ -402,7 +401,6 @@ namespace OpenEarth {
         const GLfloat far = 3.0f;
 //      mProjectionMatrix = glm::ortho(left, right, bottom, top, near, far); //正交投影
         gProjectionMatrix = glm::perspective(90.0f, ratio, near, far); //透视投影
-
         gProject->setProjectMatrix(gProjectionMatrix);
         gProject->setScreenSize(screenSize);
         gTransform->setProject(gProject);
