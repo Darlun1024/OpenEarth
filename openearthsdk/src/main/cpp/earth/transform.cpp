@@ -9,7 +9,7 @@
 
 using namespace OpenEarth::Geometry;
 
-float distanceBetween(Ray* ray,glm::vec3 point);
+static const double earth_radius = 6378000; //地球半径，单位米
 
 OpenEarth::Transform::Transform(glm::mat4 modelMatrix,std::shared_ptr<OpenEarth::OpenGLProject> glProject){
     this->mModelMatrix         = modelMatrix;
@@ -54,7 +54,7 @@ glm::vec2 OpenEarth::Transform::latLngToScreenPoint(LatLng* latLng){
  * @param point
  * @return
  */
-LatLng* OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
+LatLng OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
     Ray* ray = mProject->screen2Ray(point); //先构建一条射线
     glm::vec3 earthCenter = OpenEarth::Earth::getCenter(); //获取球心
     glm::vec4 center = mModelMatrix * glm::vec4(earthCenter,1.0f);//通过模型矩阵将球心转换为世界坐标 这样球心和射线就处于同一套坐标系中
@@ -62,7 +62,7 @@ LatLng* OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
     float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale(); //经过模型矩阵转换后地球的半径
     float r = OpenEarth::Earth::getRadius();
      if(R < distanceEarthCenterToRay){ //不相交
-         return new LatLng(MAXFLOAT,MAXFLOAT); //返回一个非法的坐标
+         return  LatLng(MAXFLOAT,MAXFLOAT); //返回一个非法的坐标
      }else{
          float dist = sqrt(R*R - distanceEarthCenterToRay*distanceEarthCenterToRay);//球心与射线构成的三角形的底边的一半长度
          float rayLength  = glm::length(ray->mVector); //求射线的长度
@@ -87,7 +87,7 @@ LatLng* OpenEarth::Transform::screenPointToLatlng(glm::vec2 point){
          }
          double latD = 180 * lat/M_PI;
          double lonD = 180 * lon/M_PI;
-         return new LatLng(latD,lonD);
+         return  LatLng(latD,lonD);
      }
 
 }
@@ -135,7 +135,7 @@ glm::vec3 OpenEarth::Transform::screenPointToWorld(glm::vec2 point){
     }
 }
 
-LatLng* OpenEarth::Transform::worldToLatlng(glm::vec3 world){
+LatLng OpenEarth::Transform::worldToLatlng(glm::vec3 world){
     float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale();
     glm::vec4 point  = mInverseModelMatrix * glm::vec4(world,1.0f);
     //转为经纬度
@@ -151,11 +151,22 @@ LatLng* OpenEarth::Transform::worldToLatlng(glm::vec3 world){
     double latD = 180 * lat/M_PI;
     double lonD = 180 * lon/M_PI;
     if(lonD > 180) lonD -= 180;
-    return new LatLng(latD,lonD);
+    return  LatLng(latD,lonD);
 }
 
 glm::vec3 OpenEarth::Transform::latLngToWorld(LatLng* latLng){
     float R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale();
+    double latR = latLng->lat * M_PI / 180.0;
+    double lonR = latLng->lon * M_PI / 180.0;
+    double x = R * cos(latR) * sin(lonR);
+    double y = R * sin(latR);
+    double z = R * cos(latR)*cos(lonR);
+    return glm::vec3(x,y,z);
+}
+
+glm::vec3 OpenEarth::Transform::latLngToWorld(LatLng* latLng, float height){
+    double R = OpenEarth::Earth::getRadius()*OpenEarth::Earth::getScale();
+    R =  (height + earth_radius) * R / earth_radius;
     double latR = latLng->lat * M_PI / 180.0;
     double lonR = latLng->lon * M_PI / 180.0;
     double x = R * cos(latR) * sin(lonR);

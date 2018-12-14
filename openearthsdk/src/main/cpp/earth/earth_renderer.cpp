@@ -25,6 +25,7 @@
 #include "source/source.hpp"
 #include "../shaders/line_shader.hpp"
 #include "../shaders/light_raster_shader.hpp"
+#include "geometry/util/sphere_util.hpp"
 #include "../logging.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
@@ -41,13 +42,13 @@ namespace OpenEarth {
     GLuint d_glprogram;
     GLuint line_program;
 
-    int aPositionLocation;
-    int aTextureLocation;
-    int uTextureUnitLocation;
-    int uProjectionLocation;
-    int uMvMatrixLocation;
-    int uLightPosition;
-    int aNormalPosition;
+    GLint aPositionLocation;
+    GLint aTextureLocation;
+    GLint uTextureUnitLocation;
+    GLint uProjectionLocation;
+    GLint uMvMatrixLocation;
+    GLint uLightPosition;
+    GLint aNormalPosition;
 
 
 
@@ -126,15 +127,15 @@ namespace OpenEarth {
     //可见的地球的坐标范围
     OpenEarth::Geometry::Bounds getViewMapBounds() {
         //考虑到旋转的情况，四个角的坐标都要求
-        LatLng* nw = gTransform->screenPointToLatlng(glm::vec2(0, 0));
-        LatLng* se = gTransform->screenPointToLatlng(screenSize);
-        LatLng* ne = gTransform->screenPointToLatlng(glm::vec2(screenSize[0], 0));
-        LatLng* sw = gTransform->screenPointToLatlng(glm::vec2(0, screenSize[1]));
+        LatLng nw = gTransform->screenPointToLatlng(glm::vec2(0, 0));
+        LatLng se = gTransform->screenPointToLatlng(screenSize);
+        LatLng ne = gTransform->screenPointToLatlng(glm::vec2(screenSize[0], 0));
+        LatLng sw = gTransform->screenPointToLatlng(glm::vec2(0, screenSize[1]));
         using namespace std;
-        double left = fmax(fmin(fmin(fmin(nw->lon, se->lon), ne->lon), sw->lon), -180);
-        double right = fmin(fmax(fmax(fmax(nw->lon, se->lon), ne->lon), sw->lon), 180);
-        double bottom = fmax(fmin(fmin(fmin(nw->lat, se->lat), ne->lat), sw->lat), -90);
-        double top = fmin(fmax(fmax(fmax(nw->lat, se->lat), ne->lat), sw->lat), 90);
+        double left = fmax(fmin(fmin(fmin(nw.lon, se.lon), ne.lon), sw.lon), -180);
+        double right = fmin(fmax(fmax(fmax(nw.lon, se.lon), ne.lon), sw.lon), 180);
+        double bottom = fmax(fmin(fmin(fmin(nw.lat, se.lat), ne.lat), sw.lat), -90);
+        double top = fmin(fmax(fmax(fmax(nw.lat, se.lat), ne.lat), sw.lat), 90);
         if(left > 180 ) left = -180;
         if(bottom > 90) bottom = -90;
         return OpenEarth::Geometry::Bounds(left,bottom,right,top);
@@ -166,12 +167,12 @@ namespace OpenEarth {
         jboolean isCopy = true;
         jfloat *array1 = env->GetFloatArrayElements(screenPoint1, &isCopy);
         jfloat *array2 = env->GetFloatArrayElements(screenPoint2, &isCopy);
-        LatLng* latlng1 = gTransform->screenPointToLatlng(glm::vec2(array1[0], array1[1]));
-        LatLng* latlng2 = gTransform->screenPointToLatlng(glm::vec2(array2[0], array2[1]));
-        if (!gTransform->isValidLatlng(latlng1) || !gTransform->isValidLatlng(latlng2))
+        LatLng latlng1 = gTransform->screenPointToLatlng(glm::vec2(array1[0], array1[1]));
+        LatLng latlng2 = gTransform->screenPointToLatlng(glm::vec2(array2[0], array2[1]));
+        if (!gTransform->isValidLatlng(&latlng1) || !gTransform->isValidLatlng(&latlng2))
             return;
-        double deltaLat = latlng2->lat - latlng1->lat;
-        double deltaLon = latlng2->lon - latlng1->lon;
+        double deltaLat = latlng2.lat - latlng1.lat;
+        double deltaLon = latlng2.lon - latlng1.lon;
         if (deltaLat * (array2[1] - array1[1]) > 0) deltaLat = -deltaLat;  //在两级附近
         //TODO 处理子午线上的情况
         OpenEarth::Earth::rotate(deltaLat, deltaLon);
@@ -339,8 +340,8 @@ namespace OpenEarth {
     jfloatArray screen2LatLng(JNIEnv *env, jobject instance, jfloatArray point) {
         jboolean isCopy = true;
         jfloat *array = env->GetFloatArrayElements(point, &isCopy);
-        LatLng*  latlng = gTransform->screenPointToLatlng(glm::vec2(array[0], array[1]));
-        jfloat array1[2] = {(float)latlng->lat, (float)latlng->lon};
+        LatLng  latlng = gTransform->screenPointToLatlng(glm::vec2(array[0], array[1]));
+        jfloat array1[2] = {(float)latlng.lat, (float)latlng.lon};
         jfloatArray floatArray = env->NewFloatArray(3);
         env->SetFloatArrayRegion(floatArray, 0, 2, array1);
         return floatArray;
@@ -416,17 +417,33 @@ namespace OpenEarth {
         glm::vec4 color = glm::vec4(0.0f,1.0f,1.0f,0.6f);
 
         glUniform4fv(colorPosition,1,glm::value_ptr(color));
-        LatLng* latLng1 = new LatLng(0,-180);
-        LatLng* latLng2 = new LatLng(10,-180);
-        LatLng* latLng3 = new LatLng(20,-180);
-        glm::vec3 p1 = gTransform->latLngToWorld(latLng1);
-        glm::vec3 p2 = gTransform->latLngToWorld(latLng2);
-        glm::vec3 p3 = gTransform->latLngToWorld(latLng3);
-        float points[] = {p1.x,p1.y,p1.z,p2.x,p2.y,p2.z,p3.x,p3.y,p3.z};
+        LatLng latLng1 =  LatLng(40,-180);
+        LatLng latLng3 =  LatLng(60,-180);
+        glm::vec3 p1 = gTransform->latLngToWorld(&latLng1,10);
+        glm::vec3 p3 = gTransform->latLngToWorld(&latLng3,10);
+        int count = 1000;
+        int arraySize = (count+1)*3;
+        double fraction = 0;
+        float* points = new float[arraySize];
+        points[0] = p1.x;
+        points[1] = p1.y;
+        points[2] = p1.z;
+        points[arraySize-3] = p3.x;
+        points[arraySize-2] = p3.y;
+        points[arraySize-1] = p3.z;
+        for(int i=1;i < count;i++){
+            fraction = i/count;
+            LatLng latLng = SphereUtil::interpolate(latLng1,latLng3,fraction);
+            glm::vec3 p = gTransform->latLngToWorld(&latLng,10);
+            points[i*3] = p.x;
+            points[i*3+1] = p.y;
+            points[i*3+2] = p.z;
+        }
+
         glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
                               points);
         glEnableVertexAttribArray(aPositionLocation);
-        glDrawArrays(GL_LINE_STRIP,0,3);
+        glDrawArrays(GL_LINE_STRIP,0,count+1);
 //        float points1[] = {0,-1,1+0.001,0,0,1+0.001,0,1,1+0.001};
 //        glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
 //                              points1);

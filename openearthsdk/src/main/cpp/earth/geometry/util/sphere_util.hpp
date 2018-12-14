@@ -36,7 +36,7 @@ namespace OpenEarth{
              * @param fraction 系数
              * @return
              */
-            LatLng  interpolate(const LatLng &from, const LatLng &to, double fraction);
+            static LatLng  interpolate(const LatLng &from, const LatLng &to, double fraction);
 
             /***
              * 计算两点之间的大圆夹角

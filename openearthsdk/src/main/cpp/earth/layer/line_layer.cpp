@@ -17,9 +17,7 @@ namespace OpenEarth {
 
         void LineLayer::draw(int aColorLocation,int aPositionLocation){
             int size = mFeatures->size();
-
             glm::vec4 color = glm::vec4(0.0f,1.0f,1.0f,0.6f);
-
             glUniform4fv(aColorLocation,1,glm::value_ptr(color));
             float points[] = {0.0f,0.0f,-2.0f,1.0f,1.0f,-2.0f};
             glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
