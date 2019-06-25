@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_look_down).setOnClickListener(this);
         findViewById(R.id.btn_set_center).setOnClickListener(this);
         findViewById(R.id.btn_coordinate).setOnClickListener(this);
+    
+        
     }
 
 

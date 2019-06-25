@@ -9,7 +9,7 @@
 
 namespace OpenEarth {
     namespace Geometry {
-        class Polygon:Geometry {
+        class Polygon:public Geometry {
 
         };
     }

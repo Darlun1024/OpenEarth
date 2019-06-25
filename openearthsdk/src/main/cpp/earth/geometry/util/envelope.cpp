@@ -2,7 +2,8 @@
 // Created by GXSN-Pro on 2018/10/26.
 //
 
-#include "Envelope.hpp"
+#include "envelope.hpp"
+
 using namespace OpenEarth::Geometry;
 Envelope::Envelope(double minx,double miny,double maxx,double maxy){
     this->maxX = maxx;

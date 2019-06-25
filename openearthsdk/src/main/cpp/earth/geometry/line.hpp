@@ -8,12 +8,25 @@
 #include <vector>
 #include "latlng.hpp"
 #include "geometry.hpp"
+#include <array>
 
 
 namespace OpenEarth {
     namespace Geometry {
-        class Line:Geometry {
-//            std::vector<LatLng>
+        class Line: public Geometry {
+        private:
+            LatLng *lineString;
+            long pointCount;
+            float * vertextAttribArrary;
+            void  generateVertexAttribArray();
+        public:
+            Line();
+            ~Line();
+            void setCoordinates(const LatLng* points,long count);
+            LatLng* getCoordinates() const ;
+            float* getVertexAttribArray(long *count) const ;
+            long getPointCount() const ;
+//            double[]
         };
     }
 }

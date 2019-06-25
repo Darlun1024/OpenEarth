@@ -31,6 +31,7 @@ public class HttpRequest implements Callback{
         mCallbackThread = new CallbackThread("call_back_thread");
     }
     public HttpRequest(long nativePtr,String url){
+        Log.e("HttpRequest","HttpRequest init");
         mNativePtr = nativePtr;
         Request.Builder builder = new Request.Builder();
         builder.url(url).method("GET",null);
@@ -46,6 +47,7 @@ public class HttpRequest implements Callback{
     @Override
     public void onFailure(Call call, IOException e) {
         Log.e("tag","failure");
+        Log.e("tag",e.getMessage());
 //        nativeOnFailure(call.request().url().toString(),e.getMessage());
     }
 

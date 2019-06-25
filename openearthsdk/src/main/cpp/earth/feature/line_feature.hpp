@@ -9,12 +9,17 @@
 #include "feature.hpp"
 #include "../geometry/line.hpp"
 
+using namespace OpenEarth::Geometry;
 namespace OpenEarth{
     namespace Features{
-        class LineFeature:Feature {
+        class LineFeature: public Feature {
         private:
-        protected:
-            void draw(int aColorLocation,int aPostionLocation);
+            Line *line;
+        public:
+            LineFeature();
+            ~LineFeature();
+            void setLine(Line* line);
+            Line* getLine() const;
         };
     }
 }

@@ -15,7 +15,7 @@ namespace OpenEarth{
         using namespace std;
         class VectorLayer:Layer {
         protected:
-            shared_ptr<list<const Features::Feature*>> mFeatures;
+            shared_ptr<list<const  Features::Feature*>> mFeatures;
         public:
             VectorLayer(const std::string &layerId,const std::string &name, const std::string &sourceId);
             void addFeature(const OpenEarth::Features::Feature *feature);

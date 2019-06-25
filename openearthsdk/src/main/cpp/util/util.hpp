@@ -2,8 +2,8 @@
 // Created by GXSN-Pro on 2017/11/14.
 //
 
-#ifndef OPENEARTH_JNI_HPP
-#define OPENEARTH_JNI_HPP
+#ifndef OPENEARTH_OPENEATH_UTIL_HPP
+#define OPENEARTH_OPENEATH_UTIL_HPP
 
 #include <string>
 
@@ -36,4 +36,4 @@ namespace OpenEarth{
 }
 
 
-#endif //OPENEARTH_JNI_HPP
+#endif //OPENEARTH_OPENEATH_UTIL_HPP

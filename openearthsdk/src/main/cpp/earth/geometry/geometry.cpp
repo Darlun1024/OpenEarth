@@ -3,3 +3,16 @@
 //
 
 #include "geometry.hpp"
+
+using namespace OpenEarth::Geometry;
+
+Geometry::Geometry(){
+
+}
+Geometry::~Geometry(){
+
+}
+
+Geometry::Geometry(Geometry& geo){
+
+}

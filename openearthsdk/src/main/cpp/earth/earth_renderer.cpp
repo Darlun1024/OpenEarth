@@ -26,7 +26,9 @@
 #include "../shaders/line_shader.hpp"
 #include "../shaders/light_raster_shader.hpp"
 #include "geometry/util/sphere_util.hpp"
-#include "../logging.hpp"
+#import "geometry/line.hpp"
+#import "feature/line_feature.hpp"
+#import "layer/line_layer.hpp"
 
 #define  DEFAULT_EYE_HEIGHT 1.0f
 
@@ -39,6 +41,7 @@ namespace OpenEarth {
     std::unique_ptr<OpenEarth::TileManagement> tileManager;
     Tile *tile1;
     Tile *tile2;
+    Layers::LineLayer* lineLayer;
     GLuint d_glprogram;
     GLuint line_program;
 
@@ -81,6 +84,10 @@ namespace OpenEarth {
     OpenEarth::EarthRenderer::~EarthRenderer() {
         if (sphere)
             sphere.reset();
+
+        if(lineLayer){
+            delete lineLayer;
+        }
 
         if (tile1) {
             delete tile1;
@@ -387,6 +394,23 @@ namespace OpenEarth {
         const char *line_shader_fragment = OpenEarth::Shaders::LineShader::fragmentShader;
         line_program = OpenEarth::Programs::Program::createProgram(line_shader_vertex, line_shader_fragment);
 
+
+        //初始化一条线
+        LatLng latLng1 =  LatLng(40,-180);
+        LatLng latLng3 =  LatLng(60,-180);
+        int count = 1001;
+        double fraction = 0;
+        LatLng *latLngArray = new LatLng[count+1];
+        for(int i=0; i <= count;i++){
+            fraction = i/count;
+            latLngArray[i] = SphereUtil::interpolate(latLng1,latLng3,fraction);
+        }
+        Line* line = new Line();
+        line->setCoordinates(latLngArray,count+1);
+        Features::LineFeature* lineFeature = new Features::LineFeature();
+        lineFeature->setLine(line);
+        lineLayer = new Layers::LineLayer("1","name","123");
+        lineLayer->addFeature(lineFeature);
     }
 
 
@@ -413,54 +437,27 @@ namespace OpenEarth {
         aPositionLocation    = glGetAttribLocation(line_program, "POSITION");
         uProjectionLocation  = glGetUniformLocation(line_program,"u_MVPMatrix");
         int  colorPosition   = glGetUniformLocation(line_program,"u_LineColor");
+
+        gMvpMatrix = gProjectionMatrix * gViewMatrix * gModelMatrix; //投影x视图x模型矩阵
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
         glm::vec4 color = glm::vec4(0.0f,1.0f,1.0f,0.6f);
 
         glUniform4fv(colorPosition,1,glm::value_ptr(color));
-        LatLng latLng1 =  LatLng(40,-180);
-        LatLng latLng3 =  LatLng(60,-180);
-        glm::vec3 p1 = gTransform->latLngToWorld(&latLng1,10);
-        glm::vec3 p3 = gTransform->latLngToWorld(&latLng3,10);
-        int count = 1000;
-        int arraySize = (count+1)*3;
-        double fraction = 0;
-        float* points = new float[arraySize];
-        points[0] = p1.x;
-        points[1] = p1.y;
-        points[2] = p1.z;
-        points[arraySize-3] = p3.x;
-        points[arraySize-2] = p3.y;
-        points[arraySize-1] = p3.z;
-        for(int i=1;i < count;i++){
-            fraction = i/count;
-            LatLng latLng = SphereUtil::interpolate(latLng1,latLng3,fraction);
-            glm::vec3 p = gTransform->latLngToWorld(&latLng,10);
-            points[i*3] = p.x;
-            points[i*3+1] = p.y;
-            points[i*3+2] = p.z;
-        }
 
-        glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
-                              points);
-        glEnableVertexAttribArray(aPositionLocation);
-        glDrawArrays(GL_LINE_STRIP,0,count+1);
-//        float points1[] = {0,-1,1+0.001,0,0,1+0.001,0,1,1+0.001};
-//        glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GL_FLOAT),
-//                              points1);
-//        glEnableVertexAttribArray(aPositionLocation);
-//        glDrawArrays(GL_LINE_STRIP,0,3);
+        lineLayer->draw(colorPosition,aPositionLocation);
     }
 
     void render(JNIEnv *env, jobject instance) {
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
         drawEarth(env);
         testDrawLine();
     }
 
     void drawEarth(JNIEnv *env) {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
+
         glUseProgram(d_glprogram);
 
         aPositionLocation    = glGetAttribLocation(d_glprogram, "POSITION");
@@ -484,10 +481,9 @@ namespace OpenEarth {
         glUniformMatrix4fv(uProjectionLocation, 1, GL_FALSE, glm::value_ptr(gMvpMatrix));
 //        file:///storage/emulated/0/
 //        Source::Source* source = new Source::Source("http://web2.geo-compass.com/wmts/wmts?layer=dzdt_mkt&style=default&tilematrixset=c&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/png&TileMatrix=17&TileCol=104023&TileRow=54198");
-        Source::Source* source = new Source::Source("http://t3.tianditu.com/DataServer?T=img_c&x={x}&y={y}&l={z}");
+        Source::Source* source = new Source::Source("http://t3.tianditu.com/DataServer?T=vec_c&x={x}&y={y}&l={z}&tk=aa2422af8a6993d1ecafe727352c397b");
 //        Source::Source* source = new Source::Source("mbtile://path=/storage/emulated/0/img_beijing.db&x={x}&y={y}&l={z}");
         tileManager->draw(env,aPositionLocation,aTextureLocation,source,aAssetManager);
-        testDrawLine();
 
     }
 

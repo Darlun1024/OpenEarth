@@ -13,22 +13,17 @@
 //class VectorLayer;
 namespace OpenEarth{
     namespace Features{
-
         using namespace std;
-
-        class Feature{
-        protected:
-            shared_ptr<Geometry::Geometry> mGeometry;
-            shared_ptr<unordered_map<string,string>> mAttributes;
-//            weak_ptr<VectorLayer> mLayer;
+         class Feature{
         public:
+//            shared_ptr<Geometry::Geometry> mGeometry;
+//            shared_ptr<unordered_map<string,string>> mAttributes;
+//            weak_ptr<VectorLayer> mLayer;
             Feature();
             ~Feature();
-            void setAttribute(string key,string value);
-
-            void setGeometry(shared_ptr<Geometry::Geometry> geo);
-
-
+//            shared_ptr<Geometry::Geometry> getGeometry() const ;
+//            void setAttribute(string key,string value);
+//            void setGeometry(Geometry::Geometry* geometry);
         };
     }
 }

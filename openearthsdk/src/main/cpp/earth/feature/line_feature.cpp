@@ -6,8 +6,22 @@
 
 namespace OpenEarth {
     namespace Features {
-        void LineFeature::draw(int aColorLocation, int aPosotionLocation) {
+        LineFeature::LineFeature(){
 
+        };
+
+        LineFeature::~LineFeature(){
+            if(this->line){
+                delete  this->line;
+            }
+        }
+
+        void LineFeature::setLine(Line* line){
+            this->line = line;
+        }
+
+        Line* LineFeature::getLine() const{
+            return  this->line;
         }
     }
 }

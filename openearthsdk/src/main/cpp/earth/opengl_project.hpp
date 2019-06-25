@@ -7,7 +7,7 @@
 
 #include <cstdint>
 #include <glm/vec2.hpp>
-#include <bits/unique_ptr.h>
+#include <memory>
 #include <glm/matrix.hpp>
 #include "geometry/ray.hpp"
 

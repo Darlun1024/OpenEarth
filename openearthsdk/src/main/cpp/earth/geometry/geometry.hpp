@@ -8,6 +8,10 @@
 namespace OpenEarth{
     namespace Geometry{
         class Geometry {
+        public:
+            Geometry();
+            Geometry(Geometry& geo);
+            ~Geometry();
 
         };
     }

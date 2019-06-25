@@ -10,6 +10,7 @@
 #include "Respone.hpp"
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
+#include <vector>
 
 namespace OpenEarth{
     namespace Storage{

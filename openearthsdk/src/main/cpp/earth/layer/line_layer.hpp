@@ -10,7 +10,7 @@
 
 namespace OpenEarth{
     namespace Layers{
-        class LineLayer:VectorLayer {
+        class LineLayer:public VectorLayer {
         private:
         public:
             LineLayer(const std::string &layerId, const std::string &name,

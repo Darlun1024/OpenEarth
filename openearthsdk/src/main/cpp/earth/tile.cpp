@@ -65,7 +65,6 @@ void OpenEarth::Tile::draw(GLuint aPostionLocaiton, GLuint aTextureLocation,GLui
 
         int pointCount = cols * 2;
         glDrawArrays(GL_TRIANGLE_STRIP, 0, pointCount);
-
     }
     glDeleteTextures(1, &textureId);
 }
@@ -77,11 +76,11 @@ static float dtor(float d) {
 /**
  *  使用中心点+四个角点的方法，在边界上会有空隙
  *  使用三角形条带绘制
- *     (1)       (3)     (5)
+ *      (1)      (3)      (5)
  *       ︳    /  ︳    /  ︳
  *       ︳  /    ︳  /    ︳
  *       ︳/      ︳/      ︳
- *     (2)       (4)      (6)
+ *      (2)       (4)     (6)
  */
 void OpenEarth::Tile::genVertexArray() {
     float R = OpenEarth::Earth::getRadius();

@@ -15,8 +15,10 @@
             double lat;
             double lon;
 
+            LatLng();
             LatLng(double lat, double lon);
-
+            LatLng(const LatLng& latlng);
+            LatLng &operator= (const LatLng &latlng);
             ~LatLng();
 
             /** 标注化坐标 */
